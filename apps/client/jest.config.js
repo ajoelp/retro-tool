@@ -6,6 +6,7 @@ module.exports = {
     '^.+\\.[tj]sx?$': 'babel-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
+  coverageReporters: ["text-summary", ["lcov", {"projectRoot": "../../"}]],
   coverageDirectory: '../../coverage/apps/client',
   coverageThreshold: {
     global: {

@@ -1,0 +1,27 @@
+name: Client
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+          cache: 'yarn'
+      - run: yarn install
+      - name: Check Format
+        run: yarn format:check client
+      - name: Check Lint
+        run: yarn lint client
+      - name: Test
+        run: yarn test client --codeCoverage --verbose
+      - name: Upload Coverage
+        uses: romeovs/lcov-reporter-action@v0.2.16
+        with:
+          lcov-file: ./coverage/apps/client/lcov.info
