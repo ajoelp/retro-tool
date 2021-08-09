@@ -21,7 +21,7 @@ jobs:
         run: yarn lint api
       - name: Test
         run: yarn test api --codeCoverage --verbose
-      - name: Upload Coverage
-        uses: romeovs/lcov-reporter-action@v0.2.16
+      - uses: codecov/codecov-action@v2
         with:
-          lcov-file: ./coverage/apps/api/lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: api
