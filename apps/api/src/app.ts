@@ -5,6 +5,7 @@ import cors from 'cors'
 const app = express();
 
 const applyMiddleware = (app: Express) => {
+  /* istanbul ignore if  */
   if (process.env.NODE_ENV !== "test") {
     app.use(cors());
   }
@@ -12,10 +13,6 @@ const applyMiddleware = (app: Express) => {
 };
 
 applyMiddleware(app);
-
-app.get("/", (req, res) => {
-  return res.json({ status: "ok" });
-});
 
 app.get("/boards", async (req, res) => {
   const boards = await prisma.board.findMany();
