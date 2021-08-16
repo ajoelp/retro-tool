@@ -1,0 +1,56 @@
+version: '3.4'
+services:
+  mysql:
+    image: "mariadb:latest"
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "password"
+      MYSQL_DATABASE: "database"
+      MYSQL_USER: "user"
+      MYSQL_PASSWORD: "password"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    volumes:
+      - "mysql_data:/var/lib/mysql"
+    networks:
+      - retro-tool
+
+  mysql_tests:
+    image: "mariadb:latest"
+    ports:
+      - "3308:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "password"
+      MYSQL_DATABASE: "database"
+      MYSQL_USER: "user"
+      MYSQL_PASSWORD: "password"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    volumes:
+      - "mysql_test_data:/var/lib/mysql"
+    networks:
+      - retro-tool
+
+  api:
+    build:
+      context: ./
+      target: dev
+      dockerfile: .docker/node/Dockerfile
+    container_name: 'retro-tool-api'
+    volumes:
+      - "./:/usr/src/app"
+    ports:
+      - ${APP_PORT:-3333}:3333
+      - ${DEBUG_PORT:-9229}:9229
+    stdin_open: true
+    depends_on:
+      - mysql
+    networks:
+      - retro-tool
+
+networks:
+  retro-tool:
+volumes:
+  mysql_data:
+    driver: local
+  mysql_test_data:
+    driver: local

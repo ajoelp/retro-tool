@@ -1,0 +1,10 @@
+.sqlite
+.env.example
+.git
+.vscode
+.idea
+dist
+Dockerfile*
+docker-compose.yml
+node_modules
+.dockerignore

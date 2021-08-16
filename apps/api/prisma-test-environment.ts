@@ -1,11 +1,22 @@
 import path from 'path'
-import fs from 'fs'
 import util from 'util'
 import NodeEnvironment from 'jest-environment-node'
-import {nanoid} from 'nanoid'
 import childProcess from 'child_process'
+import mysql, {Connection} from 'mysql'
+
+const schemaPath = path.resolve(
+  __dirname,
+  '../../',
+  'prisma',
+  'schema.prisma'
+)
 
 const exec = util.promisify(childProcess.exec)
+
+const databaseUser = 'root'
+const databasePassword = 'password'
+const databasePort = 3308
+
 
 const prismaBinary = path.join(
     __dirname,
@@ -16,31 +27,77 @@ const prismaBinary = path.join(
 )
 
 class PrismaTestEnvironment extends NodeEnvironment {
-    dbName: string
-    dbPath: string
+    private connection: Connection;
+    private databaseName: string;
+
     constructor(config) {
         super(config)
-        // Generate a unique sqlite identifier for this test context
-        this.dbName = `test_${nanoid()}.db`
-        this.dbPath = path.join(
-          __dirname,
-          '../../',
-          'prisma',
-          this.dbName
-        )
-        process.env.DATABASE_URL = `file:${this.dbPath}`
-        this.global.process.env.DATABASE_URL = `file:${this.dbPath}`
+
+        this.connection = mysql.createConnection({
+          host: 'localhost',
+          user: databaseUser,
+          password: databasePassword,
+          port: databasePort
+        })
+
+        this.databaseName = `test_db_${(Math.random() + 1).toString(36).substring(7)}`
+
+        process.env.DATABASE_URL = `mysql://${databaseUser}:${databasePassword}@localhost:${databasePort}/${this.databaseName}?connection_limit=5`
+        this.global.process.env.DATABASE_URL = `mysql://${databaseUser}:${databasePassword}@localhost:${databasePort}/${this.databaseName}?connection_limit=5`
+    }
+
+    connect() {
+      return new Promise((resolve, reject) => {
+        const connection = this.connection
+        connection.connect(function (error){
+          if(error) return reject(error)
+          resolve(connection.threadId)
+        })
+      })
+    }
+
+    disconnect() {
+      return new Promise((resolve, reject) => {
+        const connection = this.connection
+        connection.end(function (error){
+          if(error) return reject(error)
+          resolve(connection.threadId)
+        })
+      })
+    }
+
+    createDatabase(){
+      return new Promise((resolve, reject) => {
+        const connection = this.connection;
+        connection.query(`CREATE DATABASE ${this.databaseName};`, (error, result) => {
+          if(error) return reject(error)
+          resolve(result)
+        })
+      })
+    }
+
+    dropDatabase(){
+      return new Promise((resolve, reject) => {
+        const connection = this.connection;
+        connection.query(`DROP DATABASE IF EXISTS ${this.databaseName};`, (error, result) => {
+          if(error) return reject(error)
+          resolve(result)
+        })
+      })
     }
 
     async setup() {
         // Run the migrations to ensure our schema has the required structure
-        await exec(`${prismaBinary} db push --preview-feature`)
+        await this.connect()
+        await this.createDatabase()
+        await exec(`${prismaBinary} db push --schema=${schemaPath}`)
         return super.setup()
     }
 
     async teardown() {
         try {
-            await fs.promises.unlink(this.dbPath)
+            await this.dropDatabase()
+            await this.disconnect()
         } catch (error) {
             // doesn't matter as the environment is torn down
         }
