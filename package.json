@@ -54,6 +54,8 @@
     "@nrwl/tao": "12.6.5",
     "@nrwl/web": "12.6.5",
     "@nrwl/workspace": "12.6.5",
+    "@prisma/migrate": "^2.29.1",
+    "@prisma/sdk": "^2.29.1",
     "@testing-library/react": "11.2.6",
     "@types/express": "4.17.0",
     "@types/jest": "26.0.24",
