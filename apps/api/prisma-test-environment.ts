@@ -9,9 +9,10 @@ const schemaPath = path.resolve(__dirname, '../../', 'prisma', 'schema.prisma');
 
 const exec = util.promisify(childProcess.exec);
 
-const databaseUser = 'root';
-const databasePassword = 'password';
-const databasePort = 3308;
+const databaseUser = process.env.TEST_DB_USER ?? 'root';
+const databasePassword = process.env.TEST_DB_PASSWORD ?? 'password';
+const databaseHost = process.env.TEST_DATABASE_HOST ?? 'localhost'
+const databasePort = parseInt(process.env.TEST_DATABASE_PORT ?? '3308')
 
 const prismaBinary = path.join(
   __dirname,
@@ -29,7 +30,7 @@ class PrismaTestEnvironment extends NodeEnvironment {
     super(config);
 
     this.connection = mysql.createConnection({
-      host: 'localhost',
+      host: databaseHost,
       user: databaseUser,
       password: databasePassword,
       port: databasePort,
@@ -39,8 +40,8 @@ class PrismaTestEnvironment extends NodeEnvironment {
       .toString(36)
       .substring(7)}`;
 
-    process.env.DATABASE_URL = `mysql://${databaseUser}:${databasePassword}@localhost:${databasePort}/${this.databaseName}?connection_limit=5`;
-    this.global.process.env.DATABASE_URL = `mysql://${databaseUser}:${databasePassword}@localhost:${databasePort}/${this.databaseName}?connection_limit=5`;
+    process.env.DATABASE_URL = `mysql://${databaseUser}:${databasePassword}@${databaseHost}:${databasePort}/${this.databaseName}?connection_limit=5`;
+    this.global.process.env.DATABASE_URL = `mysql://${databaseUser}:${databasePassword}@${databaseHost}:${databasePort}/${this.databaseName}?connection_limit=5`;
   }
 
   connect() {
