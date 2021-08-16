@@ -6,3 +6,29 @@
 [![API](https://github.com/ajoelp/retro-tool/actions/workflows/api.yml/badge.svg?branch=main)](https://github.com/ajoelp/retro-tool/actions/workflows/api.yml)
 [![API](https://github.com/ajoelp/retro-tool/actions/workflows/client.yml/badge.svg?branch=main)](https://github.com/ajoelp/retro-tool/actions/workflows/client.yml)
 
+## Development
+
+### Starting the API
+
+Start the api using docker-compose
+
+```bash
+docker-compose up
+```
+
+### Starting the client
+
+```bash
+yarn start
+```
+
+## Planning
+
+- [ ] User can create a new board
+- [ ] User is prompted to provide a name
+- [ ] User is given a unique UUID and stored in localstorage
+- [ ] Owner can modify the name of the board
+- [ ] Board is generated with default template
+- [ ] Owner can modify category titles
+- [ ] User can add cards to board
+- [ ] Owner can lock the board
