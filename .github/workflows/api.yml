@@ -25,3 +25,19 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: api
+    env:
+      TEST_DB_USER: root
+      TEST_DB_PASSWORD: password
+      TEST_DATABASE_HOST: mysql
+      TEST_DATABASE_PORT: 33306
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_DATABASE: database
+          MYSQL_USER: user
+          MYSQL_PASSWORD: password
+          MYSQL_ROOT_PASSWORD: password
+        ports:
+          - 33306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
