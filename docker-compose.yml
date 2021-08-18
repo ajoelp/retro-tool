@@ -1,32 +1,28 @@
 version: '3.4'
 services:
-  mysql:
-    image: "mariadb:latest"
+  db:
+    image: postgres:13
     ports:
-      - "3307:3306"
+      - 5433:5432
     environment:
-      MYSQL_ROOT_PASSWORD: "password"
-      MYSQL_DATABASE: "database"
-      MYSQL_USER: "user"
-      MYSQL_PASSWORD: "password"
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: user
+      POSTGRES_DB: database
     volumes:
-      - "mysql_data:/var/lib/mysql"
+      - "postgres_data:/var/lib/postgresql/data"
     networks:
       - retro-tool
 
-  mysql_tests:
-    image: "mariadb:latest"
+  db_test:
+    image: postgres:13
     ports:
-      - "3308:3306"
+      - 5434:5432
     environment:
-      MYSQL_ROOT_PASSWORD: "password"
-      MYSQL_DATABASE: "database"
-      MYSQL_USER: "user"
-      MYSQL_PASSWORD: "password"
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: user
+      POSTGRES_DB: database
     volumes:
-      - "mysql_test_data:/var/lib/mysql"
+      - "postgres_test_data:/var/lib/postgresql/data"
     networks:
       - retro-tool
 
@@ -39,18 +35,18 @@ services:
     volumes:
       - "./:/usr/src/app"
     ports:
-      - ${APP_PORT:-3333}:3333
-      - ${DEBUG_PORT:-9229}:9229
+      - 3333:3333
+      - 9229:9229
     stdin_open: true
     depends_on:
-      - mysql
+      - db
     networks:
       - retro-tool
 
 networks:
   retro-tool:
 volumes:
-  mysql_data:
+  postgres_data:
     driver: local
-  mysql_test_data:
+  postgres_test_data:
     driver: local
