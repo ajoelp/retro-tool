@@ -80,7 +80,7 @@
             "assets": ["apps/client/src/favicon.ico", "apps/client/src/assets"],
             "styles": ["apps/client/src/styles.css"],
             "scripts": [],
-            "webpackConfig": "react-tailwind.webpack.config.js"
+            "webpackConfig": "@nrwl/react/plugins/webpack"
           },
           "configurations": {
             "production": {
