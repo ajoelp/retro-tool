@@ -1,5 +1,5 @@
 import React from 'react';
-import Column from './components/Column';
+import Column from './Column';
 import { Navbar } from './Nav';
 
 export const Layout = () => {
