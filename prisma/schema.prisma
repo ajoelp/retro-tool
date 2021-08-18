@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -18,7 +18,7 @@ model Board {
 }
 
 model Category {
-  id        String      @id @default(cuid())
+  id        String      @id @default(uuid())
   title     String
   createdAt DateTime    @default(now())
   boardId   String

@@ -86,6 +86,7 @@
     "jest-environment-node": "^27.0.6",
     "mysql": "^2.18.1",
     "nanoid": "^3.1.23",
+    "pg": "^8.7.1",
     "postcss": "^8.3.6",
     "prettier": "^2.3.1",
     "supertest": "^6.1.4",
