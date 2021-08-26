@@ -7,10 +7,29 @@ export class BoardsController {
     return res.json({ boards });
   }
 
+  async fetch(req: Request, res: Response) {
+    const { id } = req.params
+    const board = await prisma.board.findFirst({ 
+      where: { id },
+      include: {
+        Category: true
+      }
+    })
+    return res.json({ board })
+  }
+
   async create(req: Request, res: Response) {
+    const { title, columns } = req.body;
+
     const board = await prisma.board.create({
-      data: req.body,
+      data: { 
+        title, 
+        Category: {
+          create: columns.map((column) => ({title: column}))
+        }
+      },
     });
+
     return res.json({ board });
   }
 
