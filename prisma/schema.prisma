@@ -11,16 +11,29 @@ generator client {
 }
 
 model Board {
-  id        String        @id @default(uuid())
+  id        String   @id @default(uuid())
   title     String
-  createdAt DateTime      @default(now())
-  Category  Category[]
+  createdAt DateTime @default(now())
+  ownerId   String
+  columnOrder Json? @default("[]")
+  columns   Column[]
 }
 
-model Category {
-  id        String      @id @default(uuid())
+model Column {
+  id        String   @id @default(uuid())
   title     String
-  createdAt DateTime    @default(now())
+  createdAt DateTime @default(now())
   boardId   String
-  Board     Board       @relation(fields: [boardId], references: [id])
+  board     Board    @relation(fields: [boardId], references: [id])
+  cards     Card[]
+}
+
+model Card {
+  id        String   @id @default(uuid())
+  content   String
+  ownerId   String
+  createdAt DateTime @default(now())
+
+  column   Column @relation(fields: [columnId], references: [id])
+  columnId String
 }

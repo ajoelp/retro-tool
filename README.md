@@ -28,7 +28,7 @@ yarn start
 - [ ] User is prompted to provide a name
 - [ ] User is given a unique UUID and stored in localstorage
 - [ ] Owner can modify the name of the board
-- [ ] Board is generated with default template
-- [ ] Owner can modify category titles
+- [ ] Index is generated with default template
+- [ ] Owner can modify column titles
 - [ ] User can add cards to board
 - [ ] Owner can lock the board

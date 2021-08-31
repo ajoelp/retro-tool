@@ -1,21 +1,21 @@
-import { Button, FormControl, FormLabel, Input } from '@chakra-ui/react';
-import axios from 'axios';
+import { Button, FormControl, FormLabel, Input, Box, Heading, FormHelperText } from '@chakra-ui/react';
 import { useRef } from 'react';
 import { useMutation } from 'react-query';
 import { useHistory } from 'react-router-dom';
-import api, { createBoardArgs } from '../api';
-import Layout from '../components/Layout';
-
-
+import api from '../api';
+import { useUser } from '../contexts/UserContext';
 
 const useCreateBoard = () => {
   return useMutation(api.createBoard);
 };
 
+const DEFAULT_COLUMNS = "Mad, Glad, Sad"
+
 const Landing = () => {
   const boardTitleRef = useRef<HTMLInputElement>(null);
   const columnNamesRef = useRef<HTMLInputElement>(null);
   const { mutateAsync } = useCreateBoard();
+  const { userId } = useUser()
 
   const history = useHistory()
 
@@ -39,70 +39,27 @@ const Landing = () => {
       return;
     }
 
-    const { data: { board } } = await mutateAsync({ title: boardTitle, columns: columnNames });
+    const { data: { board } } = await mutateAsync({ title: boardTitle, columns: columnNames, userId });
     history.push(`/boards/${board.id}`)
   };
 
   return (
-    <div>
-      <FormControl id="boardTitle" isRequired>
-        <FormLabel>Board Title</FormLabel>
-        <Input placeholder="Board title" ref={boardTitleRef} />
+    <>
+    <Heading textAlign="center" my="10">Create a board</Heading>
+    <Box maxW="md" borderRadius="lg" marginX="auto" marginY="10" borderWidth="1px" borderStyle="solid" borderColor="gray.200" p="5">
+      <FormControl id="boardTitle" isRequired mb="3">
+        <FormLabel>Index Title</FormLabel>
+        <Input placeholder="Index title" ref={boardTitleRef} />
       </FormControl>
-      <FormControl id="columnName" isRequired>
-        <FormLabel>Column Name</FormLabel>
-        <Input placeholder="Column Name" ref={columnNamesRef} />
+      <FormControl id="columnName" isRequired mb="3">
+        <FormLabel>Column Names</FormLabel>
+        <Input placeholder={DEFAULT_COLUMNS} defaultValue={DEFAULT_COLUMNS} ref={columnNamesRef} />
+        <FormHelperText>Comma separated</FormHelperText>
       </FormControl>
 
-      <Button onClick={onSubmit}>Create Board</Button>
-    </div>
-    // <div>
-    //   <div className="bg-white overflow-hidden shadow rounded-lg">
-    //     <div className="px-4 py-5 sm:p-6">
-    //       <div>The landing</div>
-    //       <div>
-    //         <label
-    //           htmlFor="boardTitle"
-    //           className="block text-sm font-medium text-gray-700"
-    //         >
-    //           Board Title
-    //         </label>
-    //         <div className="mt-1">
-    //           <input
-    //             required
-    //             type="text"
-    //             name="boardTitle"
-    //             id="boardTitle"
-    //             className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-    //             ref={boardTitleRef}
-    //           />
-    //         </div>
-    //         <label
-    //           htmlFor="columnName"
-    //           className="block text-sm font-medium text-gray-700"
-    //         >
-    //           Column Name
-    //         </label>
-    //         <input
-    //           required
-    //           type="text"
-    //           name="columnName"
-    //           id="columnName"
-    //           className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-    //           ref={columnNamesRef}
-    //         />
-
-    //         <button
-    //           type="submit"
-    //           className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-    //           onClick={onSubmit}
-    //         >
-    //           Create Board
-    //         </button>
-    //       </div>
-    //     </div>
-    //   </div>
-    // </div>
+      <Button onClick={onSubmit}>Create Index</Button>
+    </Box>
+    </>
   );
 };
 
