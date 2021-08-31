@@ -30,18 +30,18 @@ describe('Landing Page', () => {
   it('handles form submit', () => {
     renderComponent()
     const boardColumns = ['first', 'second']
-    const boardInput = screen.getByRole('textbox', {name: 'Board Title'})
+    const boardInput = screen.getByRole('textbox', {name: 'Index Title'})
 
-    const boardTitle = 'My Test Board'
+    const boardTitle = 'My Test Index'
     userEvent.type(boardInput, boardTitle)
 
     const columnInput = screen.getByRole('textbox', {name: 'Column Name'})
     userEvent.type(columnInput, boardColumns.join(','))
-    userEvent.click(screen.getByRole('button', {name: 'Create Board'}))
+    userEvent.click(screen.getByRole('button', {name: 'Create Index'}))
 
 
     expect(api.createBoard).toBeCalledWith({title: boardTitle, columns: boardColumns })
     // expect that we're rerouted?
-    
+
   })
 })
