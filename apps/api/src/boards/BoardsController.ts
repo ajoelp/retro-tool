@@ -1,8 +1,8 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { Request, Response } from 'express';
 import { prisma } from '../prismaClient';
 import { namespaceInstance } from '../sockets';
-import { BOARD_UPDATED_EVENT_NAME } from '../../../../libs/api-interfaces/src/lib/socket-events';
+import { BOARD_UPDATED_EVENT_NAME } from '@retro-tool/api-interfaces';
 
 export class BoardsController {
   async index(req: Request, res: Response) {
@@ -22,12 +22,12 @@ export class BoardsController {
   }
 
   async create(req: Request, res: Response) {
-    const { title, columns, ownerId } = req.body;
+    const { title, columns } = req.body;
 
     const createdBoard = await prisma.board.create({
       data: {
         title,
-        ownerId,
+        ownerId: (req.user as User).id,
         columns: {
           create: columns.map((column) => ({ title: column })),
         },

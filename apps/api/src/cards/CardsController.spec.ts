@@ -1,15 +1,21 @@
-import supertest from 'supertest';
-import { app } from '../app';
 import { prisma } from '../prismaClient';
-import { Board, Column } from '@prisma/client';
+import { Board, Column, User } from '@prisma/client';
+import { TestCase } from '../utils/TestCase';
 
 describe('CardsController', () => {
   let board: Board;
   let column: Column;
-
+  let user: User;
   beforeAll(async () => {
+    user = await prisma.user.create({
+      data: {
+        email: 'test@email.com',
+        githubNickname: 'testUser',
+        avatar: 'test-avatar',
+      },
+    });
     board = await prisma.board.create({
-      data: { title: 'new board', ownerId: 'ownerId' },
+      data: { title: 'new board', ownerId: user.id },
     });
     column = await prisma.column.create({
       data: {
@@ -21,7 +27,7 @@ describe('CardsController', () => {
 
   describe('list', () => {
     it('will throw an error of no columnId provided', async () => {
-      const response = await supertest(app).get('/cards');
+      const response = await TestCase.make().actingAs(user).get('/cards');
       expect(response.status).toBe(500);
     });
 
@@ -30,17 +36,17 @@ describe('CardsController', () => {
         data: { title: 'other column', boardId: board.id },
       });
       const card1 = {
-        ownerId: 'ownerId',
+        ownerId: user.id,
         columnId: column.id,
         content: 'random-content',
       };
       const card2 = {
-        ownerId: 'ownerId',
+        ownerId: user.id,
         columnId: column.id,
         content: 'random-content2',
       };
       const card3 = {
-        ownerId: 'ownerId',
+        ownerId: user.id,
         columnId: otherColumn.id,
         content: 'random-content',
       };
@@ -49,7 +55,9 @@ describe('CardsController', () => {
         data: [card1, card2, card3],
       });
 
-      const response = await supertest(app).get(`/cards?columnId=${column.id}`);
+      const response = await TestCase.make()
+        .actingAs(user)
+        .get(`/cards?columnId=${column.id}`);
       expect(response.status).toEqual(200);
       expect(response.body.cards).toEqual(
         expect.arrayContaining([
@@ -67,10 +75,13 @@ describe('CardsController', () => {
       const payload = {
         columnId: column.id,
         content: 'this is some content',
-        ownerId: 'ownerId',
       };
 
-      const response = await supertest(app).post('/cards').send(payload);
+      const response = await TestCase.make()
+        .actingAs(user)
+        .post('/cards')
+        .send(payload);
+
       expect(response.status).toEqual(200);
       expect(response.body.card).toEqual(expect.objectContaining(payload));
       expect(await prisma.card.findFirst({ where: payload })).toBeDefined();

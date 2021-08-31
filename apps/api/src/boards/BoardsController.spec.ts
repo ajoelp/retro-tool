@@ -1,10 +1,10 @@
-import supertest from 'supertest';
-import { app } from '../app';
 import { BOARDS_ROOT, BOARDS_SINGULAR } from './BoardsRouter';
 import { prisma } from '../prismaClient';
 import generatePath from '../utils/generatePath';
 import { namespaceInstance } from '../sockets';
-import { BOARD_UPDATED_EVENT_NAME } from '../../../../libs/api-interfaces/src/lib/socket-events';
+import { BOARD_UPDATED_EVENT_NAME } from '@retro-tool/api-interfaces';
+import { TestCase } from '../utils/TestCase';
+import { User } from '@prisma/client';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const mockSendEventToBoard = jest
@@ -12,18 +12,31 @@ const mockSendEventToBoard = jest
   .mockImplementation(() => {});
 
 describe('BoardsController', () => {
+  let user: User;
+
+  beforeAll(async () => {
+    user = await prisma.user.create({
+      data: {
+        email: 'test@email.com',
+        githubNickname: 'testUser',
+        avatar: 'test-avatar',
+      },
+    });
+  });
+
   const testBoard = {
     title: 'test board',
     columns: ['col1', 'col2'],
-    ownerId: 'ownerId',
   };
 
   it('fetches a board', async () => {
     const board = await prisma.board.create({
-      data: { title: 'testTitle', ownerId: 'ownerId' },
+      data: { title: 'testTitle', ownerId: user.id },
     });
 
-    const response = await supertest(app).get(`/boards/${board.id}`);
+    const response = await TestCase.make()
+      .actingAs(user)
+      .get(`/boards/${board.id}`);
 
     expect(response.status).toEqual(200);
     expect(response.body.board).toEqual(
@@ -35,9 +48,12 @@ describe('BoardsController', () => {
 
   it('lists the boards', async () => {
     const board = await prisma.board.create({
-      data: { title: 'testTitle', ownerId: 'ownerId' },
+      data: { title: 'testTitle', ownerId: user.id },
     });
-    const response = await supertest(app).get(BOARDS_ROOT).expect(200);
+    const response = await TestCase.make()
+      .actingAs(user)
+      .get(BOARDS_ROOT)
+      .expect(200);
     expect(response.body).toEqual({
       boards: expect.arrayContaining([
         expect.objectContaining({ id: board.id }),
@@ -46,7 +62,8 @@ describe('BoardsController', () => {
   });
 
   it('creates a board', async () => {
-    const response = await supertest(app)
+    const response = await TestCase.make()
+      .actingAs(user)
       .post(BOARDS_ROOT)
       .send(testBoard)
       .expect(200);
@@ -60,13 +77,14 @@ describe('BoardsController', () => {
     const board = await prisma.board.create({
       data: {
         title: 'Random Name',
-        ownerId: 'testOwnerId',
+        ownerId: user.id,
       },
     });
 
     const newTitle = { title: 'Name Random' };
 
-    const response = await supertest(app)
+    const response = await TestCase.make()
+      .actingAs(user)
       .patch(generatePath(BOARDS_SINGULAR, { id: board.id }))
       .send(newTitle);
 
@@ -84,13 +102,13 @@ describe('BoardsController', () => {
     const board = await prisma.board.create({
       data: {
         title: 'Random Name',
-        ownerId: 'testOwnerId',
+        ownerId: user.id,
       },
     });
 
-    const response = await supertest(app).delete(
-      generatePath(BOARDS_SINGULAR, { id: board.id }),
-    );
+    const response = await TestCase.make()
+      .actingAs(user)
+      .delete(generatePath(BOARDS_SINGULAR, { id: board.id }));
     expect(response.status).toEqual(200);
     expect(
       await prisma.board.findFirst({ where: { id: board.id } }),

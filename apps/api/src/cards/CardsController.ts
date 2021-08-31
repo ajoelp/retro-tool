@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import { prisma } from '../prismaClient';
 import { namespaceInstance } from '../sockets';
-import { CARD_CREATED_EVENT_NAME } from '../../../../libs/api-interfaces/src/lib/socket-events';
+import { CARD_CREATED_EVENT_NAME } from '@retro-tool/api-interfaces';
+import { User } from '@prisma/client';
 
 export class CardsController {
   async list(req: Request, res: Response) {
@@ -13,21 +14,25 @@ export class CardsController {
       where: {
         columnId: columnId as string,
       },
+      include: {
+        owner: true,
+      },
     });
 
     return res.json({ cards });
   }
 
   async create(req: Request, res: Response) {
-    const { columnId, content, ownerId } = req.body;
+    const { columnId, content } = req.body;
     const card = await prisma.card.create({
       data: {
         content,
-        ownerId,
+        ownerId: (req.user as User).id,
         columnId,
       },
       include: {
         column: true,
+        owner: true,
       },
     });
 

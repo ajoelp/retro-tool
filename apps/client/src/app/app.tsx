@@ -7,6 +7,7 @@ import Board from './pages/Board';
 import { UserProvider } from './contexts/UserContext';
 import { DialogManager } from './dialog-manager';
 import { ReactQueryDevtools } from 'react-query/devtools';
+import { AuthProvider } from './contexts/AuthProvider';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,7 +22,7 @@ export const App = () => {
     <QueryClientProvider client={queryClient}>
       <ChakraProvider>
         <DialogManager>
-          <UserProvider>
+          <AuthProvider>
             <Router>
               <div>
                 <Switch>
@@ -34,7 +35,7 @@ export const App = () => {
                 </Switch>
               </div>
             </Router>
-          </UserProvider>
+          </AuthProvider>
         </DialogManager>
       </ChakraProvider>
       <ReactQueryDevtools />
