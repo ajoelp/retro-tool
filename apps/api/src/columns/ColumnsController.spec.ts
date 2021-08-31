@@ -1,34 +1,41 @@
 import { prisma } from '../prismaClient';
-import supertest from 'supertest';
-import { app } from '../app';
 import { COLUMNS_ROOT, COLUMNS_SINGULAR } from './ColumnsRouter';
 import generatePath from '../utils/generatePath';
-import { Board } from '@prisma/client';
+import { Board, User } from '@prisma/client';
 import { namespaceInstance } from '../sockets';
 import {
   COLUMN_CREATED_EVENT_NAME,
   COLUMN_DELETED_EVENT_NAME,
   COLUMN_UPDATED_EVENT_NAME,
-} from '../../../../libs/api-interfaces/src/lib/socket-events';
+} from '@retro-tool/api-interfaces';
+import { TestCase } from '../utils/TestCase';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
 const mockSendEventToBoard = jest
   .spyOn(namespaceInstance, 'sendEventToBoard')
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   .mockImplementation(() => {});
 
 describe('ColumnsController', () => {
+  let user: User;
   let board: Board;
   beforeAll(async () => {
+    user = await prisma.user.create({
+      data: {
+        email: 'test@email.com',
+        githubNickname: 'testUser',
+        avatar: 'test-avatar',
+      },
+    });
     board = await prisma.board.create({
       data: {
         title: 'test board',
-        ownerId: 'ownerId',
+        ownerId: user.id,
       },
     });
   });
 
   it('will throw an error if no board id is provided', async () => {
-    const response = await supertest(app).get(`/columns`);
+    const response = await TestCase.make().actingAs(user).get(`/columns`);
     expect(response.status).toEqual(500);
   });
 
@@ -39,7 +46,8 @@ describe('ColumnsController', () => {
         boardId: board.id,
       },
     });
-    const response = await supertest(app)
+    const response = await TestCase.make()
+      .actingAs(user)
       .get(`/columns?boardId=${board.id}`)
       .expect(200);
     expect(response.body).toEqual({
@@ -55,7 +63,8 @@ describe('ColumnsController', () => {
       boardId: board.id,
     };
 
-    const response = await supertest(app)
+    const response = await TestCase.make()
+      .actingAs(user)
       .post(COLUMNS_ROOT)
       .send(testColumn)
       .expect(200);
@@ -85,7 +94,8 @@ describe('ColumnsController', () => {
       title: 'new column title',
     };
 
-    const response = await supertest(app)
+    const response = await TestCase.make()
+      .actingAs(user)
       .patch(generatePath(COLUMNS_SINGULAR, { id: column.id }))
       .send(payload)
       .expect(200);
@@ -109,7 +119,8 @@ describe('ColumnsController', () => {
       },
     });
 
-    const response = await supertest(app)
+    const response = await TestCase.make()
+      .actingAs(user)
       .delete(generatePath(COLUMNS_SINGULAR, { id: column.id }))
       .expect(200);
 

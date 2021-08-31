@@ -12,6 +12,7 @@ import { useMutation } from 'react-query';
 import { useHistory } from 'react-router-dom';
 import api from '../api';
 import { useUser } from '../contexts/UserContext';
+import { useAuth } from '../contexts/AuthProvider';
 
 const useCreateBoard = () => {
   return useMutation(api.createBoard);
@@ -23,7 +24,7 @@ const Landing = () => {
   const boardTitleRef = useRef<HTMLInputElement>(null);
   const columnNamesRef = useRef<HTMLInputElement>(null);
   const { mutateAsync } = useCreateBoard();
-  const { userId } = useUser();
+  const { user, login } = useAuth();
 
   const history = useHistory();
 
@@ -49,9 +50,22 @@ const Landing = () => {
 
     const {
       data: { board },
-    } = await mutateAsync({ title: boardTitle, columns: columnNames, userId });
+    } = await mutateAsync({
+      title: boardTitle,
+      columns: columnNames,
+      userId: 'asdasd',
+    });
     history.push(`/boards/${board.id}`);
   };
+
+  if (!user) {
+    return (
+      <div>
+        <p>Please login</p>
+        <button onClick={login}>Login</button>
+      </div>
+    );
+  }
 
   return (
     <>

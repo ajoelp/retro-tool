@@ -1,5 +1,7 @@
-import { Board, Card, Column } from '@prisma/client';
+import { Board, Card, Column, User } from '@prisma/client';
 import axios from 'axios';
+import Cookies from 'js-cookie';
+import { CardWithOwner } from '@retro-tool/api-interfaces';
 
 export type BoardWithColumn = Board & {
   columns: Column[];
@@ -29,37 +31,70 @@ export type createCardsArgs = {
   content: string;
 };
 
+const apiClient = axios.create({
+  baseURL: 'http://localhost:3333',
+});
+
+apiClient.interceptors.request.use(
+  function (config) {
+    const token = Cookies.get('auth_token');
+    if (token != null) {
+      config.headers.Authorization = token;
+    }
+    return config;
+  },
+  function (error) {
+    return Promise.reject(error);
+  },
+);
+
+// Add a response interceptor
+apiClient.interceptors.response.use(
+  function (response) {
+    return response;
+  },
+  function (error) {
+    return Promise.reject(error);
+  },
+);
+
 const api = {
+  getCurrentUser: async (): Promise<User> => {
+    const { data } = await apiClient.get('/auth/me');
+    return data.user;
+  },
   createBoard: ({ title, columns, userId }: createBoardArgs) =>
-    axios.post('http://localhost:3333/boards', { title, columns, userId }),
+    apiClient.post('/boards', { title, columns, userId }),
   fetchBoard: async (id: string): Promise<Board> => {
-    const { data } = await axios.get(`http://localhost:3333/boards/${id}`);
+    const { data } = await apiClient.get(`/boards/${id}`);
     return data.board;
   },
   fetchColumns: async (boardId: string): Promise<Column[]> => {
-    const { data } = await axios.get(`http://localhost:3333/columns`, {
+    const { data } = await apiClient.get(`/columns`, {
       params: { boardId },
     });
     return data.columns;
   },
   addColumn: async ({ boardId, title }: addColumnArgs): Promise<Column> => {
-    const { data } = await axios.post('http://localhost:3333/columns/', {
+    const { data } = await apiClient.post('/columns/', {
       boardId,
       title,
     });
     return data.column;
   },
   deleteColumn: ({ columnId }: deleteColumnArgs) => {
-    return axios.delete(`http://localhost:3333/columns/${columnId}`);
+    return apiClient.delete(`/columns/${columnId}`);
   },
-  fetchCards: async ({ columnId }: fetchCardsArgs): Promise<Card[]> => {
-    const { data } = await axios.get('http://localhost:3333/cards', {
+  fetchCards: async ({
+    columnId,
+  }: fetchCardsArgs): Promise<CardWithOwner[]> => {
+    const { data } = await apiClient.get('/cards', {
       params: { columnId },
     });
     return data.cards;
   },
-  createCard: async (payload: createCardsArgs): Promise<Card> => {
-    const { data } = await axios.post('http://localhost:3333/cards', payload);
+  createCard: async (payload: createCardsArgs): Promise<CardWithOwner> => {
+    const { data } = await apiClient.post('/cards', payload);
     return data.card;
   },
 };

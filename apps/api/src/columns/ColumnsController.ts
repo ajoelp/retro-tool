@@ -6,7 +6,7 @@ import {
   COLUMN_CREATED_EVENT_NAME,
   COLUMN_DELETED_EVENT_NAME,
   COLUMN_UPDATED_EVENT_NAME,
-} from '../../../../libs/api-interfaces/src/lib/socket-events';
+} from '@retro-tool/api-interfaces';
 import { Prisma } from '@prisma/client';
 
 export class ColumnsController {

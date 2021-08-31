@@ -1,6 +1,6 @@
 import { Board, Column as ColumnType } from '@prisma/client';
 import styled from 'styled-components';
-import { Heading } from '@chakra-ui/react';
+import { Avatar, Flex, Heading } from '@chakra-ui/react';
 import { BorderRadius, NavHeight } from '../../theme/sizes';
 import { backgroundColor } from '../../theme/colors';
 import { useBoard } from '../../hooks/boards';
@@ -110,6 +110,10 @@ export default function Column({ column, board }: ColumnProps) {
           {cards?.map((card) => (
             <Card key={card.id}>
               <p>{card.content}</p>
+              <Flex alignItems="center" mt="auto">
+                <Avatar size="sm" src={card.owner.avatar} mr="2" />
+                <p>{card.owner.githubNickname}</p>
+              </Flex>
             </Card>
           ))}
         </CardsContainer>
