@@ -1,5 +1,3 @@
-
-
 # RetroTool
 
 [![codecov](https://codecov.io/gh/ajoelp/retro-tool/branch/main/graph/badge.svg?token=XSUW0861R1)](https://codecov.io/gh/ajoelp/retro-tool)

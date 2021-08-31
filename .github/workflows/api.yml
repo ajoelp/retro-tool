@@ -21,7 +21,7 @@ jobs:
         run: yarn lint api
       - name: Test
         env:
-          TEST_DATABASE_URL: "postgresql://user:password@localhost:${{ job.services.postgres.ports[5432] }}/database?schema=public"
+          TEST_DATABASE_URL: 'postgresql://user:password@localhost:${{ job.services.postgres.ports[5432] }}/database?schema=public'
         run: yarn test api --codeCoverage --verbose
       - uses: codecov/codecov-action@v2
         with:

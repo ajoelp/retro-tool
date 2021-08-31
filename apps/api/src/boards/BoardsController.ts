@@ -1,8 +1,8 @@
 import { Prisma } from '@prisma/client';
 import { Request, Response } from 'express';
 import { prisma } from '../prismaClient';
-import {namespaceInstance} from "../sockets";
-import {BOARD_UPDATED_EVENT_NAME} from "../../../../libs/api-interfaces/src/lib/socket-events";
+import { namespaceInstance } from '../sockets';
+import { BOARD_UPDATED_EVENT_NAME } from '../../../../libs/api-interfaces/src/lib/socket-events';
 
 export class BoardsController {
   async index(req: Request, res: Response) {
@@ -11,14 +11,14 @@ export class BoardsController {
   }
 
   async fetch(req: Request, res: Response) {
-    const { id } = req.params
+    const { id } = req.params;
     const board = await prisma.board.findFirst({
       where: { id },
       include: {
-        columns: true
-      }
-    })
-    return res.json({ board })
+        columns: true,
+      },
+    });
+    return res.json({ board });
   }
 
   async create(req: Request, res: Response) {
@@ -29,20 +29,22 @@ export class BoardsController {
         title,
         ownerId,
         columns: {
-          create: columns.map((column) => ({title: column}))
-        }
+          create: columns.map((column) => ({ title: column })),
+        },
       },
-      include: { columns: true }
+      include: { columns: true },
     });
 
     // Set columns order
 
-    const columnOrder = createdBoard.columns.map(column => column.id) as Prisma.JsonArray
+    const columnOrder = createdBoard.columns.map(
+      (column) => column.id,
+    ) as Prisma.JsonArray;
 
     const board = await prisma.board.update({
       where: { id: createdBoard.id },
-      data: { columnOrder }
-    })
+      data: { columnOrder },
+    });
 
     return res.json({ board });
   }
@@ -55,8 +57,8 @@ export class BoardsController {
 
     namespaceInstance.sendEventToBoard(board.id, {
       type: BOARD_UPDATED_EVENT_NAME,
-      payload: board
-    })
+      payload: board,
+    });
 
     return res.json({ board });
   }

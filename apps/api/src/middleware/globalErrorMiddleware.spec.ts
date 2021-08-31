@@ -1,6 +1,6 @@
-import globalErrorMiddleware from "./globalErrorMiddleware";
-import {NotFoundError} from "../errors/NotFoundError";
-import {Request, Response} from "express";
+import globalErrorMiddleware from './globalErrorMiddleware';
+import { NotFoundError } from '../errors/NotFoundError';
+import { Request, Response } from 'express';
 
 class ResponseMock {
   status(status: any) {
@@ -15,32 +15,36 @@ class ResponseMock {
 const responseMock = new ResponseMock();
 
 describe('globalErrorMiddleware', () => {
-  const statusSpy = jest.spyOn(responseMock, "status");
-  const jsonSpy = jest.spyOn(responseMock, "json");
+  const statusSpy = jest.spyOn(responseMock, 'status');
+  const jsonSpy = jest.spyOn(responseMock, 'json');
 
   it('will throw a NotFoundError', async () => {
-    const error = new NotFoundError('This is the message')
-    const req = {} as Request
-    const next = jest.fn()
-    await globalErrorMiddleware(error, req, responseMock as Response, next)
+    const error = new NotFoundError('This is the message');
+    const req = {} as Request;
+    const next = jest.fn();
+    await globalErrorMiddleware(error, req, responseMock as Response, next);
 
-    expect(statusSpy).toHaveBeenCalledWith(404)
-    expect(jsonSpy).toHaveBeenCalledWith(expect.objectContaining({
-      error: 'not-found',
-      message: error.message
-    }))
-  })
+    expect(statusSpy).toHaveBeenCalledWith(404);
+    expect(jsonSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        error: 'not-found',
+        message: error.message,
+      }),
+    );
+  });
 
   it('will throw a Error', async () => {
-    const error = new Error('This is the message')
-    const req = {} as Request
-    const next = jest.fn()
-    await globalErrorMiddleware(error, req, responseMock as Response, next)
+    const error = new Error('This is the message');
+    const req = {} as Request;
+    const next = jest.fn();
+    await globalErrorMiddleware(error, req, responseMock as Response, next);
 
-    expect(statusSpy).toHaveBeenCalledWith(500)
-    expect(jsonSpy).toHaveBeenCalledWith(expect.objectContaining({
-      error: 'server-error',
-      message: error.message
-    }))
-  })
+    expect(statusSpy).toHaveBeenCalledWith(500);
+    expect(jsonSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        error: 'server-error',
+        message: error.message,
+      }),
+    );
+  });
 });

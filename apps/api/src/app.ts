@@ -1,21 +1,21 @@
 import express, { Express } from 'express';
 import cors from 'cors';
-import 'express-async-errors'
+import 'express-async-errors';
 import { BoardsRouter } from './boards/BoardsRouter';
 import { ColumnsRouter } from './columns/ColumnsRouter';
-import {CardsRouter} from "./cards/CardsRouter";
-import { Server } from 'socket.io'
-import http from 'http'
-import {buildSockets} from "./sockets";
-import globalErrorMiddleware from "./middleware/globalErrorMiddleware";
+import { CardsRouter } from './cards/CardsRouter';
+import { Server } from 'socket.io';
+import http from 'http';
+import { buildSockets } from './sockets';
+import globalErrorMiddleware from './middleware/globalErrorMiddleware';
 
 const expressApp = express();
-const app = http.createServer(expressApp)
+const app = http.createServer(expressApp);
 const io = new Server(app, {
   cors: {
-    origin: '*'
-  }
-})
+    origin: '*',
+  },
+});
 
 const applyMiddleware = (app: Express) => {
   /* istanbul ignore if  */
@@ -29,10 +29,10 @@ applyMiddleware(expressApp);
 
 expressApp.use(BoardsRouter);
 expressApp.use(ColumnsRouter);
-expressApp.use(CardsRouter)
+expressApp.use(CardsRouter);
 
-buildSockets(io)
+buildSockets(io);
 
-expressApp.use(globalErrorMiddleware)
+expressApp.use(globalErrorMiddleware);
 
 export { app };

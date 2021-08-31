@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: user
       POSTGRES_DB: database
     volumes:
-      - "postgres_data:/var/lib/postgresql/data"
+      - 'postgres_data:/var/lib/postgresql/data'
     networks:
       - retro-tool
 
@@ -22,7 +22,7 @@ services:
       POSTGRES_USER: user
       POSTGRES_DB: database
     volumes:
-      - "postgres_test_data:/var/lib/postgresql/data"
+      - 'postgres_test_data:/var/lib/postgresql/data'
     networks:
       - retro-tool
 
