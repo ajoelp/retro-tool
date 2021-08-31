@@ -6,14 +6,14 @@ import Landing from './pages/Landing';
 import Board from './pages/Board';
 import { UserProvider } from './contexts/UserContext';
 import { DialogManager } from './dialog-manager';
-import {ReactQueryDevtools} from "react-query/devtools";
+import { ReactQueryDevtools } from 'react-query/devtools';
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: Infinity
-    }
-  }
+      staleTime: Infinity,
+    },
+  },
 });
 
 export const App = () => {
@@ -22,20 +22,18 @@ export const App = () => {
       <ChakraProvider>
         <DialogManager>
           <UserProvider>
-
-                <Router>
-                  <div>
-                    <Switch>
-                      <Route path="/" exact={true}>
-                        <Landing />
-                      </Route>
-                      <Route path="/boards/:id">
-                        <Board />
-                      </Route>
-                    </Switch>
-                  </div>
-                </Router>
-
+            <Router>
+              <div>
+                <Switch>
+                  <Route path="/" exact={true}>
+                    <Landing />
+                  </Route>
+                  <Route path="/boards/:id">
+                    <Board />
+                  </Route>
+                </Switch>
+              </div>
+            </Router>
           </UserProvider>
         </DialogManager>
       </ChakraProvider>

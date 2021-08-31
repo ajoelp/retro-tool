@@ -1,39 +1,36 @@
-import { ReactNode, useContext, useMemo, createContext } from "react";
+import { ReactNode, useContext, useMemo, createContext } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 type UserContextState = {
-  userId: string
-}
+  userId: string;
+};
 
 const UserContext = createContext<UserContextState>({
-  userId: ''
-})
+  userId: '',
+});
 
 type UserProviderProps = {
-  children: ReactNode
-}
+  children: ReactNode;
+};
 
-const USER_ID_KEY = 'userId'
+const USER_ID_KEY = 'userId';
 
-export function UserProvider({ children}: UserProviderProps) {
-
+export function UserProvider({ children }: UserProviderProps) {
   const userId = useMemo(() => {
-    const userId = window.localStorage.getItem(USER_ID_KEY)
-    if(!userId){
-      const newUserId = uuidv4()
-      window.localStorage.setItem(USER_ID_KEY, newUserId)
-      return newUserId
+    const userId = window.localStorage.getItem(USER_ID_KEY);
+    if (!userId) {
+      const newUserId = uuidv4();
+      window.localStorage.setItem(USER_ID_KEY, newUserId);
+      return newUserId;
     }
-    return userId
-  }, [])
+    return userId;
+  }, []);
 
   return (
-    <UserContext.Provider value={{userId}}>
-      {children}
-    </UserContext.Provider>
-  )
+    <UserContext.Provider value={{ userId }}>{children}</UserContext.Provider>
+  );
 }
 
-export function useUser(){
-  return useContext(UserContext)
+export function useUser() {
+  return useContext(UserContext);
 }

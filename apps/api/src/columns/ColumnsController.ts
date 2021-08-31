@@ -1,20 +1,23 @@
 import { Request, Response } from 'express';
 import { prisma } from '../prismaClient';
-import {namespaceInstance} from "../sockets";
+import { namespaceInstance } from '../sockets';
 import {
   BOARD_UPDATED_EVENT_NAME,
-  COLUMN_CREATED_EVENT_NAME, COLUMN_DELETED_EVENT_NAME,
-  COLUMN_UPDATED_EVENT_NAME
-} from "../../../../libs/api-interfaces/src/lib/socket-events";
-import {Prisma} from "@prisma/client";
+  COLUMN_CREATED_EVENT_NAME,
+  COLUMN_DELETED_EVENT_NAME,
+  COLUMN_UPDATED_EVENT_NAME,
+} from '../../../../libs/api-interfaces/src/lib/socket-events';
+import { Prisma } from '@prisma/client';
 
 export class ColumnsController {
   async index(req: Request, res: Response) {
-    const { boardId } = req.query
+    const { boardId } = req.query;
 
-    if(!boardId) throw new Error('No board id provided')
+    if (!boardId) throw new Error('No board id provided');
 
-    const columns = await prisma.column.findMany({ where: { boardId: boardId as string }});
+    const columns = await prisma.column.findMany({
+      where: { boardId: boardId as string },
+    });
     return res.json({ columns });
   }
 
@@ -22,29 +25,29 @@ export class ColumnsController {
     const column = await prisma.column.create({
       data: req.body,
       include: {
-        board: true
-      }
+        board: true,
+      },
     });
 
     const board = await prisma.board.update({
       where: { id: column.board.id },
       data: {
         columnOrder: [
-          ...column.board.columnOrder as Prisma.JsonArray,
-          column.id
-        ] as Prisma.JsonArray
-      }
-    })
+          ...(column.board.columnOrder as Prisma.JsonArray),
+          column.id,
+        ] as Prisma.JsonArray,
+      },
+    });
 
     namespaceInstance.sendEventToBoard(column.boardId, {
       type: BOARD_UPDATED_EVENT_NAME,
-      payload: board
-    })
+      payload: board,
+    });
 
     namespaceInstance.sendEventToBoard(column.boardId, {
       type: COLUMN_CREATED_EVENT_NAME,
-      payload: column
-    })
+      payload: column,
+    });
 
     return res.json({ column });
   }
@@ -57,8 +60,8 @@ export class ColumnsController {
 
     namespaceInstance.sendEventToBoard(column.boardId, {
       type: COLUMN_UPDATED_EVENT_NAME,
-      payload: column
-    })
+      payload: column,
+    });
 
     return res.json({ column });
   }
@@ -66,25 +69,27 @@ export class ColumnsController {
   async destroy(req: Request, res: Response) {
     const column = await prisma.column.delete({
       where: { id: req.params.id },
-      include: { board: true }
+      include: { board: true },
     });
 
     const board = await prisma.board.update({
       where: { id: column.board.id },
       data: {
-        columnOrder: (column.board.columnOrder as Prisma.JsonArray).filter(columnId => columnId !== column.id)
-      }
-    })
+        columnOrder: (column.board.columnOrder as Prisma.JsonArray).filter(
+          (columnId) => columnId !== column.id,
+        ),
+      },
+    });
 
     namespaceInstance.sendEventToBoard(column.boardId, {
       type: BOARD_UPDATED_EVENT_NAME,
-      payload: board
-    })
+      payload: board,
+    });
 
     namespaceInstance.sendEventToBoard(column.boardId, {
       type: COLUMN_DELETED_EVENT_NAME,
-      payload: column
-    })
+      payload: column,
+    });
 
     return res.json({});
   }

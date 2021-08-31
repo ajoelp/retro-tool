@@ -1,5 +1,5 @@
-import {prisma} from "./src/prismaClient";
+import { prisma } from './src/prismaClient';
 
 afterAll(() => {
-  prisma.$disconnect()
-})
+  prisma.$disconnect();
+});
