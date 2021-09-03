@@ -2,16 +2,17 @@ import { prisma } from '../prismaClient';
 import { COLUMNS_ROOT, COLUMNS_SINGULAR } from './ColumnsRouter';
 import generatePath from '../utils/generatePath';
 import { Board, User } from '@prisma/client';
-import { namespaceInstance } from '../sockets';
+
 import {
   COLUMN_CREATED_EVENT_NAME,
   COLUMN_DELETED_EVENT_NAME,
   COLUMN_UPDATED_EVENT_NAME,
 } from '@retro-tool/api-interfaces';
 import { TestCase } from '../utils/TestCase';
+import dependencies from '../dependencies';
 
 const mockSendEventToBoard = jest
-  .spyOn(namespaceInstance, 'sendEventToBoard')
+  .spyOn(dependencies.namespaceService, 'sendEventToBoard')
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   .mockImplementation(() => {});
 
@@ -44,6 +45,7 @@ describe('ColumnsController', () => {
       data: {
         title: 'column',
         boardId: board.id,
+        order: 0,
       },
     });
     const response = await TestCase.make()
@@ -87,6 +89,7 @@ describe('ColumnsController', () => {
       data: {
         title: 'test column',
         boardId: board.id,
+        order: 0,
       },
     });
 
@@ -116,6 +119,7 @@ describe('ColumnsController', () => {
       data: {
         title: 'test column',
         boardId: board.id,
+        order: 0,
       },
     });
 

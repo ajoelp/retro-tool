@@ -4,6 +4,7 @@ import passport from 'passport';
 import { Strategy } from 'passport-github2';
 import { prisma } from '../prismaClient';
 import { authenticatedMiddleware } from '../middleware/authMiddleware';
+import { GithubStrategy } from '../utils/GithubStrategy';
 
 const AuthRouter = Router();
 const authController = new AuthController();
@@ -17,25 +18,30 @@ passport.deserializeUser(function (user, done) {
 });
 
 passport.use(
-  new Strategy(
+  new GithubStrategy(
     {
       clientID: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
       callbackURL: process.env.GITHUB_CALLBACK_URL,
     },
     async function (accessToken, refreshToken, profile, done) {
+      if (!profile.organizations?.includes?.('vehikl')) {
+        done(new Error('Invalid organization'), null);
+        return;
+      }
+
       try {
         const user = await prisma.user.upsert({
-          where: { email: profile.emails?.[0].value },
+          where: { email: profile.email },
           create: {
-            email: profile.emails?.[0].value,
-            githubNickname: profile.username,
-            avatar: profile.photos?.[0].value,
+            email: profile.email,
+            githubNickname: profile.githubNickname,
+            avatar: profile.avatar,
           },
           update: {
-            email: profile.emails?.[0].value,
-            githubNickname: profile.username,
-            avatar: profile.photos?.[0].value,
+            email: profile.email,
+            githubNickname: profile.githubNickname,
+            avatar: profile.avatar,
           },
         });
         done(null, user);
@@ -48,7 +54,7 @@ passport.use(
 
 AuthRouter.get(
   '/auth/github',
-  passport.authenticate('github', { scope: ['user:email'] }),
+  passport.authenticate('github', { scope: ['user:email', 'read:org'] }),
 );
 
 AuthRouter.get(

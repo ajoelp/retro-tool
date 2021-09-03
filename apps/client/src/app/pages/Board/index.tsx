@@ -26,11 +26,21 @@ import {
 import { useBoardEvents } from '../../hooks/useBoardEvents';
 import { Prisma } from '@prisma/client';
 
-const Wrapper = styled.div`
-  height: calc(100vh - ${NavHeight}px);
+const PageWrapper = styled.div`
   display: flex;
+  flex-direction: column;
+  height: 100vh;
   width: 100vw;
+`;
+
+const Wrapper = styled.div`
+  flex: 1;
+  display: flex;
   flex-wrap: nowrap;
+  margin: 0 auto;
+  max-width: 100vw;
+  overflow-x: scroll;
+  padding: 0 2rem;
 `;
 
 const Board = () => {
@@ -46,19 +56,15 @@ const Board = () => {
   if (isLoading) return <Spinner />;
   if (!data) return null;
 
-  const columnOrder = (data?.columnOrder as string[]) ?? [];
-
   return (
-    <>
+    <PageWrapper>
       <Navigation board={data} />
       <Wrapper>
-        {columnOrder.map((columnId) => {
-          const column = columns?.find((column) => column.id === columnId);
-          if (!column) return null;
+        {columns?.map((column) => {
           return <Column column={column} board={data} key={column.id} />;
         })}
       </Wrapper>
-    </>
+    </PageWrapper>
   );
 };
 

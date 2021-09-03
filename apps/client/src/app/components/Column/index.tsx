@@ -1,7 +1,7 @@
 import { Board, Column as ColumnType } from '@prisma/client';
 import styled from 'styled-components';
 import { Avatar, Flex, Heading } from '@chakra-ui/react';
-import { BorderRadius, NavHeight } from '../../theme/sizes';
+import { BorderRadius, ColumnWidth, GAP, NavHeight } from '../../theme/sizes';
 import { backgroundColor } from '../../theme/colors';
 import { useBoard } from '../../hooks/boards';
 import { BoardWithColumn } from '../../api';
@@ -11,11 +11,16 @@ import { DeleteIcon } from '@chakra-ui/icons';
 import { useCards, useCreateCard } from '../../hooks/cards';
 import { useRef } from 'react';
 import { Card } from '../Card';
+import { RingShadow } from '../../theme/shadows';
 
 const Wrapper = styled.div`
-  padding: 40px;
-  width: 25vw;
-  height: calc(100vh - ${NavHeight}px);
+  width: ${ColumnWidth}px;
+  margin-right: ${GAP}px;
+  padding: 2em 0;
+  flex-shrink: 0;
+  &:last-child {
+    margin-right: 0;
+  }
 `;
 
 const CardsContainer = styled.div`
@@ -24,9 +29,10 @@ const CardsContainer = styled.div`
   margin: 20px 0;
   border-radius: ${BorderRadius}px;
   display: flex;
+  flex-direction: column;
   padding: 10px;
-  flex-wrap: wrap;
   align-items: flex-start;
+  overflow-y: scroll;
 `;
 
 const Container = styled.div`
@@ -49,7 +55,8 @@ const AddCardInput = styled.textarea`
   display: flex;
   &:focus {
     outline: none;
-    border: 1px solid blue;
+    border: none;
+    box-shadow: ${RingShadow};
     border-radius: ${BorderRadius}px;
   }
 `;
@@ -108,13 +115,7 @@ export default function Column({ column, board }: ColumnProps) {
       <Container>
         <CardsContainer>
           {cards?.map((card) => (
-            <Card key={card.id}>
-              <p>{card.content}</p>
-              <Flex alignItems="center" mt="auto">
-                <Avatar size="sm" src={card.owner.avatar} mr="2" />
-                <p>{card.owner.githubNickname}</p>
-              </Flex>
-            </Card>
+            <Card key={card.id} card={card} column={column} />
           ))}
         </CardsContainer>
         <AddCardContainer onSubmit={submitCard}>

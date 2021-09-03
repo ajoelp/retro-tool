@@ -21,6 +21,7 @@ describe('CardsController', () => {
       data: {
         title: 'column',
         boardId: board.id,
+        order: 1,
       },
     });
   });
@@ -33,22 +34,25 @@ describe('CardsController', () => {
 
     it('will list all the cards for a column', async () => {
       const otherColumn = await prisma.column.create({
-        data: { title: 'other column', boardId: board.id },
+        data: { title: 'other column', boardId: board.id, order: 1 },
       });
       const card1 = {
         ownerId: user.id,
         columnId: column.id,
         content: 'random-content',
+        order: 1,
       };
       const card2 = {
         ownerId: user.id,
         columnId: column.id,
         content: 'random-content2',
+        order: 2,
       };
       const card3 = {
         ownerId: user.id,
         columnId: otherColumn.id,
         content: 'random-content',
+        order: 3,
       };
 
       await prisma.card.createMany({

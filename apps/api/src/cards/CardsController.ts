@@ -1,8 +1,14 @@
 import { Request, Response } from 'express';
 import { prisma } from '../prismaClient';
-import { namespaceInstance } from '../sockets';
-import { CARD_CREATED_EVENT_NAME } from '@retro-tool/api-interfaces';
+import {
+  CARD_CREATED_EVENT_NAME,
+  CARD_UPDATED_EVENT_NAME,
+} from '@retro-tool/api-interfaces';
 import { User } from '@prisma/client';
+import dependencies from '../dependencies';
+import { CardRepository } from './CardRepository';
+
+const cardRepository = new CardRepository();
 
 export class CardsController {
   async list(req: Request, res: Response) {
@@ -29,6 +35,7 @@ export class CardsController {
         content,
         ownerId: (req.user as User).id,
         columnId,
+        order: await cardRepository.getNextOrderValue(columnId),
       },
       include: {
         column: true,
@@ -36,8 +43,31 @@ export class CardsController {
       },
     });
 
-    namespaceInstance.sendEventToBoard(card.column.boardId, {
+    dependencies.namespaceService.sendEventToBoard(card.column.boardId, {
       type: CARD_CREATED_EVENT_NAME,
+      payload: card,
+    });
+
+    return res.json({ card });
+  }
+
+  async update(req: Request, res: Response) {
+    const { cardId } = req.params;
+    const { content } = req.body;
+
+    const card = await prisma.card.update({
+      where: {
+        id: cardId,
+      },
+      data: { content },
+      include: {
+        column: true,
+        owner: true,
+      },
+    });
+
+    dependencies.namespaceService.sendEventToBoard(card.column.boardId, {
+      type: CARD_UPDATED_EVENT_NAME,
       payload: card,
     });
 

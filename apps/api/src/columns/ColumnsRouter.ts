@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { ColumnsController } from './ColumnsController';
 import { authenticatedMiddleware } from '../middleware/authMiddleware';
+import { query } from 'express-validator';
+import validateRequestParams from '../middleware/validateRequestParams';
 
 const ColumnsRouter = Router();
 const columnsController = new ColumnsController();
@@ -10,6 +12,8 @@ export const COLUMNS_SINGULAR = '/columns/:id';
 
 ColumnsRouter.get(COLUMNS_ROOT, [
   authenticatedMiddleware,
+  query('boardId').isString(),
+  validateRequestParams,
   columnsController.index,
 ]);
 ColumnsRouter.post(COLUMNS_ROOT, [

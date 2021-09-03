@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { CardsController } from './CardsController';
-import { body, param } from 'express-validator';
+import { body, query } from 'express-validator';
 import { authenticatedMiddleware } from '../middleware/authMiddleware';
+import validateRequestParams from '../middleware/validateRequestParams';
 
 const CardsRouter = Router();
 const cardsController = new CardsController();
@@ -11,12 +12,19 @@ CardsRouter.post('/cards', [
   body('columnId'),
   body('ownerId'),
   body('content'),
+  validateRequestParams,
   cardsController.create,
+]);
+
+CardsRouter.post('/cards/:cardId', [
+  authenticatedMiddleware,
+  body('content'),
+  cardsController.update,
 ]);
 
 CardsRouter.get('/cards', [
   authenticatedMiddleware,
-  param('columnId'),
+  query('columnId'),
   cardsController.list,
 ]);
 

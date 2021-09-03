@@ -11,7 +11,7 @@ class MockIO extends EventEmitter {
 
 describe('NamespaceService', () => {
   const mockIO = new MockIO();
-  const service = new NamespaceService(mockIO as unknown as Server);
+  const service = new NamespaceService().setIO(mockIO as unknown as Server);
 
   beforeAll(() => {
     service.start();
