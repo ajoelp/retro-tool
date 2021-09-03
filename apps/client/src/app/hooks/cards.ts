@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import api from '../api';
+import { AuthProvider } from '../contexts/AuthProvider';
 
 export function useCards(columnId: string) {
   const { data, isLoading, refetch } = useQuery(['cards', columnId], () =>
@@ -21,4 +22,20 @@ export function useCreateCard(columnId: string) {
     ({ content }: createCardArgs) => api.createCard({ columnId, content }),
   );
   return { createCard: mutateAsync, createCardLoading: isLoading };
+}
+
+type updateCardArgs = {
+  cardId: string;
+  content: string;
+};
+
+export function useUpdateCard() {
+  const { mutateAsync, isLoading } = useMutation(
+    ({ cardId, content }: updateCardArgs) =>
+      api.updateCard({ cardId, content }),
+  );
+  return {
+    updateCard: mutateAsync,
+    updateCardLoading: isLoading,
+  };
 }

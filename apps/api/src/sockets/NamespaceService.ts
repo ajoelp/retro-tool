@@ -12,11 +12,15 @@ export class NamespaceService {
   private path: RegExp;
   public clients: Map<string, NamespaceWithData>;
 
-  constructor(io: Server) {
-    this.io = io;
+  constructor() {
     this.path = /\/boards\/(.*)/;
-    this.namespace = this.io.of(this.path);
     this.clients = new Map<string, NamespaceWithData>();
+  }
+
+  setIO(io: Server) {
+    this.io = io;
+    this.namespace = this.io.of(this.path);
+    return this;
   }
 
   onConnection(socket: Socket) {

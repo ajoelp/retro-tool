@@ -1,14 +1,14 @@
 import { BOARDS_ROOT, BOARDS_SINGULAR } from './BoardsRouter';
 import { prisma } from '../prismaClient';
 import generatePath from '../utils/generatePath';
-import { namespaceInstance } from '../sockets';
 import { BOARD_UPDATED_EVENT_NAME } from '@retro-tool/api-interfaces';
 import { TestCase } from '../utils/TestCase';
 import { User } from '@prisma/client';
+import dependencies from '../dependencies';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
 const mockSendEventToBoard = jest
-  .spyOn(namespaceInstance, 'sendEventToBoard')
+  .spyOn(dependencies.namespaceService, 'sendEventToBoard')
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   .mockImplementation(() => {});
 
 describe('BoardsController', () => {

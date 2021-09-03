@@ -14,7 +14,6 @@ CREATE TABLE "Board" (
     "title" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "ownerId" TEXT NOT NULL,
-    "columnOrder" JSONB DEFAULT E'[]',
 
     PRIMARY KEY ("id")
 );
@@ -25,6 +24,7 @@ CREATE TABLE "Column" (
     "title" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "boardId" TEXT NOT NULL,
+    "order" INTEGER NOT NULL,
 
     PRIMARY KEY ("id")
 );
@@ -36,6 +36,7 @@ CREATE TABLE "Card" (
     "ownerId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "columnId" TEXT NOT NULL,
+    "order" INTEGER NOT NULL,
 
     PRIMARY KEY ("id")
 );

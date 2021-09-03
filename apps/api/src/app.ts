@@ -1,24 +1,18 @@
+import 'express-async-errors';
 import express, { Express } from 'express';
 import cors from 'cors';
-import 'express-async-errors';
 import { BoardsRouter } from './boards/BoardsRouter';
 import { ColumnsRouter } from './columns/ColumnsRouter';
 import { CardsRouter } from './cards/CardsRouter';
 import { Server } from 'socket.io';
 import http from 'http';
-import { buildSockets } from './sockets';
 import globalErrorMiddleware from './middleware/globalErrorMiddleware';
 import { AuthRouter } from './auth/AuthRouter';
 import passport from 'passport';
 import helmet from 'helmet';
+import dependencies from './dependencies';
 
 const expressApp = express();
-const app = http.createServer(expressApp);
-const io = new Server(app, {
-  cors: {
-    origin: '*',
-  },
-});
 
 const applyMiddleware = (app: Express) => {
   /* istanbul ignore if  */
@@ -38,8 +32,15 @@ expressApp.use(ColumnsRouter);
 expressApp.use(CardsRouter);
 expressApp.use(AuthRouter);
 
-buildSockets(io);
-
 expressApp.use(globalErrorMiddleware);
+
+const app = http.createServer(expressApp);
+const io = new Server(app, {
+  cors: {
+    origin: '*',
+  },
+});
+
+dependencies.namespaceService.setIO(io).start();
 
 export { app };

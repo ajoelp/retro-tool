@@ -1,8 +1,8 @@
-import { Prisma, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { Request, Response } from 'express';
 import { prisma } from '../prismaClient';
-import { namespaceInstance } from '../sockets';
 import { BOARD_UPDATED_EVENT_NAME } from '@retro-tool/api-interfaces';
+import dependencies from '../dependencies';
 
 export class BoardsController {
   async index(req: Request, res: Response) {
@@ -24,26 +24,15 @@ export class BoardsController {
   async create(req: Request, res: Response) {
     const { title, columns } = req.body;
 
-    const createdBoard = await prisma.board.create({
+    const board = await prisma.board.create({
       data: {
         title,
         ownerId: (req.user as User).id,
         columns: {
-          create: columns.map((column) => ({ title: column })),
+          create: columns.map((column, order) => ({ title: column, order })),
         },
       },
       include: { columns: true },
-    });
-
-    // Set columns order
-
-    const columnOrder = createdBoard.columns.map(
-      (column) => column.id,
-    ) as Prisma.JsonArray;
-
-    const board = await prisma.board.update({
-      where: { id: createdBoard.id },
-      data: { columnOrder },
     });
 
     return res.json({ board });
@@ -55,7 +44,7 @@ export class BoardsController {
       data: req.body,
     });
 
-    namespaceInstance.sendEventToBoard(board.id, {
+    dependencies.namespaceService.sendEventToBoard(board.id, {
       type: BOARD_UPDATED_EVENT_NAME,
       payload: board,
     });

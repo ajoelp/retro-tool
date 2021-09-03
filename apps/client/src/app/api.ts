@@ -31,6 +31,11 @@ export type createCardsArgs = {
   content: string;
 };
 
+export type updateCardArgs = {
+  cardId: string;
+  content: string;
+};
+
 const apiClient = axios.create({
   baseURL: 'http://localhost:3333',
 });
@@ -95,6 +100,13 @@ const api = {
   },
   createCard: async (payload: createCardsArgs): Promise<CardWithOwner> => {
     const { data } = await apiClient.post('/cards', payload);
+    return data.card;
+  },
+  updateCard: async ({
+    cardId,
+    content,
+  }: updateCardArgs): Promise<CardWithOwner> => {
+    const { data } = await apiClient.post(`/cards/${cardId}`, { content });
     return data.card;
   },
 };

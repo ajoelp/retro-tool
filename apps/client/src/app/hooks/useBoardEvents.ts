@@ -3,10 +3,11 @@ import { useCallback, useEffect, useMemo } from 'react';
 import {
   BOARD_UPDATED_EVENT_NAME,
   CARD_CREATED_EVENT_NAME,
+  CARD_UPDATED_EVENT_NAME,
   COLUMN_CREATED_EVENT_NAME,
   COLUMN_DELETED_EVENT_NAME,
   SocketEvents,
-} from '../../../../../libs/api-interfaces/src/lib/socket-events';
+} from '@retro-tool/api-interfaces';
 import { useQueryClient } from 'react-query';
 import { Board, Card, Column } from '@prisma/client';
 
@@ -26,6 +27,18 @@ export function useBoardEvents(boardId: string) {
             ['cards', event.payload.columnId],
             (oldData) => {
               return [...(oldData ?? []), event.payload];
+            },
+          );
+          return;
+        case CARD_UPDATED_EVENT_NAME:
+          queryClient.setQueryData<Card[]>(
+            ['cards', event.payload.columnId],
+            (oldData) => {
+              return (
+                oldData?.map((card) => {
+                  return card.id === event.payload.id ? event.payload : card;
+                }) ?? []
+              );
             },
           );
           return;

@@ -11,22 +11,21 @@ generator client {
 }
 
 model User {
-  id String @id @default(uuid())
-  githubNickname String @unique
-  email String @unique
-  avatar String
-  boards Board[]
-  cards Card[]
+  id             String  @id @default(uuid())
+  githubNickname String  @unique
+  email          String  @unique
+  avatar         String
+  boards         Board[]
+  cards          Card[]
 }
 
 model Board {
-  id        String   @id @default(uuid())
-  title     String
-  createdAt DateTime @default(now())
-  owner User @relation(fields: [ownerId], references: [id])
-  ownerId String
-  columnOrder Json? @default("[]")
-  columns   Column[]
+  id          String   @id @default(uuid())
+  title       String
+  createdAt   DateTime @default(now())
+  owner       User     @relation(fields: [ownerId], references: [id])
+  ownerId     String
+  columns     Column[]
 }
 
 model Column {
@@ -36,14 +35,16 @@ model Column {
   boardId   String
   board     Board    @relation(fields: [boardId], references: [id])
   cards     Card[]
+  order     Int
 }
 
 model Card {
   id        String   @id @default(uuid())
   content   String
-  owner User @relation(fields: [ownerId], references: [id])
-  ownerId String
+  owner     User     @relation(fields: [ownerId], references: [id])
+  ownerId   String
   createdAt DateTime @default(now())
-  column   Column @relation(fields: [columnId], references: [id])
-  columnId String
+  column    Column   @relation(fields: [columnId], references: [id])
+  columnId  String
+  order     Int
 }
