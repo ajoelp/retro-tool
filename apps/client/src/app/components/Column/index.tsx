@@ -1,6 +1,11 @@
 import { Board, Column as ColumnType } from '@prisma/client';
 import styled from 'styled-components';
 import { Avatar, Flex, Heading } from '@chakra-ui/react';
+import {
+  Draggable,
+  DraggableProvided,
+  DraggableStateSnapshot,
+} from 'react-beautiful-dnd';
 import { BorderRadius, ColumnWidth, GAP, NavHeight } from '../../theme/sizes';
 import { backgroundColor } from '../../theme/colors';
 import { useBoard } from '../../hooks/boards';
@@ -70,9 +75,11 @@ const HeadingContainer = styled.div`
 type ColumnProps = {
   column: ColumnType;
   board: Board;
+  title: string;
+  index: number;
 };
 
-export default function Column({ column, board }: ColumnProps) {
+export default function Column({ column, board, title, index }: ColumnProps) {
   const { mutateAsync: deleteColumnAsync } = useDeleteColumn();
   const { openDialog } = useDialogs();
   const { refetch } = useBoard(board.id);
@@ -104,25 +111,33 @@ export default function Column({ column, board }: ColumnProps) {
     });
   };
   return (
-    <Wrapper>
-      <HeadingContainer>
-        <Heading size="md">{column.title}</Heading>
-        <button onClick={() => deleteColumn(column.id)}>
-          <DeleteIcon />
-        </button>
-      </HeadingContainer>
+    <Draggable draggableId={title} index={index}>
+      {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
+        <Wrapper
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          isDragging={snapshot.isDragging}
+        >
+          <HeadingContainer {...provided.dragHandleProps}>
+            <Heading size="md">{column.title}</Heading>
+            <button onClick={() => deleteColumn(column.id)}>
+              <DeleteIcon />
+            </button>
+          </HeadingContainer>
 
-      <Container>
-        <CardsContainer>
-          {cards?.map((card) => (
-            <Card key={card.id} card={card} column={column} />
-          ))}
-        </CardsContainer>
-        <AddCardContainer onSubmit={submitCard}>
-          <AddCardInput ref={newCardRef} placeholder="New item" />
-          <button type="submit">Send</button>
-        </AddCardContainer>
-      </Container>
-    </Wrapper>
+          <Container>
+            <CardsContainer>
+              {cards?.map((card) => (
+                <Card key={card.id} card={card} column={column} />
+              ))}
+            </CardsContainer>
+            <AddCardContainer onSubmit={submitCard}>
+              <AddCardInput ref={newCardRef} placeholder="New item" />
+              <button type="submit">Send</button>
+            </AddCardContainer>
+          </Container>
+        </Wrapper>
+      )}
+    </Draggable>
   );
 }
