@@ -138,4 +138,38 @@ describe('ColumnsController', () => {
       payload: expect.objectContaining(column),
     });
   });
+
+  it.only('will delete a column with cards', async () => {
+    const column = await prisma.column.create({
+      data: {
+        title: 'title',
+        order: 0,
+        boardId: board.id,
+      },
+    });
+
+    const card = await prisma.card.create({
+      data: {
+        content: '',
+        ownerId: user.id,
+        columnId: column.id,
+        order: 0,
+      },
+    });
+
+    const response = await TestCase.make()
+      .actingAs(user)
+      .delete(generatePath(COLUMNS_SINGULAR, { id: column.id }))
+      .expect(200);
+
+    expect(response.status).toEqual(200);
+    expect(
+      await prisma.column.findFirst({ where: { id: column.id } }),
+    ).toBeFalsy();
+
+    expect(mockSendEventToBoard).toHaveBeenCalledWith(board.id, {
+      type: COLUMN_DELETED_EVENT_NAME,
+      payload: expect.objectContaining(column),
+    });
+  });
 });
