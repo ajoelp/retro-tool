@@ -55,6 +55,10 @@ export class ColumnsController {
   }
 
   async destroy(req: Request, res: Response) {
+    await prisma.card.deleteMany({
+      where: { columnId: req.params.id },
+    });
+
     const column = await prisma.column.delete({
       where: { id: req.params.id },
       include: { board: true },
