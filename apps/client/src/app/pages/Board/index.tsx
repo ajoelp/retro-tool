@@ -18,6 +18,7 @@ import {
 } from 'react-beautiful-dnd';
 import { useMutation, useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
+import { orderBy } from 'lodash';
 import api from '../../api';
 import { useDialogs } from '../../dialog-manager';
 import styled from 'styled-components';
@@ -28,6 +29,7 @@ import { useBoard } from '../../hooks/boards';
 import {
   useColumns,
   useDeleteColumn,
+  useReorderColumn,
   useUpdateBoard,
 } from '../../hooks/columns';
 import { useBoardEvents } from '../../hooks/useBoardEvents';
@@ -66,9 +68,10 @@ const Board = () => {
   const { data, isLoading } = useBoard(id);
   const { columns: apiColumns, columnsLoading } = useColumns(id);
   const { mutateAsync: addColumnAsync } = useUpdateBoard();
-  const [columns, setColumns] = useState(apiColumns);
+  const { mutateAsync: reorderColumnAsync } = useReorderColumn();
+  const [columns, setColumns] = useState(() => orderBy(apiColumns, 'order'));
 
-  useEffect(() => setColumns(apiColumns), [apiColumns]);
+  useEffect(() => setColumns(orderBy(apiColumns, 'order')), [apiColumns]);
 
   useBoardEvents(id);
 
@@ -99,6 +102,12 @@ const Board = () => {
         source.index,
         destination.index,
       );
+      // make request here
+      reorderColumnAsync({
+        boardId: id,
+        sourceIndex: source.index,
+        destinationIndex: destination.index,
+      });
 
       setColumns(ordered);
 

@@ -6,6 +6,7 @@ import {
   CARD_UPDATED_EVENT_NAME,
   COLUMN_CREATED_EVENT_NAME,
   COLUMN_DELETED_EVENT_NAME,
+  COLUMN_UPDATED_EVENT_NAME,
   SocketEvents,
 } from '@retro-tool/api-interfaces';
 import { useQueryClient } from 'react-query';
@@ -37,6 +38,20 @@ export function useBoardEvents(boardId: string) {
               return (
                 oldData?.map((card) => {
                   return card.id === event.payload.id ? event.payload : card;
+                }) ?? []
+              );
+            },
+          );
+          return;
+        case COLUMN_UPDATED_EVENT_NAME:
+          queryClient.setQueryData<Column[]>(
+            ['columns', event.payload.boardId],
+            (oldData) => {
+              return (
+                oldData?.map((column) => {
+                  return column.id === event.payload.id
+                    ? event.payload
+                    : column;
                 }) ?? []
               );
             },

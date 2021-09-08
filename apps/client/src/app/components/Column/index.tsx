@@ -113,11 +113,7 @@ export default function Column({ column, board, title, index }: ColumnProps) {
   return (
     <Draggable draggableId={title} index={index}>
       {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
-        <Wrapper
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          isDragging={snapshot.isDragging}
-        >
+        <Wrapper ref={provided.innerRef} {...provided.draggableProps}>
           <HeadingContainer {...provided.dragHandleProps}>
             <Heading size="md">{column.title}</Heading>
             <button onClick={() => deleteColumn(column.id)}>
