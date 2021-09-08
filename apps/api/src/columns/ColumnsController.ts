@@ -64,12 +64,23 @@ export class ColumnsController {
       include: { board: true },
     });
 
-    await columnRepository.reorderColumns(column.boardId);
+    await columnRepository.deleteColumns(column.boardId);
 
     dependencies.namespaceService.sendEventToBoard(column.boardId, {
       type: COLUMN_DELETED_EVENT_NAME,
       payload: column,
     });
+
+    return res.json({});
+  }
+
+  async updateOrder(req: Request, res: Response) {
+    const { boardId, sourceIndex, destinationIndex } = req.body;
+    await columnRepository.reorderColumns(
+      boardId,
+      sourceIndex,
+      destinationIndex,
+    );
 
     return res.json({});
   }

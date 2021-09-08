@@ -37,7 +37,7 @@ describe('ColumnRepository', () => {
     });
   });
 
-  describe('reorderColumns', () => {
+  describe('deleteColumns', () => {
     it("will reorder columns that don't match", async () => {
       const column1 = await prisma.column.create({
         data: {
@@ -60,7 +60,7 @@ describe('ColumnRepository', () => {
           order: 3,
         },
       });
-      await columnRepository.reorderColumns(board.id);
+      await columnRepository.deleteColumns(board.id);
 
       expect(
         await prisma.column.findFirst({ where: { id: column1.id } }),
@@ -73,6 +73,46 @@ describe('ColumnRepository', () => {
       expect(
         await prisma.column.findFirst({ where: { id: column3.id } }),
       ).toEqual(expect.objectContaining({ order: 2 }));
+    });
+  });
+
+  describe('reorderColumns', () => {
+    it("will reorder columns that don't match", async () => {
+      const column1 = await prisma.column.create({
+        data: {
+          title: 'column',
+          boardId: board.id,
+          order: 0,
+        },
+      });
+      const column2 = await prisma.column.create({
+        data: {
+          title: 'column',
+          boardId: board.id,
+          order: 1,
+        },
+      });
+      const column3 = await prisma.column.create({
+        data: {
+          title: 'column',
+          boardId: board.id,
+          order: 2,
+        },
+      });
+
+      await columnRepository.reorderColumns(board.id, 2, 0);
+
+      expect(
+        await prisma.column.findFirst({ where: { id: column1.id } }),
+      ).toEqual(expect.objectContaining({ order: 1 }));
+
+      expect(
+        await prisma.column.findFirst({ where: { id: column2.id } }),
+      ).toEqual(expect.objectContaining({ order: 2 }));
+
+      expect(
+        await prisma.column.findFirst({ where: { id: column3.id } }),
+      ).toEqual(expect.objectContaining({ order: 0 }));
     });
   });
 

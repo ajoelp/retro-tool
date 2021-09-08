@@ -22,6 +22,12 @@ export type deleteColumnArgs = {
   columnId: string;
 };
 
+export type reorderColumnArgs = {
+  boardId: string;
+  sourceIndex: number;
+  destinationIndex: number;
+};
+
 export type fetchCardsArgs = {
   columnId: string;
 };
@@ -89,6 +95,17 @@ const api = {
   },
   deleteColumn: ({ columnId }: deleteColumnArgs) => {
     return apiClient.delete(`/columns/${columnId}`);
+  },
+  redorderColumn: ({
+    boardId,
+    sourceIndex,
+    destinationIndex,
+  }: reorderColumnArgs) => {
+    return apiClient.post(`/columns/reorder`, {
+      boardId,
+      sourceIndex,
+      destinationIndex,
+    });
   },
   fetchCards: async ({
     columnId,

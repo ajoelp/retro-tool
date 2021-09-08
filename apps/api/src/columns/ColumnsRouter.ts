@@ -9,6 +9,7 @@ const columnsController = new ColumnsController();
 
 export const COLUMNS_ROOT = '/columns';
 export const COLUMNS_SINGULAR = '/columns/:id';
+export const COLUMNS_REORDER = '/columns/reorder';
 
 ColumnsRouter.get(COLUMNS_ROOT, [
   authenticatedMiddleware,
@@ -27,6 +28,10 @@ ColumnsRouter.patch(COLUMNS_SINGULAR, [
 ColumnsRouter.delete(COLUMNS_SINGULAR, [
   authenticatedMiddleware,
   columnsController.destroy,
+]);
+ColumnsRouter.post(COLUMNS_REORDER, [
+  authenticatedMiddleware,
+  columnsController.updateOrder,
 ]);
 
 export { ColumnsRouter };

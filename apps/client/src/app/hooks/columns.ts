@@ -18,3 +18,7 @@ export const useUpdateBoard = () => {
 export const useDeleteColumn = () => {
   return useMutation(api.deleteColumn);
 };
+
+export const useReorderColumn = () => {
+  return useMutation(api.redorderColumn);
+};
