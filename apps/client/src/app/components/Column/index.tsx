@@ -14,7 +14,7 @@ import { useDialogs } from '../../dialog-manager';
 import { useDeleteColumn } from '../../hooks/columns';
 import { DeleteIcon } from '@chakra-ui/icons';
 import { useCards, useCreateCard } from '../../hooks/cards';
-import { useRef } from 'react';
+import { useRef, KeyboardEvent } from 'react';
 import { Card } from '../Card';
 import { RingShadow } from '../../theme/shadows';
 
@@ -107,9 +107,20 @@ export default function Column({ column, board, title, index }: ColumnProps) {
         await refetch();
       },
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      onCancel: () => {},
+      onCancel: () => { },
     });
   };
+
+  const onInputKeyPress = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (!e.shiftKey && e.code === 'Enter') {
+      e.preventDefault();
+      submitCard(e)
+      return;
+    }
+  }
+
+  const inputPlaceholder = "Add a new card.\nPress Enter to submit.\nPress Shift + Enter for a new line"
+
   return (
     <Draggable draggableId={title} index={index}>
       {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
@@ -128,8 +139,7 @@ export default function Column({ column, board, title, index }: ColumnProps) {
               ))}
             </CardsContainer>
             <AddCardContainer onSubmit={submitCard}>
-              <AddCardInput ref={newCardRef} placeholder="New item" />
-              <button type="submit">Send</button>
+              <AddCardInput ref={newCardRef} placeholder={inputPlaceholder} onKeyPress={onInputKeyPress} />
             </AddCardContainer>
           </Container>
         </Wrapper>

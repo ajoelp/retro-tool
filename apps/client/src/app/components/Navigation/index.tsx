@@ -6,6 +6,9 @@ import { Board } from '@prisma/client';
 import { AddIcon } from '@chakra-ui/icons';
 import { useUpdateBoard } from '../../hooks/columns';
 import { useDialogs } from '../../dialog-manager';
+import { useActiveUsers } from '../../hooks/users';
+import { Avatar, AvatarGroup } from '@chakra-ui/avatar';
+import { Tooltip } from "@chakra-ui/react"
 
 const NavigationWrapper = styled.div`
   margin: 1rem auto;
@@ -24,9 +27,12 @@ const BoardTitleInput = styled.input`
 `;
 
 const AddColumnButton = styled.button`
-  margin-left: auto;
   padding: 10px 20px;
 `;
+
+const AvatarContainer = styled.div`
+  margin-left: auto;
+`
 
 type NavigationProps = {
   board: Board;
@@ -35,6 +41,7 @@ type NavigationProps = {
 export function Navigation({ board }: NavigationProps) {
   const { mutateAsync: addColumnAsync } = useUpdateBoard();
   const { openDialog } = useDialogs();
+  const activeUsers = useActiveUsers(board.id)
 
   const addColumn = async () => {
     openDialog('addColumn', {
@@ -47,6 +54,15 @@ export function Navigation({ board }: NavigationProps) {
   return (
     <NavigationWrapper>
       <BoardTitleInput defaultValue={board.title} />
+      <AvatarContainer>
+        <AvatarGroup max={10}>
+          {activeUsers?.map(user => (
+            <Tooltip label={user.githubNickname} key={user.id}>
+              <Avatar size="xs" bor src={user.avatar} />
+            </Tooltip>
+          ))}
+        </AvatarGroup>
+      </AvatarContainer>
       <AddColumnButton onClick={addColumn}>
         <AddIcon />
       </AddColumnButton>
