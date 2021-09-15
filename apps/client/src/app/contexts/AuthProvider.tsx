@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from 'react-query';
-import { createContext, ReactNode, useContext } from 'react';
+import { createContext, ReactNode, useContext, useEffect } from 'react';
 import { User } from '@prisma/client';
 import api from '../api';
 import { environment } from '../../environments/environment.prod';
@@ -12,7 +12,7 @@ interface LoginParams {
 export interface AuthProviderState {
   user: User | undefined | null;
   userLoading: boolean;
-  login(): void;
+  login(redirect?: string): void;
   logout(): Promise<any>;
   logoutLoading: boolean;
 }
@@ -41,7 +41,8 @@ const useMe = () => {
 };
 
 const useLogin = () => {
-  return () => {
+  return (redirect = "/") => {
+    window.localStorage.setItem('redirect', redirect)
     window.location.href = `${environment.apiUrl}/auth/github`;
   };
 };
@@ -51,8 +52,18 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const { data: user, isLoading: userLoading } = useMe();
+  const { data: user, isLoading: userLoading, isFetched } = useMe();
   const login = useLogin();
+
+  useEffect(() => {
+    if (user) {
+      const redirect = window.localStorage.getItem('redirect')
+      if (redirect) {
+        window.localStorage.removeItem('redirect')
+        window.location.href = redirect
+      }
+    }
+  }, [user])
 
   const value: AuthProviderState = {
     user,
@@ -62,6 +73,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     async logout() { },
     logoutLoading: false,
   };
+
+  if (!isFetched) return null
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
