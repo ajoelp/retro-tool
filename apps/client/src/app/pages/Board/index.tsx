@@ -18,6 +18,8 @@ import {
   useColumns, useReorderColumn,
 } from '../../hooks/columns';
 import { useBoardEvents } from '../../hooks/useBoardEvents';
+import usePrevious from 'react-use/esm/usePrevious';
+import isEqual from 'lodash/isEqual'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -55,7 +57,13 @@ const Board = () => {
   const { mutateAsync: reorderColumnAsync } = useReorderColumn();
   const [columns, setColumns] = useState(() => orderBy(apiColumns, 'order'));
 
-  useEffect(() => setColumns(orderBy(apiColumns, 'order')), [apiColumns]);
+  const previousApiColumns = usePrevious(columns)
+  useEffect(() => {
+    const newApiColumns = orderBy(apiColumns, 'order');
+    if (!isEqual(previousApiColumns, newApiColumns)) {
+      setColumns(newApiColumns)
+    }
+  }, [apiColumns, previousApiColumns]);
 
   useBoardEvents(id);
 

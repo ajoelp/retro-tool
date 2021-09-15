@@ -9,11 +9,12 @@ import {
 } from '@chakra-ui/react';
 import { useRef } from 'react';
 import { useMutation } from 'react-query';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import api from '../api';
 import GithubButton from 'react-github-login-button'
 import { useAuth } from '../contexts/AuthProvider';
 import styled from 'styled-components'
+import queryString from 'query-string'
 
 const LoginWrapper = styled.div`
   width: 100vw;
@@ -30,11 +31,17 @@ const useCreateBoard = () => {
 
 const DEFAULT_COLUMNS = 'Mad, Glad, Sad';
 
+function useQueryParams() {
+  return queryString.parse(useLocation().search)
+}
+
 const Landing = () => {
   const boardTitleRef = useRef<HTMLInputElement>(null);
   const columnNamesRef = useRef<HTMLInputElement>(null);
   const { mutateAsync } = useCreateBoard();
+  const { redirect } = useQueryParams()
   const { user, login } = useAuth();
+
 
   const history = useHistory();
 
@@ -72,7 +79,7 @@ const Landing = () => {
     return (
       <LoginWrapper>
         <Heading size="md" mb="4">Please login.</Heading>
-        <GithubButton onClick={login}>Login</GithubButton>
+        <GithubButton onClick={() => login(redirect as string)}>Login</GithubButton>
       </LoginWrapper>
     );
   }

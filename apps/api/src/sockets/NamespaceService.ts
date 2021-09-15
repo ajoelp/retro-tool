@@ -59,8 +59,6 @@ export class NamespaceService {
     this.emitUserRoom()
 
     socket.on('disconnect', () => {
-      console.log(`User ${user.id} -> ${id} disconnected;`)
-      console.log([...this.clients.values()].length)
       this.clients.delete(id);
     });
   }
@@ -69,7 +67,6 @@ export class NamespaceService {
     const boardUsers = [...this.clients.values()]
       .reduce<User[]>((carry, client) => {
         const index = carry.findIndex(user => user.id === client.user.id)
-        console.log(index)
         if (index < 0) {
           return [...carry, client.user]
         }
