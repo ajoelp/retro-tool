@@ -1,45 +1,30 @@
-import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 import {
-  Box,
-  Flex,
-  Grid,
-  Heading,
-  Icon,
-  Spacer,
-  Spinner,
+  Spinner
 } from '@chakra-ui/react';
+import { Column as ColumnType } from '@prisma/client';
+import { orderBy } from 'lodash';
 import { useEffect, useState } from 'react';
 import {
-  DragDropContext,
-  Droppable,
+  DragDropContext, DraggableLocation, Droppable,
   DroppableProvided,
-  DropResult,
-  DraggableLocation,
+  DropResult
 } from 'react-beautiful-dnd';
-import { useMutation, useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
-import { orderBy } from 'lodash';
-import api from '../../api';
-import { useDialogs } from '../../dialog-manager';
 import styled from 'styled-components';
-import { Navigation } from '../../components/Navigation';
-import { NavHeight } from '../../theme/sizes';
 import Column from '../../components/Column';
+import { Navigation } from '../../components/Navigation';
 import { useBoard } from '../../hooks/boards';
 import {
-  useColumns,
-  useDeleteColumn,
-  useReorderColumn,
-  useUpdateBoard,
+  useColumns, useReorderColumn,
 } from '../../hooks/columns';
 import { useBoardEvents } from '../../hooks/useBoardEvents';
-import { Column as ColumnType, Prisma } from '@prisma/client';
 
 const PageWrapper = styled.div`
   display: flex;
   flex-direction: column;
   height: 100vh;
   width: 100vw;
+  overflow-x: scroll;
 `;
 
 const Wrapper = styled.div`
@@ -48,7 +33,7 @@ const Wrapper = styled.div`
   flex-wrap: nowrap;
   margin: 0 auto;
   max-width: 100vw;
-  overflow-x: scroll;
+
   padding: 0 2rem;
 `;
 
@@ -67,7 +52,6 @@ const Board = () => {
   const { id } = useParams<{ id: string }>();
   const { data, isLoading } = useBoard(id);
   const { columns: apiColumns, columnsLoading } = useColumns(id);
-  const { mutateAsync: addColumnAsync } = useUpdateBoard();
   const { mutateAsync: reorderColumnAsync } = useReorderColumn();
   const [columns, setColumns] = useState(() => orderBy(apiColumns, 'order'));
 
@@ -75,9 +59,7 @@ const Board = () => {
 
   useBoardEvents(id);
 
-  const { openDialog } = useDialogs();
-
-  if (isLoading) return <Spinner />;
+  if (isLoading || columnsLoading) return <Spinner />;
   if (!data) return null;
 
   const onDragEnd = (result: DropResult) => {

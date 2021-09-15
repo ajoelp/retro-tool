@@ -2,6 +2,7 @@ import { useMutation, useQuery } from 'react-query';
 import { createContext, ReactNode, useContext } from 'react';
 import { User } from '@prisma/client';
 import api from '../api';
+import { environment } from '../../environments/environment.prod';
 
 interface LoginParams {
   email: string;
@@ -20,9 +21,9 @@ export const AuthContext = createContext<AuthProviderState>({
   user: null,
   userLoading: false,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  login() {},
+  login() { },
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  async logout() {},
+  async logout() { },
   logoutLoading: false,
 });
 
@@ -41,7 +42,7 @@ const useMe = () => {
 
 const useLogin = () => {
   return () => {
-    window.location.href = 'http://localhost:3333/auth/github';
+    window.location.href = `${environment.apiUrl}/auth/github`;
   };
 };
 
@@ -58,7 +59,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     userLoading,
     login,
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    async logout() {},
+    async logout() { },
     logoutLoading: false,
   };
 

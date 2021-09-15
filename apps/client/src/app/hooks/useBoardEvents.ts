@@ -11,12 +11,14 @@ import {
 } from '@retro-tool/api-interfaces';
 import { useQueryClient } from 'react-query';
 import { Board, Card, Column } from '@prisma/client';
+import Cookies from 'js-cookie';
+import { environment } from '../../environments/environment.prod';
 
 export function useBoardEvents(boardId: string) {
   const queryClient = useQueryClient();
-  const socketUrl = `http://localhost:3333/boards/${boardId}`;
+  const socketUrl = `${environment.apiUrl}/boards/${boardId}`;
   const socket = useMemo(
-    () => (boardId ? io(socketUrl) : undefined),
+    () => (boardId ? io(socketUrl, { auth: { token: Cookies.get('auth_token') } }) : undefined),
     [socketUrl, boardId],
   );
 
@@ -95,6 +97,10 @@ export function useBoardEvents(boardId: string) {
 
     socket?.on('event', processEvent);
 
+    socket?.on('users', (users) => {
+      queryClient.setQueryData(['activeUsers', { boardId }], () => users)
+    })
+
     socket?.on('disconnect', () => {
       console.log('Disconnected from WS');
     });
@@ -102,5 +108,5 @@ export function useBoardEvents(boardId: string) {
     return () => {
       socket?.close();
     };
-  }, [processEvent, socket]);
+  }, [boardId, processEvent, queryClient, socket]);
 }

@@ -1,7 +1,8 @@
-import { Board, Card, Column, User } from '@prisma/client';
+import { Board, Column, User } from '@prisma/client';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { CardWithOwner } from '@retro-tool/api-interfaces';
+import { environment } from '../environments/environment.prod';
 
 export type BoardWithColumn = Board & {
   columns: Column[];
@@ -43,7 +44,7 @@ export type updateCardArgs = {
 };
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:3333',
+  baseURL: environment.apiUrl,
 });
 
 apiClient.interceptors.request.use(
