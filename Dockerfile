@@ -30,4 +30,4 @@ RUN apk add --no-cache tini
 COPY --chown=node:node --from=build-runtime /usr/src/app ./
 USER node
 ENTRYPOINT ["/sbin/tini", "--", "node"]
-CMD ["./apps/api/main.js"]
+CMD ["./src/apps/api/main.js"]

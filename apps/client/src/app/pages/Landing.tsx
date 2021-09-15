@@ -11,8 +11,18 @@ import { useRef } from 'react';
 import { useMutation } from 'react-query';
 import { useHistory } from 'react-router-dom';
 import api from '../api';
-import { useUser } from '../contexts/UserContext';
+import GithubButton from 'react-github-login-button'
 import { useAuth } from '../contexts/AuthProvider';
+import styled from 'styled-components'
+
+const LoginWrapper = styled.div`
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+`
 
 const useCreateBoard = () => {
   return useMutation(api.createBoard);
@@ -60,10 +70,10 @@ const Landing = () => {
 
   if (!user) {
     return (
-      <div>
-        <p>Please login</p>
-        <button onClick={login}>Login</button>
-      </div>
+      <LoginWrapper>
+        <Heading size="md" mb="4">Please login.</Heading>
+        <GithubButton onClick={login}>Login</GithubButton>
+      </LoginWrapper>
     );
   }
 
@@ -96,7 +106,7 @@ const Landing = () => {
           <FormHelperText>Comma separated</FormHelperText>
         </FormControl>
 
-        <Button onClick={onSubmit}>Create Index</Button>
+        <Button onClick={onSubmit}>Create board</Button>
       </Box>
     </>
   );
