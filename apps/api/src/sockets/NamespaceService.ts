@@ -76,12 +76,12 @@ export class NamespaceService {
     this.namespace.emit('users', boardUsers)
   }
 
-  sendEventToBoard(boardId: string, event: SocketEvents) {
+  sendEventToBoard(boardId: string, event: SocketEvents, eventTrackingId?: string) {
     const boardClients = [...this.clients.values()].filter(
       (namespace) => namespace.boardId === boardId,
     );
     boardClients.forEach((client) => {
-      client.emit('event', event);
+      client.emit('event', { ...event, eventTrackingId },);
     });
   }
 

@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from './contexts/AuthProvider';
 import { theme } from './theme';
 import { lazy, LazyExoticComponent, ReactComponentElement, Suspense } from 'react';
 import '@fontsource/inter';
+import { IgnoredEventsProvider } from './contexts/IgnoredEventsContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -41,21 +42,23 @@ const Route = (props: AuthenticatedRouteProps) => {
 
 export const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ChakraProvider theme={theme}>
-        <DialogManager>
-          <AuthProvider>
-            <Router>
-              <Switch>
-                <Route path="/" exact={true} component={lazy(() => import('./pages/Landing'))} />
-                <Route path="/boards/:id" auth={true} component={lazy(() => import('./pages/Board'))} />
-              </Switch>
-            </Router>
-          </AuthProvider>
-        </DialogManager>
-      </ChakraProvider>
-      <ReactQueryDevtools />
-    </QueryClientProvider>
+    <IgnoredEventsProvider>
+      <QueryClientProvider client={queryClient}>
+        <ChakraProvider theme={theme}>
+          <DialogManager>
+            <AuthProvider>
+              <Router>
+                <Switch>
+                  <Route path="/" exact={true} component={lazy(() => import('./pages/Landing'))} />
+                  <Route path="/boards/:id" auth={true} component={lazy(() => import('./pages/Board'))} />
+                </Switch>
+              </Router>
+            </AuthProvider>
+          </DialogManager>
+        </ChakraProvider>
+        <ReactQueryDevtools />
+      </QueryClientProvider>
+    </IgnoredEventsProvider>
   );
 };
 

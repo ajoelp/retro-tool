@@ -55,15 +55,11 @@ const Board = () => {
   const { data, isLoading } = useBoard(id);
   const { columns: apiColumns, columnsLoading } = useColumns(id);
   const { mutateAsync: reorderColumnAsync } = useReorderColumn();
-  const [columns, setColumns] = useState(() => orderBy(apiColumns, 'order'));
+  const [columns, setColumns] = useState(orderBy(apiColumns, 'order'));
 
-  const previousApiColumns = usePrevious(columns)
   useEffect(() => {
-    const newApiColumns = orderBy(apiColumns, 'order');
-    if (!isEqual(previousApiColumns, newApiColumns)) {
-      setColumns(newApiColumns)
-    }
-  }, [apiColumns, previousApiColumns]);
+    setColumns(orderBy(apiColumns, 'order'))
+  }, [apiColumns]);
 
   useBoardEvents(id);
 

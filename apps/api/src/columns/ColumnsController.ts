@@ -75,11 +75,13 @@ export class ColumnsController {
   }
 
   async updateOrder(req: Request, res: Response) {
-    const { boardId, sourceIndex, destinationIndex } = req.body;
+    const { boardId, sourceIndex, destinationIndex, eventTrackingId } = req.body;
+
     await columnRepository.reorderColumns(
       boardId,
       sourceIndex,
       destinationIndex,
+      eventTrackingId
     );
 
     return res.json({});

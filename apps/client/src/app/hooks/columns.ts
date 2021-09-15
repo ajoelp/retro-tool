@@ -1,5 +1,8 @@
+import { useIgnoredEvents } from './../contexts/IgnoredEventsContext';
+import { reorderColumnArgs } from './../api';
 import { useMutation, useQuery } from 'react-query';
 import api from '../api';
+import { v4 as uuid } from 'uuid';
 
 export const useColumns = (boardId: string) => {
   const { data, isLoading } = useQuery(['columns', boardId], () =>
@@ -20,5 +23,13 @@ export const useDeleteColumn = () => {
 };
 
 export const useReorderColumn = () => {
-  return useMutation(api.redorderColumn);
+  const { addIgnoreId } = useIgnoredEvents()
+  return useMutation((args: Omit<reorderColumnArgs, 'eventTrackingId'>) => {
+    const eventTrackingId = uuid()
+    addIgnoreId(eventTrackingId)
+    return api.redorderColumn({
+      ...args,
+      eventTrackingId
+    })
+  });
 };
