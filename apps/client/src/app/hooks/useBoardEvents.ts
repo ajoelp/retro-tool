@@ -1,5 +1,6 @@
-import { io } from 'socket.io-client';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useIgnoredEvents } from './../contexts/IgnoredEventsContext';
+import { io, Socket } from 'socket.io-client';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import {
   BOARD_UPDATED_EVENT_NAME,
   CARD_CREATED_EVENT_NAME,
@@ -14,16 +15,16 @@ import { Board, Card, Column } from '@prisma/client';
 import Cookies from 'js-cookie';
 import { environment } from '../../environments/environment.prod';
 
+type EventType = SocketEvents & { eventTrackingId?: string }
+
 export function useBoardEvents(boardId: string) {
   const queryClient = useQueryClient();
-  const socketUrl = `${environment.apiUrl}/boards/${boardId}`;
-  const socket = useMemo(
-    () => (boardId ? io(socketUrl, { auth: { token: Cookies.get('auth_token') } }) : undefined),
-    [socketUrl, boardId],
-  );
+  const { ignoredEvents } = useIgnoredEvents()
+  const socket = useRef<Socket>()
 
   const processEvent = useCallback(
-    (event: SocketEvents) => {
+    (event: EventType) => {
+      if (event.eventTrackingId && ignoredEvents.includes(event.eventTrackingId)) return;
       switch (event.type) {
         case CARD_CREATED_EVENT_NAME:
           queryClient.setQueryData<Card[]>(
@@ -87,26 +88,30 @@ export function useBoardEvents(boardId: string) {
           return;
       }
     },
-    [queryClient],
+    [ignoredEvents, queryClient],
   );
 
+  const setUsers = useCallback((users) => {
+    queryClient.setQueryData(['activeUsers', { boardId }], () => users)
+  }, [boardId, queryClient])
+
   useEffect(() => {
-    socket?.on('connect', () => {
+    socket.current = io(`${environment.apiUrl}/boards/${boardId}`, { auth: { token: Cookies.get('auth_token') } })
+    socket.current?.on('connect', () => {
       console.log('Connected to WS');
     });
 
-    socket?.on('event', processEvent);
+    socket.current?.on('event', processEvent);
 
-    socket?.on('users', (users) => {
-      queryClient.setQueryData(['activeUsers', { boardId }], () => users)
-    })
+    socket.current?.on('users', setUsers)
 
-    socket?.on('disconnect', () => {
-      console.log('Disconnected from WS');
+    socket.current?.on('disconnect', (e) => {
+      console.log('Disconnected from WS', e);
     });
 
     return () => {
-      socket?.close();
+      socket.current?.disconnect();
     };
-  }, [boardId, processEvent, queryClient, socket]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [boardId]);
 }

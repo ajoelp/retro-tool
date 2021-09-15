@@ -17,6 +17,14 @@ passport.deserializeUser(function (user, done) {
   done(null, user);
 });
 
+const isAllowedToRegister = (organizations: string[]) => {
+  const allowedOrgs = (process.env.ALLOWED_ORGS ?? '').split(',') as string[]
+  if (!allowedOrgs.length) return true
+  return !!organizations.find(organization => {
+    return allowedOrgs.find(allowedOrg => allowedOrg === organization)
+  })
+}
+
 passport.use(
   new GithubStrategy(
     {
@@ -25,7 +33,7 @@ passport.use(
       callbackURL: process.env.GITHUB_CALLBACK_URL,
     },
     async function (accessToken, refreshToken, profile, done) {
-      if (!profile.organizations?.includes?.('vehikl')) {
+      if (!isAllowedToRegister(profile.organizations ?? [])) {
         done(new Error('Invalid organization'), null);
         return;
       }

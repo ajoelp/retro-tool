@@ -47,6 +47,7 @@ export class ColumnRepository {
     boardId: string,
     sourceIndex: number,
     destinationIndex: number,
+    eventTrackingId: string
   ) {
     const columns = await prisma.column.findMany({
       where: { boardId },
@@ -65,7 +66,7 @@ export class ColumnRepository {
         dependencies.namespaceService.sendEventToBoard(boardId, {
           type: COLUMN_UPDATED_EVENT_NAME,
           payload: updatedColumn,
-        });
+        }, eventTrackingId);
       }
     }
   }

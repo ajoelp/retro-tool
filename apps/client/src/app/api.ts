@@ -27,6 +27,7 @@ export type reorderColumnArgs = {
   boardId: string;
   sourceIndex: number;
   destinationIndex: number;
+  eventTrackingId: string;
 };
 
 export type fetchCardsArgs = {
@@ -101,11 +102,13 @@ const api = {
     boardId,
     sourceIndex,
     destinationIndex,
+    eventTrackingId
   }: reorderColumnArgs) => {
     return apiClient.post(`/columns/reorder`, {
       boardId,
       sourceIndex,
       destinationIndex,
+      eventTrackingId
     });
   },
   fetchCards: async ({
