@@ -15,6 +15,7 @@ export class AuthController {
     return res
       .cookie('auth_token', `Bearer ${generateJwtSecret(req.user as User)}`, {
         expires: new Date(Date.now() + 48 * 3600000),
+        domain: process.env.SPA_URL
       })
       .redirect(301, process.env.SPA_URL);
   }
