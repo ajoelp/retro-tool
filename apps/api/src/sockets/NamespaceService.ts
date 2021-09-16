@@ -56,15 +56,21 @@ export class NamespaceService {
 
     this.clients.set(id, namespace);
 
-    this.emitUserRoom()
+    this.emitUserRoom(boardId)
 
     socket.on('disconnect', () => {
       this.clients.delete(id);
     });
   }
 
-  emitUserRoom() {
-    const boardUsers = [...this.clients.values()]
+  getUserInBoard(boardId: string) {
+    return [...this.clients.values()].filter(
+      (namespace) => namespace.boardId === boardId,
+    );
+  }
+
+  emitUserRoom(boardId: string) {
+    const boardUsers = this.getUserInBoard(boardId)
       .reduce<User[]>((carry, client) => {
         const index = carry.findIndex(user => user.id === client.user.id)
         if (index < 0) {
@@ -77,10 +83,7 @@ export class NamespaceService {
   }
 
   sendEventToBoard(boardId: string, event: SocketEvents, eventTrackingId?: string) {
-    const boardClients = [...this.clients.values()].filter(
-      (namespace) => namespace.boardId === boardId,
-    );
-    boardClients.forEach((client) => {
+    this.getUserInBoard(boardId).forEach((client) => {
       client.emit('event', { ...event, eventTrackingId },);
     });
   }
