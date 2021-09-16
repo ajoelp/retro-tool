@@ -53,7 +53,7 @@ export class CardsController {
 
   async update(req: Request, res: Response) {
     const { cardId } = req.params;
-    const { content } = req.body;
+    const { content, eventTrackingId } = req.body;
 
     const card = await prisma.card.update({
       where: {
@@ -69,7 +69,7 @@ export class CardsController {
     dependencies.namespaceService.sendEventToBoard(card.column.boardId, {
       type: CARD_UPDATED_EVENT_NAME,
       payload: card,
-    });
+    }, eventTrackingId);
 
     return res.json({ card });
   }

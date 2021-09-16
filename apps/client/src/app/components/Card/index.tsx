@@ -98,15 +98,15 @@ export const Card: React.FC<CardProps> = ({ card }) => {
         <CardInput as="p">{value}</CardInput>
       )}
       <CardDetails>
-        <CardVotesContainer>
-          <CardVotesButton>
-            <ArrowCircleUpIcon />
-          </CardVotesButton>
-          <p>12</p>
-          <CardVotesButton>
-            <ArrowCircleDownIcon />
-          </CardVotesButton>
-        </CardVotesContainer>
+        {/*<CardVotesContainer>*/}
+        {/*  <CardVotesButton>*/}
+        {/*    <ArrowCircleUpIcon />*/}
+        {/*  </CardVotesButton>*/}
+        {/*  <p>12</p>*/}
+        {/*  <CardVotesButton>*/}
+        {/*    <ArrowCircleDownIcon />*/}
+        {/*  </CardVotesButton>*/}
+        {/*</CardVotesContainer>*/}
         <div>
           {updateCardLoading && <Loader size="xs" />}
           <Avatar size="xs" src={card.owner.avatar} />

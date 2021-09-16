@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import api from '../api';
 import { AuthProvider } from '../contexts/AuthProvider';
+import {v4 as uuid} from "uuid";
+import {useIgnoredEvents} from "../contexts/IgnoredEventsContext";
 
 export function useCards(columnId: string) {
   const { data, isLoading, refetch } = useQuery(['cards', columnId], () =>
@@ -30,9 +32,13 @@ type updateCardArgs = {
 };
 
 export function useUpdateCard() {
+  const { addIgnoreId } = useIgnoredEvents()
   const { mutateAsync, isLoading } = useMutation(
-    ({ cardId, content }: updateCardArgs) =>
-      api.updateCard({ cardId, content }),
+    ({ cardId, content }: updateCardArgs) => {
+      const eventTrackingId = uuid()
+      addIgnoreId(eventTrackingId)
+      return api.updateCard({ cardId, content, eventTrackingId })
+    }
   );
   return {
     updateCard: mutateAsync,

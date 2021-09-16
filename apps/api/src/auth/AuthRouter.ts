@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { AuthController } from './AuthController';
 import passport from 'passport';
-import { Strategy } from 'passport-github2';
 import { prisma } from '../prismaClient';
 import { authenticatedMiddleware } from '../middleware/authMiddleware';
 import { GithubStrategy } from '../utils/GithubStrategy';
@@ -18,8 +17,12 @@ passport.deserializeUser(function (user, done) {
 });
 
 const isAllowedToRegister = (organizations: string[]) => {
-  const allowedOrgs = (process.env.ALLOWED_ORGS ?? '').split(',') as string[]
-  if (!allowedOrgs.length) return true
+  const allowedOrgs = (process.env.ALLOWED_ORGS ?? '')
+    .split(',')
+    .filter(org => org !== '')
+
+  if (allowedOrgs.length <= 0) return true
+  console.log(organizations, allowedOrgs)
   return !!organizations.find(organization => {
     return allowedOrgs.find(allowedOrg => allowedOrg === organization)
   })

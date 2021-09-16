@@ -100,7 +100,7 @@ describe('ColumnRepository', () => {
         },
       });
 
-      await columnRepository.reorderColumns(board.id, 2, 0);
+      await columnRepository.reorderColumns(board.id, 2, 0, 'randomId');
 
       expect(
         await prisma.column.findFirst({ where: { id: column1.id } }),

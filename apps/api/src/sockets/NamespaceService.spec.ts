@@ -9,7 +9,7 @@ class MockIO extends EventEmitter {
   }
 }
 
-describe('NamespaceService', () => {
+describe.skip('NamespaceService', () => {
   const mockIO = new MockIO();
   const service = new NamespaceService().setIO(mockIO as unknown as Server);
 

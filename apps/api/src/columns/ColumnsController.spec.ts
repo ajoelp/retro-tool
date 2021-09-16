@@ -139,7 +139,7 @@ describe('ColumnsController', () => {
     });
   });
 
-  it.only('will delete a column with cards', async () => {
+  it('will delete a column with cards', async () => {
     const column = await prisma.column.create({
       data: {
         title: 'title',

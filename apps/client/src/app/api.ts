@@ -42,6 +42,7 @@ export type createCardsArgs = {
 export type updateCardArgs = {
   cardId: string;
   content: string;
+  eventTrackingId: string;
 };
 
 const apiClient = axios.create({
@@ -126,8 +127,9 @@ const api = {
   updateCard: async ({
     cardId,
     content,
+    eventTrackingId
   }: updateCardArgs): Promise<CardWithOwner> => {
-    const { data } = await apiClient.post(`/cards/${cardId}`, { content });
+    const { data } = await apiClient.post(`/cards/${cardId}`, { content, eventTrackingId });
     return data.card;
   },
 };
