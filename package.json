@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "attach": "docker-compose exec api /bin/sh",
     "nx": "nx",
     "start": "nx serve",
     "build": "NODE_ENV=production nx build",
@@ -113,7 +112,7 @@
     "autoprefixer": "^10.3.4",
     "babel-jest": "27.2.0",
     "cypress": "^8.4.0",
-    "dotenv": "^10.0.0",
+    "dotenv": "10.0.0",
     "eslint": "7.32.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-cypress": "^2.12.1",

@@ -26,7 +26,8 @@
                 }
               ]
             }
-          }
+          },
+          "generatePackageJson": true
         },
         "serve": {
           "executor": "@nrwl/node:execute",
@@ -38,7 +39,8 @@
           "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["apps/api/**/*.ts"]
-          }
+          },
+          "outputs": ["{options.outputFile}"]
         },
         "test": {
           "executor": "@nrwl/jest:jest",
@@ -59,7 +61,8 @@
           "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["libs/api-interfaces/**/*.ts"]
-          }
+          },
+          "outputs": ["{options.outputFile}"]
         }
       }
     },
@@ -82,6 +85,7 @@
               "apps/client/src/favicon.ico",
               "apps/client/src/assets"
             ],
+            "generatePackageJson": true,
             "styles": [],
             "scripts": [],
             "webpackConfig": "@nrwl/react/plugins/webpack"
@@ -129,7 +133,8 @@
           "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["apps/client/**/*.{ts,tsx,js,jsx}"]
-          }
+          },
+          "outputs": ["{options.outputFile}"]
         },
         "test": {
           "executor": "@nrwl/jest:jest",
