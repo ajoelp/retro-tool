@@ -2,7 +2,6 @@ import {
   Spinner
 } from '@chakra-ui/react';
 import { Column as ColumnType } from '@prisma/client';
-import { orderBy } from 'lodash';
 import { useEffect, useState } from 'react';
 import {
   DragDropContext, DraggableLocation, Droppable,
@@ -18,8 +17,6 @@ import {
   useColumns, useReorderColumn,
 } from '../../hooks/columns';
 import { useBoardEvents } from '../../hooks/useBoardEvents';
-import usePrevious from 'react-use/esm/usePrevious';
-import isEqual from 'lodash/isEqual'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -39,11 +36,13 @@ const Wrapper = styled.div`
   padding: 0 2rem;
 `;
 
+const order = (columns: ColumnType[]) => columns.sort((a, b) => b.order - a.order)
+
 const reorder = (
   list: ColumnType[] = [],
   startIndex: number,
   endIndex: number,
-): any[] => {
+): ColumnType[] => {
   const result = Array.from(list);
   const [removed] = result.splice(startIndex, 1);
   result.splice(endIndex, 0, removed);
@@ -55,10 +54,10 @@ const Board = () => {
   const { data, isLoading } = useBoard(id);
   const { columns: apiColumns, columnsLoading } = useColumns(id);
   const { mutateAsync: reorderColumnAsync } = useReorderColumn();
-  const [columns, setColumns] = useState(orderBy(apiColumns, 'order'));
+  const [columns, setColumns] = useState(order(apiColumns ?? []));
 
   useEffect(() => {
-    setColumns(orderBy(apiColumns, 'order'))
+    setColumns(order(apiColumns ?? []))
   }, [apiColumns]);
 
   useBoardEvents(id);
