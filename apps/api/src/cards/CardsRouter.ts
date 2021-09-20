@@ -18,7 +18,6 @@ CardsRouter.post('/cards', [
 
 CardsRouter.post('/cards/:cardId', [
   authenticatedMiddleware,
-  body('content'),
   cardsController.update,
 ]);
 

@@ -1,29 +1,27 @@
-import {
-  Spinner
-} from '@chakra-ui/react';
+import { Spinner } from '@chakra-ui/react';
 import { Column as ColumnType } from '@prisma/client';
 import { useEffect, useState } from 'react';
 import {
-  DragDropContext, DraggableLocation, Droppable,
+  DragDropContext,
+  DraggableLocation,
+  Droppable,
   DroppableProvided,
-  DropResult
+  DropResult,
 } from 'react-beautiful-dnd';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import Column from '../../components/Column';
 import { Navigation } from '../../components/Navigation';
 import { useBoard } from '../../hooks/boards';
-import {
-  useColumns, useReorderColumn,
-} from '../../hooks/columns';
+import { useColumns, useReorderColumn } from '../../hooks/columns';
 import { useBoardEvents } from '../../hooks/useBoardEvents';
+import { useUpdateCard } from '../../hooks/cards';
 
 const PageWrapper = styled.div`
   display: flex;
   flex-direction: column;
   height: 100vh;
   width: 100vw;
-  overflow-x: scroll;
 `;
 
 const Wrapper = styled.div`
@@ -32,11 +30,12 @@ const Wrapper = styled.div`
   flex-wrap: nowrap;
   margin: 0 auto;
   max-width: 100vw;
-
+  overflow-x: scroll;
   padding: 0 2rem;
 `;
 
-const order = (columns: ColumnType[]) => columns.sort((a, b) => b.order - a.order)
+const order = (columns: ColumnType[]) =>
+  columns.sort((a, b) => a.order - b.order);
 
 const reorder = (
   list: ColumnType[] = [],
@@ -55,9 +54,10 @@ const Board = () => {
   const { columns: apiColumns, columnsLoading } = useColumns(id);
   const { mutateAsync: reorderColumnAsync } = useReorderColumn();
   const [columns, setColumns] = useState(order(apiColumns ?? []));
+  const { updateCard } = useUpdateCard();
 
   useEffect(() => {
-    setColumns(order(apiColumns ?? []))
+    setColumns(order(apiColumns ?? []));
   }, [apiColumns]);
 
   useBoardEvents(id);
@@ -65,7 +65,19 @@ const Board = () => {
   if (isLoading || columnsLoading) return <Spinner />;
   if (!data) return null;
 
-  const onDragEnd = (result: DropResult) => {
+  const onDragEnd = async (result: DropResult) => {
+    if (result.combine) {
+      if (result.type === 'CARD') {
+        const cardTook = result.draggableId;
+        const cardCombined = result.combine.draggableId;
+        await updateCard({
+          cardId: cardTook,
+          payload: { parentId: cardCombined },
+        });
+      }
+      return;
+    }
+
     if (!result.destination) {
       return;
     }
@@ -80,6 +92,20 @@ const Board = () => {
       return;
     }
 
+    // moving to a different column
+
+    if (result.type === 'CARD') {
+      if (result.source.droppableId !== result.destination.droppableId) {
+        await updateCard({
+          cardId: result.draggableId,
+          payload: {
+            columnId: result.destination.droppableId,
+          },
+        });
+      }
+      return;
+    }
+
     // reordering column
     if (result.type === 'COLUMN') {
       const ordered: ColumnType[] = reorder(
@@ -87,14 +113,15 @@ const Board = () => {
         source.index,
         destination.index,
       );
+
+      setColumns(ordered);
+
       // make request here
-      reorderColumnAsync({
+      await reorderColumnAsync({
         boardId: id,
         sourceIndex: source.index,
         destinationIndex: destination.index,
       });
-
-      setColumns(ordered);
 
       return;
     }

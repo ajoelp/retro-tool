@@ -1,34 +1,57 @@
-import { Card as CardType, Column } from '@prisma/client';
-import { ChangeEvent, useEffect, useState } from 'react';
-import styled from 'styled-components';
+import { Column } from '@prisma/client';
+import { ChangeEvent, useEffect, useMemo, useState } from 'react';
+import styled, { css } from 'styled-components';
 import { useAuth } from '../../contexts/AuthProvider';
 import { useUpdateCard } from '../../hooks/cards';
 import { RingShadow } from '../../theme/shadows';
-import { Avatar, Spinner } from '@chakra-ui/react';
-import { CardWithOwner } from '@retro-tool/api-interfaces';
-import { ArrowCircleDownIcon, ArrowCircleUpIcon } from '@heroicons/react/solid';
+import { Avatar, Badge, Spinner } from '@chakra-ui/react';
+import { CardType } from '@retro-tool/api-interfaces';
 import { primaryColor } from '../../theme/colors';
-
-type CardWrapperProps = {
-  padding?: boolean;
-};
+import {
+  Draggable,
+  DraggableProvided,
+  DraggableStateSnapshot,
+  DraggingStyle,
+  NotDraggingStyle,
+} from 'react-beautiful-dnd';
 
 type CardProps = {
   column: Column;
-  card: CardWithOwner;
+  card: CardType;
+  index: number;
+  isClone?: boolean;
 };
 
-export const CardWrapper = styled.div`
+type CardWrapperProps = {
+  isDragging: boolean;
+  isGroupedOver: boolean;
+  hasChildren: boolean;
+};
+export const CardWrapper = styled.div<CardWrapperProps>`
+  ${({ isDragging }) =>
+    isDragging &&
+    css`
+      opacity: 0.8;
+    `}
+  background-color: white;
+  ${({ isGroupedOver }) =>
+    isGroupedOver &&
+    css`
+      box-shadow: ${RingShadow};
+    `}
   position: relative;
   width: 100%;
   min-height: 9rem;
-  background-color: white;
   border: 1px solid #efefef;
   margin-bottom: 1rem;
   display: flex;
   flex-direction: column;
   border-radius: 0.3rem;
   overflow: hidden;
+  background-color: white;
+  z-index: 10;
+  top: 0;
+  left: 0;
 `;
 
 export const CardInput = styled.textarea`
@@ -36,6 +59,7 @@ export const CardInput = styled.textarea`
   flex: 1;
   resize: none;
   padding: 1rem;
+
   &:focus {
     outline: none;
     border: none;
@@ -51,6 +75,7 @@ const CardDetails = styled.div`
 
 const CardVotesContainer = styled.div`
   display: flex;
+
   p {
     margin: 0 0.5rem;
   }
@@ -73,45 +98,89 @@ const HoldBar = styled.div`
   background-color: ${primaryColor};
 `;
 
-export const Card: React.FC<CardProps> = ({ card }) => {
+function getStyle(
+  style: DraggingStyle | NotDraggingStyle | undefined,
+  snapshot: DraggableStateSnapshot,
+) {
+  if (!snapshot.isDragging) return {};
+  if (!snapshot.isDropAnimating) return style;
+  return {
+    ...style,
+    transitionDuration: '-0.001s',
+  };
+}
+
+export const Card: React.FC<CardProps> = ({ card, index }) => {
   const [value, setValue] = useState(card?.content);
   const { updateCard, updateCardLoading } = useUpdateCard();
   const { user } = useAuth();
 
+  const hasChildren = useMemo(() => {
+    if (!card.children) return false;
+    return card.children.length > 0;
+  }, [card]);
+
   useEffect(() => {
-    setValue(card?.content);
-  }, [card?.content]);
+    if (value !== card?.content) {
+      setValue(card?.content);
+    }
+  }, [value, card?.content]);
 
   const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setValue(event.target.value);
-    updateCard({ cardId: card.id, content: event.target.value });
+    updateCard({ cardId: card.id, payload: { content: event.target.value } });
   };
 
   const isOwner = user?.id === card.ownerId;
 
   return (
-    <CardWrapper>
-      <HoldBar />
-      {isOwner ? (
-        <CardInput value={value} onChange={handleChange} disabled={!isOwner} />
-      ) : (
-        <CardInput as="p">{value}</CardInput>
+    <Draggable key={card.id} draggableId={card.id} index={index}>
+      {(
+        dragProvided: DraggableProvided,
+        dragSnapshot: DraggableStateSnapshot,
+      ) => (
+        <CardWrapper
+          key={card.id}
+          isDragging={dragSnapshot.isDragging}
+          isGroupedOver={Boolean(dragSnapshot.combineTargetFor)}
+          hasChildren={hasChildren}
+          ref={dragProvided.innerRef}
+          {...dragProvided.draggableProps}
+          {...dragProvided.dragHandleProps}
+          style={getStyle(dragProvided.draggableProps.style, dragSnapshot)}
+        >
+          <HoldBar />
+          {isOwner ? (
+            <CardInput
+              value={value}
+              onChange={handleChange}
+              disabled={!isOwner}
+            />
+          ) : (
+            <CardInput as="p">{value}</CardInput>
+          )}
+          <CardDetails>
+            {/*<CardVotesContainer>*/}
+            {/*  <CardVotesButton>*/}
+            {/*    <ArrowCircleUpIcon />*/}
+            {/*  </CardVotesButton>*/}
+            {/*  <p>12</p>*/}
+            {/*  <CardVotesButton>*/}
+            {/*    <ArrowCircleDownIcon />*/}
+            {/*  </CardVotesButton>*/}
+            {/*</CardVotesContainer>*/}
+            <div>
+              {updateCardLoading && <Loader size="xs" />}
+              <Avatar size="xs" src={card.owner.avatar} />
+            </div>
+            {hasChildren && (
+              <div>
+                <Badge>{card.children?.length}</Badge>
+              </div>
+            )}
+          </CardDetails>
+        </CardWrapper>
       )}
-      <CardDetails>
-        {/*<CardVotesContainer>*/}
-        {/*  <CardVotesButton>*/}
-        {/*    <ArrowCircleUpIcon />*/}
-        {/*  </CardVotesButton>*/}
-        {/*  <p>12</p>*/}
-        {/*  <CardVotesButton>*/}
-        {/*    <ArrowCircleDownIcon />*/}
-        {/*  </CardVotesButton>*/}
-        {/*</CardVotesContainer>*/}
-        <div>
-          {updateCardLoading && <Loader size="xs" />}
-          <Avatar size="xs" src={card.owner.avatar} />
-        </div>
-      </CardDetails>
-    </CardWrapper>
+    </Draggable>
   );
 };

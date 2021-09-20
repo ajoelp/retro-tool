@@ -29,4 +29,46 @@ export class CardRepository {
       }
     }
   }
+
+  getCardById(id: string) {
+    return prisma.card.findFirst({
+      where: { id },
+      include: { children: true, column: true, owner: true },
+    });
+  }
+
+  async updateCard(id: string, payload: any) {
+    const card = await prisma.card.update({
+      where: {
+        id,
+      },
+      data: payload,
+      include: {
+        children: true,
+        column: true,
+        owner: true,
+      },
+    });
+
+    dependencies.namespaceService.sendEventToBoard(card.column.boardId, {
+      type: CARD_UPDATED_EVENT_NAME,
+      payload: card,
+    });
+
+    if (payload.parentId != null) {
+      const parentCard = await this.getCardById(payload.parentId);
+      dependencies.namespaceService.sendEventToBoard(card.column.boardId, {
+        type: CARD_UPDATED_EVENT_NAME,
+        payload: parentCard,
+      });
+    }
+
+    if (payload.columnId != null && card.children.length > 0) {
+      for (const child of card.children) {
+        await this.updateCard(child.id, payload);
+      }
+    }
+
+    return card;
+  }
 }

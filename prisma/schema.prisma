@@ -20,12 +20,12 @@ model User {
 }
 
 model Board {
-  id          String   @id @default(uuid())
-  title       String
-  createdAt   DateTime @default(now())
-  owner       User     @relation(fields: [ownerId], references: [id])
-  ownerId     String
-  columns     Column[]
+  id        String   @id @default(uuid())
+  title     String
+  createdAt DateTime @default(now())
+  owner     User     @relation(fields: [ownerId], references: [id])
+  ownerId   String
+  columns   Column[]
 }
 
 model Column {
@@ -47,4 +47,7 @@ model Card {
   column    Column   @relation(fields: [columnId], references: [id])
   columnId  String
   order     Int
+  parentId  String?
+  parent    Card?    @relation(fields: [parentId], references: [id])
+  children      Card[]   @relation("CardToCard")
 }
