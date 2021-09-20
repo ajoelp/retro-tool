@@ -1,22 +1,25 @@
 import { Board, Column as ColumnType } from '@prisma/client';
-import styled from 'styled-components';
-import { Avatar, Flex, Heading } from '@chakra-ui/react';
+import styled, { css } from 'styled-components';
+import { Heading } from '@chakra-ui/react';
 import {
   Draggable,
   DraggableProvided,
   DraggableStateSnapshot,
+  Droppable,
+  DroppableProvided,
+  DroppableStateSnapshot,
 } from 'react-beautiful-dnd';
-import { BorderRadius, ColumnWidth, GAP, NavHeight } from '../../theme/sizes';
-import { backgroundColor } from '../../theme/colors';
+import { BorderRadius, ColumnWidth, GAP } from '../../theme/sizes';
+import { backgroundColor, backgroundColorDarker } from '../../theme/colors';
 import { useBoard } from '../../hooks/boards';
-import { BoardWithColumn } from '../../api';
 import { useDialogs } from '../../dialog-manager';
 import { useDeleteColumn } from '../../hooks/columns';
 import { DeleteIcon } from '@chakra-ui/icons';
 import { useCards, useCreateCard } from '../../hooks/cards';
-import { useRef, KeyboardEvent } from 'react';
+import { KeyboardEvent, useMemo, useRef } from 'react';
 import { Card } from '../Card';
 import { RingShadow } from '../../theme/shadows';
+import { CardType } from '@retro-tool/api-interfaces';
 
 const Wrapper = styled.div`
   width: ${ColumnWidth}px;
@@ -28,8 +31,18 @@ const Wrapper = styled.div`
   }
 `;
 
-const CardsContainer = styled.div`
+type CardsContainerProps = {
+  isDraggingOver: boolean;
+  isDraggingFrom: boolean;
+};
+
+const CardsContainer = styled.div<CardsContainerProps>`
   background-color: ${backgroundColor};
+  ${({ isDraggingOver }) =>
+    isDraggingOver &&
+    css`
+      background-color: ${backgroundColorDarker};
+    `};
   height: 100%;
   margin: 20px 0;
   border-radius: ${BorderRadius}px;
@@ -79,6 +92,36 @@ type ColumnProps = {
   index: number;
 };
 
+type CardsListProps = {
+  cards: CardType[];
+  column: ColumnType;
+  listType: string;
+  listId: string;
+};
+
+export function CardList({ cards, column, listType, listId }: CardsListProps) {
+  return (
+    <Droppable droppableId={listId} type={listType} isCombineEnabled={true}>
+      {(
+        dropProvided: DroppableProvided,
+        dropSnapshot: DroppableStateSnapshot,
+      ) => (
+        <CardsContainer
+          ref={dropProvided.innerRef}
+          isDraggingOver={dropSnapshot.isDraggingOver}
+          isDraggingFrom={Boolean(dropSnapshot.draggingFromThisWith)}
+          {...dropProvided.droppableProps}
+        >
+          {cards?.map((card, index) => (
+            <Card key={card.id} card={card} column={column} index={index} />
+          ))}
+          {dropProvided.placeholder}
+        </CardsContainer>
+      )}
+    </Droppable>
+  );
+}
+
 export default function Column({ column, board, title, index }: ColumnProps) {
   const { mutateAsync: deleteColumnAsync } = useDeleteColumn();
   const { openDialog } = useDialogs();
@@ -86,6 +129,10 @@ export default function Column({ column, board, title, index }: ColumnProps) {
   const { cards } = useCards(column.id);
   const { createCard } = useCreateCard(column.id);
   const newCardRef = useRef<HTMLTextAreaElement>(null);
+
+  const filteredCards = useMemo(() => {
+    return cards?.filter((card) => card.parentId == null) ?? [];
+  }, [cards]);
 
   const submitCard = async (event: any) => {
     event.preventDefault();
@@ -107,19 +154,20 @@ export default function Column({ column, board, title, index }: ColumnProps) {
         await refetch();
       },
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      onCancel: () => { },
+      onCancel: () => {},
     });
   };
 
   const onInputKeyPress = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (!e.shiftKey && e.code === 'Enter') {
       e.preventDefault();
-      submitCard(e)
+      submitCard(e);
       return;
     }
-  }
+  };
 
-  const inputPlaceholder = "Add a new card.\nPress Enter to submit.\nPress Shift + Enter for a new line"
+  const inputPlaceholder =
+    'Add a new card.\nPress Enter to submit.\nPress Shift + Enter for a new line';
 
   return (
     <Draggable draggableId={title} index={index}>
@@ -133,13 +181,18 @@ export default function Column({ column, board, title, index }: ColumnProps) {
           </HeadingContainer>
 
           <Container>
-            <CardsContainer>
-              {cards?.map((card) => (
-                <Card key={card.id} card={card} column={column} />
-              ))}
-            </CardsContainer>
+            <CardList
+              listType="CARD"
+              listId={column.id}
+              cards={filteredCards}
+              column={column}
+            />
             <AddCardContainer onSubmit={submitCard}>
-              <AddCardInput ref={newCardRef} placeholder={inputPlaceholder} onKeyPress={onInputKeyPress} />
+              <AddCardInput
+                ref={newCardRef}
+                placeholder={inputPlaceholder}
+                onKeyPress={onInputKeyPress}
+              />
             </AddCardContainer>
           </Container>
         </Wrapper>

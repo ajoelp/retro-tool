@@ -1,9 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '../prismaClient';
-import {
-  CARD_CREATED_EVENT_NAME,
-  CARD_UPDATED_EVENT_NAME,
-} from '@retro-tool/api-interfaces';
+import { CARD_CREATED_EVENT_NAME } from '@retro-tool/api-interfaces';
 import { User } from '@prisma/client';
 import dependencies from '../dependencies';
 import { CardRepository } from './CardRepository';
@@ -12,15 +9,18 @@ const cardRepository = new CardRepository();
 
 export class CardsController {
   async list(req: Request, res: Response) {
-    const { columnId } = req.query;
+    const { columnId, parentId = null } = req.query;
 
     if (columnId == null) throw new Error('No columnId provided');
 
     const cards = await prisma.card.findMany({
       where: {
         columnId: columnId as string,
+        parent: parentId ? { id: parentId as string } : null,
       },
+      orderBy: { createdAt: 'asc' },
       include: {
+        children: true,
         owner: true,
       },
     });
@@ -38,6 +38,7 @@ export class CardsController {
         order: await cardRepository.getNextOrderValue(columnId),
       },
       include: {
+        children: true,
         column: true,
         owner: true,
       },
@@ -53,23 +54,9 @@ export class CardsController {
 
   async update(req: Request, res: Response) {
     const { cardId } = req.params;
-    const { content, eventTrackingId } = req.body;
+    const { payload } = req.body;
 
-    const card = await prisma.card.update({
-      where: {
-        id: cardId,
-      },
-      data: { content },
-      include: {
-        column: true,
-        owner: true,
-      },
-    });
-
-    dependencies.namespaceService.sendEventToBoard(card.column.boardId, {
-      type: CARD_UPDATED_EVENT_NAME,
-      payload: card,
-    }, eventTrackingId);
+    const card = await cardRepository.updateCard(cardId, payload);
 
     return res.json({ card });
   }

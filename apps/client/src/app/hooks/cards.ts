@@ -1,8 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import api from '../api';
-import { AuthProvider } from '../contexts/AuthProvider';
-import {v4 as uuid} from "uuid";
-import {useIgnoredEvents} from "../contexts/IgnoredEventsContext";
+import { Card } from '@prisma/client';
 
 export function useCards(columnId: string) {
   const { data, isLoading, refetch } = useQuery(['cards', columnId], () =>
@@ -26,19 +24,16 @@ export function useCreateCard(columnId: string) {
   return { createCard: mutateAsync, createCardLoading: isLoading };
 }
 
-type updateCardArgs = {
+export type UpdateCardArgs = {
   cardId: string;
-  content: string;
+  payload: Partial<Omit<Card, 'id'>>;
 };
 
 export function useUpdateCard() {
-  const { addIgnoreId } = useIgnoredEvents()
   const { mutateAsync, isLoading } = useMutation(
-    ({ cardId, content }: updateCardArgs) => {
-      const eventTrackingId = uuid()
-      addIgnoreId(eventTrackingId)
-      return api.updateCard({ cardId, content, eventTrackingId })
-    }
+    ({ cardId, payload }: UpdateCardArgs) => {
+      return api.updateCard({ cardId, payload });
+    },
   );
   return {
     updateCard: mutateAsync,

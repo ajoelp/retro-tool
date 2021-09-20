@@ -1,5 +1,6 @@
 import { Card, User } from '@prisma/client';
 
-export interface CardWithOwner extends Card {
+export interface CardType extends Card {
   owner: User;
+  children?: Omit<CardType, 'children'>[];
 }

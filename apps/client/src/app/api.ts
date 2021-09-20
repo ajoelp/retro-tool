@@ -1,7 +1,7 @@
-import { Board, Column, User } from '@prisma/client';
+import { Board, Card, Column, User } from '@prisma/client';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { CardWithOwner } from '@retro-tool/api-interfaces';
+import { CardType } from '@retro-tool/api-interfaces';
 import { environment } from '../environments/environment.prod';
 
 export type BoardWithColumn = Board & {
@@ -41,8 +41,7 @@ export type createCardsArgs = {
 
 export type updateCardArgs = {
   cardId: string;
-  content: string;
-  eventTrackingId: string;
+  payload: Partial<Omit<Card, 'id'>>;
 };
 
 const apiClient = axios.create({
@@ -103,33 +102,32 @@ const api = {
     boardId,
     sourceIndex,
     destinationIndex,
-    eventTrackingId
+    eventTrackingId,
   }: reorderColumnArgs) => {
     return apiClient.post(`/columns/reorder`, {
       boardId,
       sourceIndex,
       destinationIndex,
-      eventTrackingId
+      eventTrackingId,
     });
   },
-  fetchCards: async ({
-    columnId,
-  }: fetchCardsArgs): Promise<CardWithOwner[]> => {
+  fetchCards: async ({ columnId }: fetchCardsArgs): Promise<CardType[]> => {
     const { data } = await apiClient.get('/cards', {
       params: { columnId },
     });
     return data.cards;
   },
-  createCard: async (payload: createCardsArgs): Promise<CardWithOwner> => {
+  createCard: async (payload: createCardsArgs): Promise<CardType> => {
     const { data } = await apiClient.post('/cards', payload);
     return data.card;
   },
   updateCard: async ({
     cardId,
-    content,
-    eventTrackingId
-  }: updateCardArgs): Promise<CardWithOwner> => {
-    const { data } = await apiClient.post(`/cards/${cardId}`, { content, eventTrackingId });
+    payload,
+  }: updateCardArgs): Promise<CardType> => {
+    const { data } = await apiClient.post(`/cards/${cardId}`, {
+      payload,
+    });
     return data.card;
   },
 };
