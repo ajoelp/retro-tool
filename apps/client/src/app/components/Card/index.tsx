@@ -14,6 +14,10 @@ import {
   DraggingStyle,
   NotDraggingStyle,
 } from 'react-beautiful-dnd';
+import {
+  ArrowCircleDownIcon,
+  ArrowCircleUpIcon,
+} from '@heroicons/react/outline';
 
 type CardProps = {
   column: Column;
@@ -112,6 +116,7 @@ function getStyle(
 
 export const Card: React.FC<CardProps> = ({ card, index }) => {
   const [value, setValue] = useState(card?.content);
+  const [isFocused, setIsFocused] = useState(false);
   const { updateCard, updateCardLoading } = useUpdateCard();
   const { user } = useAuth();
 
@@ -121,6 +126,7 @@ export const Card: React.FC<CardProps> = ({ card, index }) => {
   }, [card]);
 
   useEffect(() => {
+    if (isFocused) return;
     if (value !== card?.content) {
       setValue(card?.content);
     }
@@ -157,18 +163,24 @@ export const Card: React.FC<CardProps> = ({ card, index }) => {
               disabled={!isOwner}
             />
           ) : (
-            <CardInput as="p">{value}</CardInput>
+            <CardInput
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              as="p"
+            >
+              {value}
+            </CardInput>
           )}
           <CardDetails>
-            {/*<CardVotesContainer>*/}
-            {/*  <CardVotesButton>*/}
-            {/*    <ArrowCircleUpIcon />*/}
-            {/*  </CardVotesButton>*/}
-            {/*  <p>12</p>*/}
-            {/*  <CardVotesButton>*/}
-            {/*    <ArrowCircleDownIcon />*/}
-            {/*  </CardVotesButton>*/}
-            {/*</CardVotesContainer>*/}
+            <CardVotesContainer>
+              <CardVotesButton>
+                <ArrowCircleUpIcon />
+              </CardVotesButton>
+              <p>12</p>
+              <CardVotesButton>
+                <ArrowCircleDownIcon />
+              </CardVotesButton>
+            </CardVotesContainer>
             <div>
               {updateCardLoading && <Loader size="xs" />}
               <Avatar size="xs" src={card.owner.avatar} />
