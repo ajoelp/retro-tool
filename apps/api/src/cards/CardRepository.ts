@@ -55,14 +55,22 @@ export class CardRepository {
       payload: card,
     });
 
+    // If the cards are grouped
     if (payload.parentId != null) {
       const parentCard = await this.getCardById(payload.parentId);
       dependencies.namespaceService.sendEventToBoard(card.column.boardId, {
         type: CARD_UPDATED_EVENT_NAME,
         payload: parentCard,
       });
+
+      if (card.children && card.children.length) {
+        for (const childCard of card.children) {
+          await this.updateCard(childCard.id, { parentId: payload.parentId })
+        }
+      }
     }
 
+    // If a group is moved to a new column
     if (payload.columnId != null && card.children.length > 0) {
       for (const child of card.children) {
         await this.updateCard(child.id, payload);
