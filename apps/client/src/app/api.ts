@@ -3,6 +3,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { CardType } from '@retro-tool/api-interfaces';
 import { environment } from '../environments/environment.prod';
+import { toast } from '@chakra-ui/toast';
 
 export type BoardWithColumn = Board & {
   columns: Column[];
@@ -67,6 +68,9 @@ apiClient.interceptors.response.use(
     return response;
   },
   function (error) {
+    if (error.response?.data?.message) {
+      toast.notify(error.response?.data?.message, { status: 'error' })
+    }
     return Promise.reject(error);
   },
 );
