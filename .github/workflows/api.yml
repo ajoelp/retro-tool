@@ -50,4 +50,4 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
       - name: Run Deploy
-        run: ssh ${{secrets.SSH_USER}}@${{secrets.SERVER_HOST}} "cd /var/www/retro-tool && sh ./deploy.sh"
+        run: ssh ${{secrets.SSH_USER}}@${{secrets.SERVER_HOST}} "cd /var/www/retro-tool && git fetch && git pull origin main && sh ./deploy.sh"

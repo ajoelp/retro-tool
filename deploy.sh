@@ -1,7 +1,5 @@
-git pull origin main
-
 yarn install
-yarn build
+yarn build api
 yarn prisma migrate deploy
 
 sudo service restart nginx
