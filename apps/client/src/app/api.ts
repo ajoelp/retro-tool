@@ -44,7 +44,7 @@ export type updateCardArgs = {
   payload: Partial<Omit<Card, 'id'>>;
 };
 
-const apiClient = axios.create({
+export const apiClient = axios.create({
   baseURL: environment.apiUrl,
 });
 
