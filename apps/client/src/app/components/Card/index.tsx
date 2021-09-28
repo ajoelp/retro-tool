@@ -2,7 +2,7 @@ import { Column } from '@prisma/client';
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useAuth } from '../../contexts/AuthProvider';
-import { useUpdateCard } from '../../hooks/cards';
+import { useUpdateCard, useVoteCard } from '../../hooks/cards';
 import { RingShadow } from '../../theme/shadows';
 import { Avatar, Badge, Spinner, Tooltip } from '@chakra-ui/react';
 import { CardType } from '@retro-tool/api-interfaces';
@@ -154,6 +154,7 @@ export const Card: React.FC<CardProps> = ({ card, index }) => {
   const [isFocused, setIsFocused] = useState(false);
   const { updateCard, updateCardLoading } = useUpdateCard();
   const { user } = useAuth();
+  const { voteCard } = useVoteCard(card.id)
 
   const hasChildren = useMemo(() => {
     if (!card.children) return false;
@@ -214,11 +215,11 @@ export const Card: React.FC<CardProps> = ({ card, index }) => {
             </InputContainer>
             <CardDetails>
               <CardVotesContainer>
-                <CardVotesButton>
+                <CardVotesButton onClick={() => voteCard({ increment: true })}>
                   <ArrowCircleUpIcon />
                 </CardVotesButton>
-                <p>12</p>
-                <CardVotesButton>
+                <p>{card.votes}</p>
+                <CardVotesButton onClick={() => voteCard({ increment: false })}>
                   <ArrowCircleDownIcon />
                 </CardVotesButton>
               </CardVotesContainer>

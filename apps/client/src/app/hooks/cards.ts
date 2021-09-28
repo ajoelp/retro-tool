@@ -1,3 +1,4 @@
+import { apiClient } from './../api';
 import { useMutation, useQuery } from 'react-query';
 import api from '../api';
 import { Card } from '@prisma/client';
@@ -39,4 +40,18 @@ export function useUpdateCard() {
     updateCard: mutateAsync,
     updateCardLoading: isLoading,
   };
+}
+
+
+export type VoteCardArgs = {
+  increment: boolean;
+}
+export function useVoteCard(cardId: string) {
+  const { mutateAsync, isLoading } = useMutation(
+    ({ increment }: VoteCardArgs) => apiClient.post(`/cards/${cardId}/vote`, { increment })
+  )
+  return {
+    voteCard: mutateAsync,
+    voteLoading: isLoading
+  }
 }

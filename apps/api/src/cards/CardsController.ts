@@ -60,4 +60,12 @@ export class CardsController {
 
     return res.json({ card });
   }
+
+  async vote(req: Request, res: Response) {
+    const { cardId } = req.params
+    const { increment = true } = req.body
+    const card = await cardRepository.vote(cardId, increment)
+    return res.json({ card });
+  }
+
 }

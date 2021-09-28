@@ -27,4 +27,9 @@ CardsRouter.get('/cards', [
   cardsController.list,
 ]);
 
+CardsRouter.post('/cards/:cardId/vote', [
+  authenticatedMiddleware,
+  cardsController.vote
+])
+
 export { CardsRouter };

@@ -37,6 +37,30 @@ export class CardRepository {
     });
   }
 
+  async vote(id: string, increment: boolean) {
+    const method = increment ? 'increment' : 'decrement'
+
+    const card = await prisma.card.update({
+      where: {
+        id,
+      },
+      data: {
+        votes: { [method]: 1 }
+      },
+      include: {
+        children: true,
+        column: true,
+        owner: true,
+      },
+    });
+
+    dependencies.namespaceService.sendEventToBoard(card.column.boardId, {
+      type: CARD_UPDATED_EVENT_NAME,
+      payload: card,
+    });
+
+  }
+
   async updateCard(id: string, payload: any) {
     const card = await prisma.card.update({
       where: {
