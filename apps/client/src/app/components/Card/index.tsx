@@ -1,10 +1,10 @@
 import { Column } from '@prisma/client';
-import { ChangeEvent, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useAuth } from '../../contexts/AuthProvider';
 import { useUpdateCard } from '../../hooks/cards';
 import { RingShadow } from '../../theme/shadows';
-import { Avatar, Badge, Spinner } from '@chakra-ui/react';
+import { Avatar, Badge, Spinner, Tooltip } from '@chakra-ui/react';
 import { CardType } from '@retro-tool/api-interfaces';
 import { primaryColor } from '../../theme/colors';
 import {
@@ -17,6 +17,7 @@ import {
 import {
   ArrowCircleDownIcon,
   ArrowCircleUpIcon,
+  MenuIcon,
 } from '@heroicons/react/outline';
 
 type CardProps = {
@@ -31,6 +32,10 @@ type CardWrapperProps = {
   isGroupedOver: boolean;
   hasChildren: boolean;
 };
+
+
+const StackedBoxShadow = `0 1px 1px rgba(0,0,0,0.15), 0 10px 0 -5px #eee, 0 10px 1px -4px rgba(0,0,0,0.15), 0 20px 0 -10px #eee, 0 20px 1px -9px rgba(0,0,0,0.15)`
+
 export const CardWrapper = styled.div<CardWrapperProps>`
   ${({ isDragging }) =>
     isDragging &&
@@ -56,6 +61,23 @@ export const CardWrapper = styled.div<CardWrapperProps>`
   z-index: 10;
   top: 0;
   left: 0;
+  &:focus-within {
+    outline: none;
+    border: none;
+    box-shadow: ${RingShadow};
+  }
+  ${({ hasChildren, isGroupedOver }) => hasChildren && css`
+    box-shadow: ${StackedBoxShadow} ;
+      &:focus-within {
+        outline: none;
+        border: none;
+        box-shadow: ${RingShadow}, ${StackedBoxShadow};
+      }
+
+      ${isGroupedOver && css`
+        box-shadow: ${RingShadow}, ${StackedBoxShadow};
+      `}
+  `}
 `;
 
 export const CardInput = styled.textarea`
@@ -63,11 +85,8 @@ export const CardInput = styled.textarea`
   flex: 1;
   resize: none;
   padding: 1rem;
-
   &:focus {
     outline: none;
-    border: none;
-    box-shadow: ${RingShadow};
   }
 `;
 
@@ -75,6 +94,7 @@ const CardDetails = styled.div`
   display: flex;
   padding: 0.5rem;
   justify-content: space-between;
+  margin-top: auto;
 `;
 
 const CardVotesContainer = styled.div`
@@ -101,6 +121,21 @@ const HoldBar = styled.div`
   height: 5px;
   background-color: ${primaryColor};
 `;
+
+const HoldIcon = styled(MenuIcon)`
+  width: 20px;
+  height: 20px;
+  margin: 1rem 0.5rem;
+`
+
+const InputContainer = styled.div`
+  display: flex;
+`
+
+const DragWrapper = styled.div`
+  position: relative;
+  width: 100%;
+`
 
 function getStyle(
   style: DraggingStyle | NotDraggingStyle | undefined,
@@ -130,7 +165,7 @@ export const Card: React.FC<CardProps> = ({ card, index }) => {
     if (value !== card?.content) {
       setValue(card?.content);
     }
-  }, [value, card?.content]);
+  }, [value, card?.content, isFocused]);
 
   const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setValue(event.target.value);
@@ -145,54 +180,59 @@ export const Card: React.FC<CardProps> = ({ card, index }) => {
         dragProvided: DraggableProvided,
         dragSnapshot: DraggableStateSnapshot,
       ) => (
-        <CardWrapper
-          key={card.id}
-          isDragging={dragSnapshot.isDragging}
-          isGroupedOver={Boolean(dragSnapshot.combineTargetFor)}
-          hasChildren={hasChildren}
-          ref={dragProvided.innerRef}
+        <DragWrapper
           {...dragProvided.draggableProps}
           {...dragProvided.dragHandleProps}
+          ref={dragProvided.innerRef}
           style={getStyle(dragProvided.draggableProps.style, dragSnapshot)}
         >
-          <HoldBar />
-          {isOwner ? (
-            <CardInput
-              value={value}
-              onChange={handleChange}
-              disabled={!isOwner}
-            />
-          ) : (
-            <CardInput
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-              as="p"
-            >
-              {value}
-            </CardInput>
-          )}
-          <CardDetails>
-            <CardVotesContainer>
-              <CardVotesButton>
-                <ArrowCircleUpIcon />
-              </CardVotesButton>
-              <p>12</p>
-              <CardVotesButton>
-                <ArrowCircleDownIcon />
-              </CardVotesButton>
-            </CardVotesContainer>
-            <div>
-              {updateCardLoading && <Loader size="xs" />}
-              <Avatar size="xs" src={card.owner.avatar} />
-            </div>
-            {hasChildren && (
+          <CardWrapper
+            key={card.id}
+            isDragging={dragSnapshot.isDragging}
+            isGroupedOver={Boolean(dragSnapshot.combineTargetFor)}
+            hasChildren={hasChildren}
+          >
+            <HoldBar />
+            <InputContainer>
+              <HoldIcon />
+              {isOwner ? (
+                <CardInput
+                  value={value}
+                  onChange={handleChange}
+                  disabled={!isOwner}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => setIsFocused(false)}
+                />
+              ) : (
+                <CardInput
+
+                  as="p"
+                >
+                  {value}
+                </CardInput>
+              )}
+            </InputContainer>
+            <CardDetails>
+              <CardVotesContainer>
+                <CardVotesButton>
+                  <ArrowCircleUpIcon />
+                </CardVotesButton>
+                <p>12</p>
+                <CardVotesButton>
+                  <ArrowCircleDownIcon />
+                </CardVotesButton>
+              </CardVotesContainer>
               <div>
-                <Badge>{card.children?.length}</Badge>
+                {hasChildren && <Badge mr="2">{card.children?.length ?? 0 + 1}</Badge>}
+                <Tooltip label={card.owner.githubNickname}>
+                  <Avatar size="xs" src={card.owner.avatar} />
+                </Tooltip>
               </div>
-            )}
-          </CardDetails>
-        </CardWrapper>
+            </CardDetails>
+          </CardWrapper>
+        </DragWrapper>
       )}
     </Draggable>
+
   );
 };
