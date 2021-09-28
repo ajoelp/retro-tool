@@ -49,5 +49,5 @@ jobs:
         with:
           key: ${{ secrets.PRIVATE_KEY }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
-      - name: List Everything
-        run: ls -la .
+      - name: Run Deploy
+        run: ssh ${{secrets.SSH_USER}}@${{secrets.SERVER_HOST}} "ls -la /var/www/retro-tool"
