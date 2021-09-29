@@ -9,7 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     name: E2E
     env:
-      DATABASE_URL: 'postgresql://user:password@localhost:${{ job.services.postgres.ports[5432] }}/database?schema=public'
       TOKEN_SECRET: randomSecret123
       GITHUB_CLIENT_ID: randomClientId
       GITHUB_CLIENT_SECRET: randomClientSecret
@@ -25,9 +24,15 @@ jobs:
           cache: 'yarn'
       - run: yarn install
       - run: yarn prisma db push
+        env:
+          DATABASE_URL: 'postgresql://user:password@localhost:${{ job.services.postgres.ports[5432] }}/database?schema=public'
       - run: yarn prisma db reset --force
+        env:
+          DATABASE_URL: 'postgresql://user:password@localhost:${{ job.services.postgres.ports[5432] }}/database?schema=public'
       - uses: cypress-io/github-action@v2
         name: Chrome
+        env:
+          DATABASE_URL: 'postgresql://user:password@localhost:${{ job.services.postgres.ports[5432] }}/database?schema=public'
         with:
           browser: chrome
           install: false
