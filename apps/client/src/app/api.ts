@@ -68,9 +68,9 @@ apiClient.interceptors.response.use(
     return response;
   },
   function (error) {
-    if (error.response?.data?.message) {
-      toast.notify(error.response?.data?.message, { status: 'error' })
-    }
+    // if (error.response?.data?.message) {
+    //   toast.notify(error.response?.data?.message, { status: 'error' })
+    // }
     return Promise.reject(error);
   },
 );
