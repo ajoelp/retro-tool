@@ -5,3 +5,4 @@ node_modules
 *.db-journal
 dist
 coverage
+apps/client-e2e/src/fixtures/userData.json
