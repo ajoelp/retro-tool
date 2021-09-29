@@ -63,37 +63,4 @@ describe('client', () => {
 
     cy.getBySel('card-list-0').children().should('have.length', 2)
   })
-
-  it('will move a card to a different column', () => {
-    cy.login(userData.user1Token)
-    cy.visit(`/boards/${userData.board1.id}`)
-
-    cy.getBySel('card-list-0')
-      .as('first-list')
-      .children()
-      .should('have.length', 2)
-
-    cy.getBySel('card-list-1')
-      .as('second-list')
-      .children()
-      .should('have.length', 0)
-
-    cy.get('@first-list')
-      .find('[data-testid=card-0]')
-      .first()
-      .focus()
-      .trigger('keydown', { keyCode: 32 })
-      .trigger('keydown', { keyCode: 39, force: true })
-      .wait(0.2 * 1000)
-      .trigger('keydown', { keyCode: 32, force: true })
-
-    cy.get('@first-list')
-      .children()
-      .should('have.length', 1)
-
-    cy.get('@second-list')
-      .children()
-      .should('have.length', 1)
-  });
-
 });
