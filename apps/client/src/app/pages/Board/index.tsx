@@ -21,7 +21,8 @@ const PageWrapper = styled.div`
   display: flex;
   flex-direction: column;
   height: 100vh;
-  width: 100vw;
+  min-width: 100vw;
+  overflow-x: scroll;
 `;
 
 const Wrapper = styled.div`
@@ -29,8 +30,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-wrap: nowrap;
   margin: 0 auto;
-  max-width: 100vw;
-  overflow-x: scroll;
+  max-height: 100vh;
   padding: 0 2rem;
 `;
 

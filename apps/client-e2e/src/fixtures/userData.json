@@ -1,0 +1,24 @@
+{
+  "user1": {
+    "id": "a74756b7-4b9b-4c24-bafd-c529002a9076",
+    "githubNickname": "user7c3772ef-1082-40b3-8d25-32158b1bdd3c",
+    "email": "test-user-1@example.com",
+    "avatar": "https://cdn.fakercloud.com/avatars/falconerie_128.jpg",
+    "boards": []
+  },
+  "user1Token": "eyJhbGciOiJIUzI1NiJ9.YTc0NzU2YjctNGI5Yi00YzI0LWJhZmQtYzUyOTAwMmE5MDc2.xrtVvJ_sRpys-Hw_5-TyNWe9mVHrP0Whrw1sUTK3C6w",
+  "user2": {
+    "id": "92aec00b-b037-4543-bc36-cec6ee68e55d",
+    "githubNickname": "user0330f0c6-57ef-4c67-85e0-c34e511ceaa0",
+    "email": "test-user-2@example.com",
+    "avatar": "https://cdn.fakercloud.com/avatars/jeremymouton_128.jpg",
+    "boards": []
+  },
+  "user2Token": "eyJhbGciOiJIUzI1NiJ9.YTc0NzU2YjctNGI5Yi00YzI0LWJhZmQtYzUyOTAwMmE5MDc2.xrtVvJ_sRpys-Hw_5-TyNWe9mVHrP0Whrw1sUTK3C6w",
+  "board1": {
+    "id": "b56091c2-e6f3-44f7-b101-6ba7c7dbe4bd",
+    "title": "Random new board title",
+    "createdAt": "2021-09-29T16:27:16.807Z",
+    "ownerId": "a74756b7-4b9b-4c24-bafd-c529002a9076"
+  }
+}

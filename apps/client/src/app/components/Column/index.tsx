@@ -97,9 +97,10 @@ type CardsListProps = {
   column: ColumnType;
   listType: string;
   listId: string;
+  name: string;
 };
 
-export function CardList({ cards, column, listType, listId }: CardsListProps) {
+export function CardList({ cards, column, listType, listId, name }: CardsListProps) {
   return (
     <Droppable droppableId={listId} type={listType} isCombineEnabled={true}>
       {(
@@ -110,6 +111,7 @@ export function CardList({ cards, column, listType, listId }: CardsListProps) {
           ref={dropProvided.innerRef}
           isDraggingOver={dropSnapshot.isDraggingOver}
           isDraggingFrom={Boolean(dropSnapshot.draggingFromThisWith)}
+          data-testid={name}
           {...dropProvided.droppableProps}
         >
           {cards?.map((card, index) => (
@@ -154,7 +156,7 @@ export default function Column({ column, board, title, index }: ColumnProps) {
         await refetch();
       },
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      onCancel: () => {},
+      onCancel: () => { },
     });
   };
 
@@ -172,7 +174,7 @@ export default function Column({ column, board, title, index }: ColumnProps) {
   return (
     <Draggable draggableId={title} index={index}>
       {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
-        <Wrapper ref={provided.innerRef} {...provided.draggableProps}>
+        <Wrapper ref={provided.innerRef} {...provided.draggableProps} data-testid={`column-${index}`}>
           <HeadingContainer {...provided.dragHandleProps}>
             <Heading size="md">{column.title}</Heading>
             <button onClick={() => deleteColumn(column.id)}>
@@ -182,6 +184,7 @@ export default function Column({ column, board, title, index }: ColumnProps) {
 
           <Container>
             <CardList
+              name={`card-list-${index}`}
               listType="CARD"
               listId={column.id}
               cards={filteredCards}
@@ -190,6 +193,7 @@ export default function Column({ column, board, title, index }: ColumnProps) {
             <AddCardContainer onSubmit={submitCard}>
               <AddCardInput
                 ref={newCardRef}
+                data-testid={`column-input-${index}`}
                 placeholder={inputPlaceholder}
                 onKeyPress={onInputKeyPress}
               />

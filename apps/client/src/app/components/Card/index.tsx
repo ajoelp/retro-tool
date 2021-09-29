@@ -184,6 +184,7 @@ export const Card: React.FC<CardProps> = ({ card, index }) => {
         <DragWrapper
           {...dragProvided.draggableProps}
           {...dragProvided.dragHandleProps}
+          data-testid={`card-${index}`}
           ref={dragProvided.innerRef}
           style={getStyle(dragProvided.draggableProps.style, dragSnapshot)}
         >
@@ -193,7 +194,7 @@ export const Card: React.FC<CardProps> = ({ card, index }) => {
             isGroupedOver={Boolean(dragSnapshot.combineTargetFor)}
             hasChildren={hasChildren}
           >
-            <HoldBar />
+            <HoldBar data-testid={`card-${index}-hold`} />
             <InputContainer>
               <HoldIcon />
               {isOwner ? (
