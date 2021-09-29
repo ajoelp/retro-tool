@@ -20,7 +20,7 @@ const NavigationWrapper = styled.div`
   flex: 0 auto;
 `;
 
-const BoardTitleInput = styled.input`
+const BoardTitleInput = styled.p`
   height: ${NavHeight}px;
   font-size: 2rem;
   font-weight: bold;
@@ -53,7 +53,7 @@ export function Navigation({ board }: NavigationProps) {
 
   return (
     <NavigationWrapper>
-      <BoardTitleInput defaultValue={board.title} />
+      <BoardTitleInput>{board.title}</BoardTitleInput>
       <AvatarContainer>
         <AvatarGroup max={10}>
           {activeUsers?.map(user => (

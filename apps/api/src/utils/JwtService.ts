@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { prisma } from '../prismaClient';
 
 export function generateJwtSecret(user: User) {
-  return jwt.sign(user.id, process.env.TOKEN_SECRET);
+  return jwt.sign(user.id, process.env.TOKEN_SECRET ?? 'secretToken');
 }
 
 export function tokenToUser(token: string) {

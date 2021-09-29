@@ -100,12 +100,13 @@ const Landing = () => {
         p="5"
       >
         <FormControl id="boardTitle" isRequired mb="3">
-          <FormLabel>Index Title</FormLabel>
-          <Input placeholder="Index title" ref={boardTitleRef} />
+          <FormLabel>Board Title</FormLabel>
+          <Input placeholder="Board title" data-testid="board_title" ref={boardTitleRef} />
         </FormControl>
         <FormControl id="columnName" isRequired mb="3">
           <FormLabel>Column Names</FormLabel>
           <Input
+            data-testid="column_names"
             placeholder={DEFAULT_COLUMNS}
             defaultValue={DEFAULT_COLUMNS}
             ref={columnNamesRef}
@@ -113,7 +114,7 @@ const Landing = () => {
           <FormHelperText>Comma separated</FormHelperText>
         </FormControl>
 
-        <Button onClick={onSubmit}>Create board</Button>
+        <Button data-testid="create_board_button" onClick={onSubmit}>Create board</Button>
       </Box>
     </>
   );

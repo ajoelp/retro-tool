@@ -27,6 +27,8 @@ const applyMiddleware = (app: Express) => {
 
 applyMiddleware(expressApp);
 
+expressApp.get('/', (_req, res) => res.json({ status: 'ok' }))
+
 expressApp.use(BoardsRouter);
 expressApp.use(ColumnsRouter);
 expressApp.use(CardsRouter);
