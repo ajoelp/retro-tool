@@ -14,7 +14,7 @@ jobs:
         name: Chrome
         with:
           browser: chrome
-          command: yarn e2e
+          command: yarn prisma db push --force-reset && yarn e2e
         env:
           DATABASE_URL: 'postgresql://user:password@localhost:${{ job.services.postgres.ports[5432] }}/database?schema=public'
           TOKEN_SECRET: randomSecret123
