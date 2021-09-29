@@ -10,11 +10,19 @@ jobs:
     name: E2E
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+          cache: 'yarn'
+      - run: yarn install
+      - run: yarn prisma db push
+      - run: yarn prisma db reset --force
       - uses: cypress-io/github-action@v2
         name: Chrome
         with:
           browser: chrome
-          command: yarn prisma db push --force-reset && yarn e2e
+          install: false
+          command: yarn e2e
         env:
           DATABASE_URL: 'postgresql://user:password@localhost:${{ job.services.postgres.ports[5432] }}/database?schema=public'
           TOKEN_SECRET: randomSecret123
