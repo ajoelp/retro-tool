@@ -8,6 +8,15 @@ jobs:
   run:
     runs-on: ubuntu-latest
     name: E2E
+    env:
+      DATABASE_URL: 'postgresql://user:password@localhost:${{ job.services.postgres.ports[5432] }}/database?schema=public'
+      TOKEN_SECRET: randomSecret123
+      GITHUB_CLIENT_ID: randomClientId
+      GITHUB_CLIENT_SECRET: randomClientSecret
+      GITHUB_CALLBACK_URL: http://localhost:3333/auth/github/callback
+      SPA_URL: http://localhost:4200
+      COOKIE_DOMAIN: localhost
+      NX_API_URL: http://localhost:3333
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -16,26 +25,13 @@ jobs:
           cache: 'yarn'
       - run: yarn install
       - run: yarn prisma db push
-        env:
-          DATABASE_URL: 'postgresql://user:password@localhost:${{ job.services.postgres.ports[5432] }}/database?schema=public'
       - run: yarn prisma db reset --force
-        env:
-          DATABASE_URL: 'postgresql://user:password@localhost:${{ job.services.postgres.ports[5432] }}/database?schema=public'
       - uses: cypress-io/github-action@v2
         name: Chrome
         with:
           browser: chrome
           install: false
           command: yarn e2e
-        env:
-          DATABASE_URL: 'postgresql://user:password@localhost:${{ job.services.postgres.ports[5432] }}/database?schema=public'
-          TOKEN_SECRET: randomSecret123
-          GITHUB_CLIENT_ID: randomClientId
-          GITHUB_CLIENT_SECRET: randomClientSecret
-          GITHUB_CALLBACK_URL: http://localhost:3333/auth/github/callback
-          SPA_URL: http://localhost:4200
-          COOKIE_DOMAIN: localhost
-          NX_API_URL: http://localhost:3333
       - uses: actions/upload-artifact@v1
         if: failure()
         with:
