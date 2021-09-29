@@ -1,24 +1,24 @@
 {
   "user1": {
-    "id": "a74756b7-4b9b-4c24-bafd-c529002a9076",
-    "githubNickname": "user7c3772ef-1082-40b3-8d25-32158b1bdd3c",
+    "id": "2baca9ee-45b4-4309-bd3c-9a5d57025b05",
+    "githubNickname": "usera232bc14-1a9c-4ac8-8c32-123a18ad23ad",
     "email": "test-user-1@example.com",
-    "avatar": "https://cdn.fakercloud.com/avatars/falconerie_128.jpg",
+    "avatar": "https://cdn.fakercloud.com/avatars/picard102_128.jpg",
     "boards": []
   },
-  "user1Token": "eyJhbGciOiJIUzI1NiJ9.YTc0NzU2YjctNGI5Yi00YzI0LWJhZmQtYzUyOTAwMmE5MDc2.xrtVvJ_sRpys-Hw_5-TyNWe9mVHrP0Whrw1sUTK3C6w",
+  "user1Token": "eyJhbGciOiJIUzI1NiJ9.MmJhY2E5ZWUtNDViNC00MzA5LWJkM2MtOWE1ZDU3MDI1YjA1.06KQMbWZ3SlOF0beczmb8OIHFVzgXmQk2BU33w1TThg",
   "user2": {
-    "id": "92aec00b-b037-4543-bc36-cec6ee68e55d",
-    "githubNickname": "user0330f0c6-57ef-4c67-85e0-c34e511ceaa0",
+    "id": "e9e6cd9a-cc5a-4281-92e9-82e69a069b73",
+    "githubNickname": "userfc7ba134-f1d4-41c8-ab8c-1c591cfb8216",
     "email": "test-user-2@example.com",
-    "avatar": "https://cdn.fakercloud.com/avatars/jeremymouton_128.jpg",
+    "avatar": "https://cdn.fakercloud.com/avatars/jonathansimmons_128.jpg",
     "boards": []
   },
-  "user2Token": "eyJhbGciOiJIUzI1NiJ9.YTc0NzU2YjctNGI5Yi00YzI0LWJhZmQtYzUyOTAwMmE5MDc2.xrtVvJ_sRpys-Hw_5-TyNWe9mVHrP0Whrw1sUTK3C6w",
+  "user2Token": "eyJhbGciOiJIUzI1NiJ9.MmJhY2E5ZWUtNDViNC00MzA5LWJkM2MtOWE1ZDU3MDI1YjA1.06KQMbWZ3SlOF0beczmb8OIHFVzgXmQk2BU33w1TThg",
   "board1": {
-    "id": "b56091c2-e6f3-44f7-b101-6ba7c7dbe4bd",
+    "id": "a76c869d-b86a-48b3-b20b-2a44cd4f98d6",
     "title": "Random new board title",
-    "createdAt": "2021-09-29T16:27:16.807Z",
-    "ownerId": "a74756b7-4b9b-4c24-bafd-c529002a9076"
+    "createdAt": "2021-09-29T16:47:52.377Z",
+    "ownerId": "2baca9ee-45b4-4309-bd3c-9a5d57025b05"
   }
 }
