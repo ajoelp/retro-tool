@@ -16,7 +16,11 @@ jobs:
           cache: 'yarn'
       - run: yarn install
       - run: yarn prisma db push
+        env:
+          DATABASE_URL: 'postgresql://user:password@localhost:${{ job.services.postgres.ports[5432] }}/database?schema=public'
       - run: yarn prisma db reset --force
+        env:
+          DATABASE_URL: 'postgresql://user:password@localhost:${{ job.services.postgres.ports[5432] }}/database?schema=public'
       - uses: cypress-io/github-action@v2
         name: Chrome
         with:
