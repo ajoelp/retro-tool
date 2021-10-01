@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { prisma } from '../prismaClient';
 import { BOARD_UPDATED_EVENT_NAME } from '@retro-tool/api-interfaces';
 import dependencies from '../dependencies';
+import { v4 as uuid } from 'uuid';
 
 export class BoardsController {
   async index(req: Request, res: Response) {
@@ -28,8 +29,12 @@ export class BoardsController {
       data: {
         title,
         ownerId: (req.user as User).id,
+        inviteCode: uuid(),
         columns: {
-          create: columns.map((column, order) => ({ title: column, order })),
+          create: columns.map((column, order) => ({
+            title: column,
+            order,
+          })),
         },
       },
       include: { columns: true },

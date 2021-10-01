@@ -11,21 +11,32 @@ generator client {
 }
 
 model User {
-  id             String  @id @default(uuid())
-  githubNickname String  @unique
-  email          String  @unique
+  id             String        @id @default(uuid())
+  githubNickname String        @unique
+  email          String        @unique
   avatar         String
   boards         Board[]
   cards          Card[]
+  boardAccesses  BoardAccess[]
 }
 
 model Board {
-  id        String   @id @default(uuid())
-  title     String
-  createdAt DateTime @default(now())
-  owner     User     @relation(fields: [ownerId], references: [id])
-  ownerId   String
-  columns   Column[]
+  id            String        @id @default(uuid())
+  title         String
+  createdAt     DateTime      @default(now())
+  owner         User          @relation(fields: [ownerId], references: [id])
+  ownerId       String
+  columns       Column[]
+  inviteCode    String?
+  boardAccesses BoardAccess[]
+}
+
+model BoardAccess {
+  id      String @id @default(uuid())
+  boardId String
+  board   Board  @relation(fields: [boardId], references: [id])
+  userId  String
+  user    User   @relation(fields: [userId], references: [id])
 }
 
 model Column {
