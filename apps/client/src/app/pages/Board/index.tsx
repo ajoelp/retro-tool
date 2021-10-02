@@ -1,4 +1,4 @@
-import { Spinner } from '@chakra-ui/react';
+import { Alert, AlertIcon, AlertTitle, Spinner } from '@chakra-ui/react';
 import { Column as ColumnType } from '@prisma/client';
 import { useEffect, useState } from 'react';
 import {
@@ -50,7 +50,7 @@ const reorder = (
 
 const Board = () => {
   const { id } = useParams<{ id: string }>();
-  const { data, isLoading } = useBoard(id);
+  const { data, isLoading, isError } = useBoard(id);
   const { columns: apiColumns, columnsLoading } = useColumns(id);
   const { mutateAsync: reorderColumnAsync } = useReorderColumn();
   const [columns, setColumns] = useState(order(apiColumns ?? []));
@@ -62,6 +62,14 @@ const Board = () => {
 
   useBoardEvents(id);
 
+  if (isError) {
+    return (
+      <Alert status="error">
+        <AlertIcon />
+        <AlertTitle mr={2}>Unauthorized.</AlertTitle>
+      </Alert>
+    );
+  }
   if (isLoading || columnsLoading) return <Spinner />;
   if (!data) return null;
 
