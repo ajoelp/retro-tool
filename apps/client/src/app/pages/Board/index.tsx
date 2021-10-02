@@ -16,6 +16,8 @@ import { useBoard } from '../../hooks/boards';
 import { useColumns, useReorderColumn } from '../../hooks/columns';
 import { useBoardEvents } from '../../hooks/useBoardEvents';
 import { useUpdateCard } from '../../hooks/cards';
+import { NavHeight } from '../../theme/sizes';
+import { Helmet } from "react-helmet";
 
 const PageWrapper = styled.div`
   display: flex;
@@ -30,7 +32,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-wrap: nowrap;
   margin: 0 auto;
-  max-height: 100vh;
+  height: calc(100vh - ${NavHeight}px - 60px);
   padding: 0 2rem;
 `;
 
@@ -52,7 +54,7 @@ const Board = () => {
   const { id } = useParams<{ id: string }>();
   const { data, isLoading, isError } = useBoard(id);
   const { columns: apiColumns, columnsLoading } = useColumns(id);
-  const { mutateAsync: reorderColumnAsync } = useReorderColumn();
+  const { mutateAsync: reorderColumnAsync } = useReorderColumn(data?.id);
   const [columns, setColumns] = useState(order(apiColumns ?? []));
   const { updateCard } = useUpdateCard();
 
@@ -126,7 +128,6 @@ const Board = () => {
 
       // make request here
       await reorderColumnAsync({
-        boardId: id,
         sourceIndex: source.index,
         destinationIndex: destination.index,
       });
@@ -137,8 +138,10 @@ const Board = () => {
 
   return (
     <PageWrapper>
+      <Helmet>
+        <title>Retro - {data.title}</title>
+      </Helmet>
       <Navigation board={data} />
-
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="board" type="COLUMN" direction="horizontal">
           {(provided: DroppableProvided) => (

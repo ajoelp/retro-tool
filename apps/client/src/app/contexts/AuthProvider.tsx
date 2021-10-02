@@ -1,7 +1,7 @@
-import { useMutation, useQuery } from 'react-query';
+import { useQuery } from 'react-query';
 import { createContext, ReactNode, useContext, useEffect } from 'react';
 import { User } from '@prisma/client';
-import api from '../api';
+import { apiClient } from '../api';
 import { environment } from '../../environments/environment.prod';
 
 interface LoginParams {
@@ -21,17 +21,18 @@ export const AuthContext = createContext<AuthProviderState>({
   user: null,
   userLoading: false,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  login() { },
+  login() {},
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  async logout() { },
+  async logout() {},
   logoutLoading: false,
 });
 
 const useMe = () => {
   return useQuery<User>(
     ['currentUser'],
-    () => {
-      return api.getCurrentUser();
+    async () => {
+      const { data } = await apiClient.get('/auth/me');
+      return data.user as User;
     },
     {
       refetchInterval: false,
@@ -41,8 +42,8 @@ const useMe = () => {
 };
 
 const useLogin = () => {
-  return (redirect = "/") => {
-    window.localStorage.setItem('redirect', redirect)
+  return (redirect = '/') => {
+    window.localStorage.setItem('redirect', redirect);
     window.location.href = `${environment.apiUrl}/auth/github`;
   };
 };
@@ -57,24 +58,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     if (user) {
-      const redirect = window.localStorage.getItem('redirect')
+      const redirect = window.localStorage.getItem('redirect');
       if (redirect) {
-        window.localStorage.removeItem('redirect')
-        window.location.href = redirect
+        window.localStorage.removeItem('redirect');
+        window.location.href = redirect;
       }
     }
-  }, [user])
+  }, [user]);
 
   const value: AuthProviderState = {
     user,
     userLoading,
     login,
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    async logout() { },
+    async logout() {},
     logoutLoading: false,
   };
 
-  if (!isFetched) return null
+  if (!isFetched) return null;
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

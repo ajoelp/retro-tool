@@ -19,6 +19,7 @@ import {
   ArrowCircleUpIcon,
   MenuIcon,
 } from '@heroicons/react/outline';
+import { Textarea } from '../Textarea';
 
 type CardProps = {
   column: Column;
@@ -80,7 +81,7 @@ export const CardWrapper = styled.div<CardWrapperProps>`
   `}
 `;
 
-export const CardInput = styled.textarea`
+export const CardInput = styled(Textarea)`
   width: 100%;
   flex: 1;
   resize: none;
@@ -168,9 +169,9 @@ export const Card: React.FC<CardProps> = ({ card, index }) => {
     }
   }, [value, card?.content, isFocused]);
 
-  const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-    setValue(event.target.value);
-    updateCard({ cardId: card.id, payload: { content: event.target.value } });
+  const handleChange = (value: string) => {
+    setValue(value);
+    updateCard({ cardId: card.id, payload: { content: value } });
   };
 
   const isOwner = user?.id === card.ownerId;
@@ -207,7 +208,6 @@ export const Card: React.FC<CardProps> = ({ card, index }) => {
                 />
               ) : (
                 <CardInput
-
                   as="p"
                 >
                   {value}

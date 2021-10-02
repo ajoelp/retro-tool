@@ -1,9 +1,14 @@
 import { User } from '@prisma/client';
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { prisma } from '../prismaClient';
 import { BOARD_UPDATED_EVENT_NAME } from '@retro-tool/api-interfaces';
 import dependencies from '../dependencies';
 import { v4 as uuid } from 'uuid';
+import { BoardRepository } from './BoardRepository';
+import { BoardResource } from './BoardResource';
+
+const boardRepository = new BoardRepository();
+const boardResource = new BoardResource();
 
 export class BoardsController {
   async index(req: Request, res: Response) {
@@ -13,13 +18,10 @@ export class BoardsController {
 
   async fetch(req: Request, res: Response) {
     const { id } = req.params;
-    const board = await prisma.board.findFirst({
-      where: { id },
-      include: {
-        columns: true,
-      },
+    const board = await boardRepository.findById(id);
+    return res.json({
+      board: boardResource.buildResponse(board, req.user as User),
     });
-    return res.json({ board });
   }
 
   async create(req: Request, res: Response) {
@@ -35,6 +37,9 @@ export class BoardsController {
             title: column,
             order,
           })),
+        },
+        boardAccesses: {
+          create: [{ userId: (req.user as User).id }],
         },
       },
       include: { columns: true },
