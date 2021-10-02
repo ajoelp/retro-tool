@@ -31,7 +31,13 @@ describe('BoardsController', () => {
 
   it('fetches a board', async () => {
     const board = await prisma.board.create({
-      data: { title: 'testTitle', ownerId: user.id },
+      data: {
+        title: 'testTitle',
+        ownerId: user.id,
+        boardAccesses: {
+          create: { userId: user.id },
+        },
+      },
     });
 
     const response = await TestCase.make()
@@ -44,6 +50,18 @@ describe('BoardsController', () => {
         id: board.id,
       }),
     );
+  });
+
+  it('throws an error if user is not invited to board', async () => {
+    const board = await prisma.board.create({
+      data: { title: 'testTitle', ownerId: user.id },
+    });
+
+    const response = await TestCase.make()
+      .actingAs(user)
+      .get(`/boards/${board.id}`);
+
+    expect(response.status).toEqual(500);
   });
 
   it('lists the boards', async () => {
@@ -117,6 +135,7 @@ describe('BoardsController', () => {
 
   afterEach(async () => {
     await prisma.column.deleteMany();
+    await prisma.boardAccess.deleteMany();
     await prisma.board.deleteMany();
   });
 });
