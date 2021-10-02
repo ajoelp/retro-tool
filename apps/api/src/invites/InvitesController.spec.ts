@@ -11,14 +11,15 @@ describe('InvitesController', () => {
       data: { title: 'new board', ownerId: user.id, inviteCode: 'our-code' },
     });
 
-    // assert user does not have board access
+    const initialAccess = await prisma.boardAccess.findFirst({
+      where: { userId: user.id, boardId: board.id },
+    });
+    expect(initialAccess).toBeFalsy();
 
-    // hit endpoint
     const response = await TestCase.make()
       .actingAs(user)
       .post(`/invites/${board.inviteCode}`);
 
-    // assert user does have board access
     expect(response.status).toEqual(200);
     expect(response.body.board).toEqual(
       expect.objectContaining({
@@ -26,10 +27,32 @@ describe('InvitesController', () => {
       }),
     );
 
-    // assert user does have board access
     const access = await prisma.boardAccess.findFirst({
       where: { userId: user.id, boardId: board.id },
     });
     expect(access).toBeTruthy();
+  });
+
+  it('throws when a board does not exist', async () => {
+    const user = await prisma.user.create({
+      data: { githubNickname: 'nacho', email: 'nacho@gmail.com', avatar: '' },
+    });
+
+    const initialAccess = await prisma.boardAccess.findFirst({
+      where: { userId: user.id, boardId: 'invalid-board-id' },
+    });
+    expect(initialAccess).toBeFalsy();
+
+    const response = await TestCase.make()
+      .actingAs(user)
+      .post(`/invites/asdasd`);
+
+    expect(response.status).toEqual(404);
+  });
+
+  afterEach(async () => {
+    await prisma.boardAccess.deleteMany();
+    await prisma.board.deleteMany();
+    await prisma.user.deleteMany();
   });
 });

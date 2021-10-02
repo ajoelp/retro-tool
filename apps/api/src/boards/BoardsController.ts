@@ -1,5 +1,5 @@
 import { User } from '@prisma/client';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { prisma } from '../prismaClient';
 import { BOARD_UPDATED_EVENT_NAME } from '@retro-tool/api-interfaces';
 import dependencies from '../dependencies';
