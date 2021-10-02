@@ -1,20 +1,19 @@
 import {
+  Box,
   Button,
   FormControl,
-  FormLabel,
-  Input,
-  Box,
-  Heading,
   FormHelperText,
+  FormLabel,
+  Heading,
+  Input,
 } from '@chakra-ui/react';
 import { useRef } from 'react';
-import { useMutation } from 'react-query';
 import { useHistory, useLocation } from 'react-router-dom';
-import api from '../api';
-import GithubButton from 'react-github-login-button'
+import GithubButton from 'react-github-login-button';
 import { useAuth } from '../contexts/AuthProvider';
-import styled from 'styled-components'
-import queryString from 'query-string'
+import styled from 'styled-components';
+import queryString from 'query-string';
+import { useCreateBoard } from '../hooks/boards';
 
 const LoginWrapper = styled.div`
   width: 100vw;
@@ -23,25 +22,20 @@ const LoginWrapper = styled.div`
   align-items: center;
   justify-content: center;
   flex-direction: column;
-`
-
-const useCreateBoard = () => {
-  return useMutation(api.createBoard);
-};
+`;
 
 const DEFAULT_COLUMNS = 'Mad, Glad, Sad';
 
 function useQueryParams() {
-  return queryString.parse(useLocation().search)
+  return queryString.parse(useLocation().search);
 }
 
 const Landing = () => {
   const boardTitleRef = useRef<HTMLInputElement>(null);
   const columnNamesRef = useRef<HTMLInputElement>(null);
   const { mutateAsync } = useCreateBoard();
-  const { redirect } = useQueryParams()
+  const { redirect } = useQueryParams();
   const { user, login } = useAuth();
-
 
   const history = useHistory();
 
@@ -78,8 +72,12 @@ const Landing = () => {
   if (!user) {
     return (
       <LoginWrapper>
-        <Heading size="md" mb="4">Please login.</Heading>
-        <GithubButton onClick={() => login(redirect as string)}>Login</GithubButton>
+        <Heading size="md" mb="4">
+          Please login.
+        </Heading>
+        <GithubButton onClick={() => login(redirect as string)}>
+          Login
+        </GithubButton>
       </LoginWrapper>
     );
   }
@@ -101,7 +99,11 @@ const Landing = () => {
       >
         <FormControl id="boardTitle" isRequired mb="3">
           <FormLabel>Board Title</FormLabel>
-          <Input placeholder="Board title" data-testid="board_title" ref={boardTitleRef} />
+          <Input
+            placeholder="Board title"
+            data-testid="board_title"
+            ref={boardTitleRef}
+          />
         </FormControl>
         <FormControl id="columnName" isRequired mb="3">
           <FormLabel>Column Names</FormLabel>
@@ -114,7 +116,9 @@ const Landing = () => {
           <FormHelperText>Comma separated</FormHelperText>
         </FormControl>
 
-        <Button data-testid="create_board_button" onClick={onSubmit}>Create board</Button>
+        <Button data-testid="create_board_button" onClick={onSubmit}>
+          Create board
+        </Button>
       </Box>
     </>
   );
