@@ -29,7 +29,6 @@ jobs:
       - run: yarn prisma db push
         env:
           DATABASE_URL: 'postgresql://user:password@localhost:${{ job.services.postgres.ports[5432] }}/database?schema=public'
-      - run: ls -la apps/client-e2e/src/fixtures
       - run: yarn prisma migrate reset --force
         env:
           DATABASE_URL: 'postgresql://user:password@localhost:${{ job.services.postgres.ports[5432] }}/database?schema=public'
