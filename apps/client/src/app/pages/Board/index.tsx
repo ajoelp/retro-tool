@@ -17,7 +17,7 @@ import { useColumns, useReorderColumn } from '../../hooks/columns';
 import { useBoardEvents } from '../../hooks/useBoardEvents';
 import { useUpdateCard } from '../../hooks/cards';
 import { NavHeight } from '../../theme/sizes';
-import { Helmet } from "react-helmet";
+import { Helmet } from 'react-helmet';
 
 const PageWrapper = styled.div`
   display: flex;

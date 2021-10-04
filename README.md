@@ -12,7 +12,7 @@
    2. Set **Homepage URL** to `http://localhost:4200`
    3. Set **Authorization callback URL** to `http://localhost:3333/auth/github/callback`
    4. Use the Client ID and Client Secret in your `.env` file
-3. Start the database servers using docker ```docker-compose up```
-4. Start the client server ```yarn start client```
-5. Start the api server ```yarn start api```
-6. Run the migrations ```yarn prisma migrate dev```
+3. Start the database servers using docker `docker-compose up`
+4. Start the client server `yarn start client`
+5. Start the api server `yarn start api`
+6. Run the migrations `yarn prisma migrate dev`

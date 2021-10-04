@@ -4,7 +4,7 @@ import { Server } from 'socket.io';
 import { Board, User } from '.prisma/client';
 import { prisma } from '../prismaClient';
 import { generateJwtSecret } from '../utils/JwtService';
-import flushPromises from 'flush-promises'
+import flushPromises from 'flush-promises';
 class MockIO extends EventEmitter {
   of() {
     return this;
@@ -17,10 +17,12 @@ class MockIO extends EventEmitter {
 describe('NamespaceService', () => {
   const mockIO = new MockIO();
   const service = new NamespaceService().setIO(mockIO as unknown as Server);
-  let user: User
+  let user: User;
 
   beforeAll(async () => {
-    user = await prisma.user.create({ data: { email: 'test@user.com', githubNickname: 'test', avatar: "" } })
+    user = await prisma.user.create({
+      data: { email: 'test@user.com', githubNickname: 'test', avatar: '' },
+    });
     service.start();
   });
 
@@ -37,9 +39,9 @@ describe('NamespaceService', () => {
       name: `/boards/${boardId}`,
     };
 
-    await service.onConnection(socket)
-    expect(disconnectSpy).toHaveBeenCalled()
-  })
+    await service.onConnection(socket);
+    expect(disconnectSpy).toHaveBeenCalled();
+  });
 
   it('will disconnect if there is no valid token', async () => {
     const boardId = 'boardId';
@@ -48,17 +50,17 @@ describe('NamespaceService', () => {
 
     socket.handshake = {
       auth: {
-        token: `Bearer random-token`
-      }
-    }
+        token: `Bearer random-token`,
+      },
+    };
 
     socket.nsp = {
       name: `/boards/${boardId}`,
     };
 
-    await service.onConnection(socket)
-    expect(disconnectSpy).toHaveBeenCalled()
-  })
+    await service.onConnection(socket);
+    expect(disconnectSpy).toHaveBeenCalled();
+  });
 
   it('will add new client when a connection is made', async () => {
     const boardId = 'boardId';
@@ -66,15 +68,15 @@ describe('NamespaceService', () => {
 
     socket.handshake = {
       auth: {
-        token: `Bearer ${generateJwtSecret(user)}`
-      }
-    }
+        token: `Bearer ${generateJwtSecret(user)}`,
+      },
+    };
 
     socket.nsp = {
       name: `/boards/${boardId}`,
     };
 
-    await service.onConnection(socket)
+    await service.onConnection(socket);
 
     expect([...service.clients.values()]).toEqual(
       expect.arrayContaining([expect.objectContaining({ boardId })]),
@@ -88,15 +90,15 @@ describe('NamespaceService', () => {
 
     socket.handshake = {
       auth: {
-        token: `Bearer ${generateJwtSecret(user)}`
-      }
-    }
+        token: `Bearer ${generateJwtSecret(user)}`,
+      },
+    };
 
     socket.nsp = {
       name: `/wrong-url/${boardId}`,
     };
 
-    await service.onConnection(socket)
+    await service.onConnection(socket);
 
     expect(socket.disconnect).toHaveBeenCalledTimes(1);
   });
@@ -107,15 +109,15 @@ describe('NamespaceService', () => {
 
     socket.handshake = {
       auth: {
-        token: `Bearer ${generateJwtSecret(user)}`
-      }
-    }
+        token: `Bearer ${generateJwtSecret(user)}`,
+      },
+    };
 
     socket.nsp = {
       name: `/boards/${boardId}`,
     };
 
-    await service.onConnection(socket)
+    await service.onConnection(socket);
 
     expect([...service.clients.values()]).toEqual(
       expect.arrayContaining([expect.objectContaining({ boardId })]),
@@ -124,7 +126,6 @@ describe('NamespaceService', () => {
     socket.emit('disconnect');
     expect([...service.clients.values()]).toEqual([]);
   });
-
 
   it('will emit an event to a client', () => {
     const boardId = 'sampleBoardId';
@@ -145,26 +146,23 @@ describe('NamespaceService', () => {
     });
   });
 
-
   it('will emit all users in a room', async () => {
     const boardId = 'sampleBoardId';
 
-    const emit = jest.fn()
-    service.namespace = { emit } as any
+    const emit = jest.fn();
+    service.namespace = { emit } as any;
 
-    service.clients.set('id-1', { boardId, user: { id: '1' } } as any)
-    service.clients.set('id-2', { boardId, user: { id: '1' } } as any)
-    service.clients.set('id-3', { boardId, user: { id: '2' } } as any)
-    service.clients.set('id-4', { boardId: 'different-board-id', user: { id: '3' } } as any)
+    service.clients.set('id-1', { boardId, user: { id: '1' } } as any);
+    service.clients.set('id-2', { boardId, user: { id: '1' } } as any);
+    service.clients.set('id-3', { boardId, user: { id: '2' } } as any);
+    service.clients.set('id-4', {
+      boardId: 'different-board-id',
+      user: { id: '3' },
+    } as any);
 
-    await service.emitUserRoom(boardId)
+    await service.emitUserRoom(boardId);
 
-    expect(emit).toHaveBeenCalledTimes(1)
-    expect(emit).toHaveBeenCalledWith('users', [
-      { id: '1' },
-      { id: '2' }
-    ])
-  })
-
-
+    expect(emit).toHaveBeenCalledTimes(1);
+    expect(emit).toHaveBeenCalledWith('users', [{ id: '1' }, { id: '2' }]);
+  });
 });

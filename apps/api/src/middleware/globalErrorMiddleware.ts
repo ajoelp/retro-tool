@@ -19,5 +19,5 @@ export default function globalErrorMiddleware(
       message: err.message,
     });
   }
-  next(err)
+  next(err);
 }
