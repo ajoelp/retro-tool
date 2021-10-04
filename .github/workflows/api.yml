@@ -15,8 +15,6 @@ jobs:
           node-version: 16.x
           cache: 'yarn'
       - run: yarn install
-      - name: Check Format
-        run: yarn format:check api
       - name: Check Lint
         run: yarn lint api
       - name: Test

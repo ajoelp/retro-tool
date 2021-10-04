@@ -16,7 +16,7 @@ jobs:
           cache: 'yarn'
       - run: yarn install
       - name: Check Format
-        run: yarn format:check client
+        run: yarn format:check client --base=origin/main
       - name: Check Lint
         run: yarn lint client
       - name: Test
