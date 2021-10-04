@@ -11,6 +11,7 @@ import { AuthRouter } from './auth/AuthRouter';
 import passport from 'passport';
 import helmet from 'helmet';
 import dependencies from './dependencies';
+import { InvitesRouter } from './invites/InvitesRouter';
 
 const expressApp = express();
 
@@ -27,12 +28,13 @@ const applyMiddleware = (app: Express) => {
 
 applyMiddleware(expressApp);
 
-expressApp.get('/', (_req, res) => res.json({ status: 'ok' }))
+expressApp.get('/', (_req, res) => res.json({ status: 'ok' }));
 
 expressApp.use(BoardsRouter);
 expressApp.use(ColumnsRouter);
 expressApp.use(CardsRouter);
 expressApp.use(AuthRouter);
+expressApp.use(InvitesRouter);
 
 expressApp.use(globalErrorMiddleware);
 

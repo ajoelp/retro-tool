@@ -1,10 +1,11 @@
 import { User } from '@prisma/client';
-import { Response, Request, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { AuthenticationError } from '../errors/AuthenticationError';
+import { ApiRequest } from '../types/ApiRequest';
 import { tokenToUser } from '../utils/JwtService';
 
 export async function authenticatedMiddleware(
-  req: Request,
+  req: ApiRequest,
   res: Response,
   next: NextFunction,
 ) {

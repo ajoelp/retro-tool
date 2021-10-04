@@ -15,14 +15,12 @@ jobs:
           node-version: 16.x
           cache: 'yarn'
       - run: yarn install
-      - name: Check Format
-        run: yarn format:check api
       - name: Check Lint
         run: yarn lint api
       - name: Test
         env:
           TEST_DATABASE_URL: 'postgresql://user:password@localhost:${{ job.services.postgres.ports[5432] }}/database?schema=public'
-        run: yarn test api --codeCoverage --verbose
+        run: yarn test:api --codeCoverage --verbose
       - uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -41,13 +39,3 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.PRIVATE_KEY }}
-          known_hosts: ${{ secrets.KNOWN_HOSTS }}
-      - name: Run Deploy
-        run: ssh ${{secrets.SSH_USER}}@${{secrets.SERVER_HOST}} "cd /var/www/retro-tool && git fetch && git pull origin main && sh ./deploy.sh"

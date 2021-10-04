@@ -1,33 +1,24 @@
 import { Router } from 'express';
 import { AuthController } from './AuthController';
 import passport from 'passport';
-import { prisma } from '../prismaClient';
 import { authenticatedMiddleware } from '../middleware/authMiddleware';
 import { GithubStrategy } from '../utils/GithubStrategy';
+import { githubStrategyCallback } from './AuthServices';
 
 const AuthRouter = Router();
 const authController = new AuthController();
 
+/* istanbul ignore next */
 passport.serializeUser(function (user, done) {
   done(null, user);
 });
 
+/* istanbul ignore next */
 passport.deserializeUser(function (user, done) {
   done(null, user);
 });
 
-const isAllowedToRegister = (organizations: string[]) => {
-  const allowedOrgs = (process.env.ALLOWED_ORGS ?? '')
-    .split(',')
-    .filter(org => org !== '')
-
-  if (allowedOrgs.length <= 0) return true
-  console.log(organizations, allowedOrgs)
-  return !!organizations.find(organization => {
-    return allowedOrgs.find(allowedOrg => allowedOrg === organization)
-  })
-}
-
+/* istanbul ignore next */
 passport.use(
   new GithubStrategy(
     {
@@ -35,39 +26,17 @@ passport.use(
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
       callbackURL: process.env.GITHUB_CALLBACK_URL,
     },
-    async function (accessToken, refreshToken, profile, done) {
-      if (!isAllowedToRegister(profile.organizations ?? [])) {
-        done(new Error('Invalid organization'), null);
-        return;
-      }
-
-      try {
-        const user = await prisma.user.upsert({
-          where: { email: profile.email },
-          create: {
-            email: profile.email,
-            githubNickname: profile.githubNickname,
-            avatar: profile.avatar,
-          },
-          update: {
-            email: profile.email,
-            githubNickname: profile.githubNickname,
-            avatar: profile.avatar,
-          },
-        });
-        done(null, user);
-      } catch (e) {
-        done(e, null);
-      }
-    },
+    githubStrategyCallback,
   ),
 );
 
+/* istanbul ignore next */
 AuthRouter.get(
   '/auth/github',
   passport.authenticate('github', { scope: ['user:email', 'read:org'] }),
 );
 
+/* istanbul ignore next */
 AuthRouter.get(
   '/auth/github/callback',
   passport.authenticate('github', {

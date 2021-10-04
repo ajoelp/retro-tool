@@ -19,6 +19,7 @@ import {
   ArrowCircleUpIcon,
   MenuIcon,
 } from '@heroicons/react/outline';
+import { Textarea } from '../Textarea';
 
 type CardProps = {
   column: Column;
@@ -33,8 +34,7 @@ type CardWrapperProps = {
   hasChildren: boolean;
 };
 
-
-const StackedBoxShadow = `0 1px 1px rgba(0,0,0,0.15), 0 10px 0 -5px #eee, 0 10px 1px -4px rgba(0,0,0,0.15), 0 20px 0 -10px #eee, 0 20px 1px -9px rgba(0,0,0,0.15)`
+const StackedBoxShadow = `0 1px 1px rgba(0,0,0,0.15), 0 10px 0 -5px #eee, 0 10px 1px -4px rgba(0,0,0,0.15), 0 20px 0 -10px #eee, 0 20px 1px -9px rgba(0,0,0,0.15)`;
 
 export const CardWrapper = styled.div<CardWrapperProps>`
   ${({ isDragging }) =>
@@ -66,21 +66,24 @@ export const CardWrapper = styled.div<CardWrapperProps>`
     border: none;
     box-shadow: ${RingShadow};
   }
-  ${({ hasChildren, isGroupedOver }) => hasChildren && css`
-    box-shadow: ${StackedBoxShadow} ;
+  ${({ hasChildren, isGroupedOver }) =>
+    hasChildren &&
+    css`
+      box-shadow: ${StackedBoxShadow};
       &:focus-within {
         outline: none;
         border: none;
         box-shadow: ${RingShadow}, ${StackedBoxShadow};
       }
 
-      ${isGroupedOver && css`
+      ${isGroupedOver &&
+      css`
         box-shadow: ${RingShadow}, ${StackedBoxShadow};
       `}
-  `}
+    `}
 `;
 
-export const CardInput = styled.textarea`
+export const CardInput = styled(Textarea)`
   width: 100%;
   flex: 1;
   resize: none;
@@ -126,16 +129,16 @@ const HoldIcon = styled(MenuIcon)`
   width: 20px;
   height: 20px;
   margin: 1rem 0.5rem;
-`
+`;
 
 const InputContainer = styled.div`
   display: flex;
-`
+`;
 
 const DragWrapper = styled.div`
   position: relative;
   width: 100%;
-`
+`;
 
 function getStyle(
   style: DraggingStyle | NotDraggingStyle | undefined,
@@ -154,7 +157,7 @@ export const Card: React.FC<CardProps> = ({ card, index }) => {
   const [isFocused, setIsFocused] = useState(false);
   const { updateCard, updateCardLoading } = useUpdateCard();
   const { user } = useAuth();
-  const { voteCard } = useVoteCard(card.id)
+  const { voteCard } = useVoteCard(card.id);
 
   const hasChildren = useMemo(() => {
     if (!card.children) return false;
@@ -168,9 +171,9 @@ export const Card: React.FC<CardProps> = ({ card, index }) => {
     }
   }, [value, card?.content, isFocused]);
 
-  const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-    setValue(event.target.value);
-    updateCard({ cardId: card.id, payload: { content: event.target.value } });
+  const handleChange = (value: string) => {
+    setValue(value);
+    updateCard({ cardId: card.id, payload: { content: value } });
   };
 
   const isOwner = user?.id === card.ownerId;
@@ -206,12 +209,7 @@ export const Card: React.FC<CardProps> = ({ card, index }) => {
                   onBlur={() => setIsFocused(false)}
                 />
               ) : (
-                <CardInput
-
-                  as="p"
-                >
-                  {value}
-                </CardInput>
+                <CardInput as="p">{value}</CardInput>
               )}
             </InputContainer>
             <CardDetails>
@@ -225,7 +223,9 @@ export const Card: React.FC<CardProps> = ({ card, index }) => {
                 </CardVotesButton>
               </CardVotesContainer>
               <div>
-                {hasChildren && <Badge mr="2">{card.children?.length ?? 0 + 1}</Badge>}
+                {hasChildren && (
+                  <Badge mr="2">{card.children?.length ?? 0 + 1}</Badge>
+                )}
                 <Tooltip label={card.owner.githubNickname}>
                   <Avatar size="xs" src={card.owner.avatar} />
                 </Tooltip>
@@ -235,6 +235,5 @@ export const Card: React.FC<CardProps> = ({ card, index }) => {
         </DragWrapper>
       )}
     </Draggable>
-
   );
 };

@@ -1,9 +1,10 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Response } from 'express';
 import { NotFoundError } from '../errors/NotFoundError';
+import { ApiRequest } from '../types/ApiRequest';
 
 export default function globalErrorMiddleware(
   err: Error,
-  req: Request,
+  req: ApiRequest,
   res: Response,
   next: NextFunction,
 ): void {
@@ -18,5 +19,5 @@ export default function globalErrorMiddleware(
       message: err.message,
     });
   }
-  next()
+  next(err);
 }

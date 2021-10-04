@@ -1,9 +1,10 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
 import { ValidationError } from '../errors/ValidationError';
+import { ApiRequest } from '../types/ApiRequest';
 
 const validateRequestParameters = (
-  req: Request,
+  req: ApiRequest,
   res: Response,
   next: NextFunction,
 ): void => {

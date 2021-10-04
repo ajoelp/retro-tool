@@ -1,14 +1,15 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { prisma } from '../prismaClient';
 import { CARD_CREATED_EVENT_NAME } from '@retro-tool/api-interfaces';
 import { User } from '@prisma/client';
 import dependencies from '../dependencies';
 import { CardRepository } from './CardRepository';
+import { ApiRequest } from '../types/ApiRequest';
 
 const cardRepository = new CardRepository();
 
 export class CardsController {
-  async list(req: Request, res: Response) {
+  async list(req: ApiRequest, res: Response) {
     const { columnId, parentId = null } = req.query;
 
     if (columnId == null) throw new Error('No columnId provided');
@@ -28,7 +29,7 @@ export class CardsController {
     return res.json({ cards });
   }
 
-  async create(req: Request, res: Response) {
+  async create(req: ApiRequest, res: Response) {
     const { columnId, content } = req.body;
     const card = await prisma.card.create({
       data: {
@@ -52,7 +53,7 @@ export class CardsController {
     return res.json({ card });
   }
 
-  async update(req: Request, res: Response) {
+  async update(req: ApiRequest, res: Response) {
     const { cardId } = req.params;
     const { payload } = req.body;
 
@@ -61,11 +62,10 @@ export class CardsController {
     return res.json({ card });
   }
 
-  async vote(req: Request, res: Response) {
-    const { cardId } = req.params
-    const { increment = true } = req.body
-    const card = await cardRepository.vote(cardId, increment)
+  async vote(req: ApiRequest, res: Response) {
+    const { cardId } = req.params;
+    const { increment = true } = req.body;
+    const card = await cardRepository.vote(cardId, increment);
     return res.json({ card });
   }
-
 }

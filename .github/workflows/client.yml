@@ -15,12 +15,10 @@ jobs:
           node-version: 16.x
           cache: 'yarn'
       - run: yarn install
-      - name: Check Format
-        run: yarn format:check client
       - name: Check Lint
         run: yarn lint client
       - name: Test
-        run: yarn test client --codeCoverage --verbose
+        run: yarn test:client --codeCoverage --verbose
       - uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

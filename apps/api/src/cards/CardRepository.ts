@@ -38,14 +38,14 @@ export class CardRepository {
   }
 
   async vote(id: string, increment: boolean) {
-    const method = increment ? 'increment' : 'decrement'
+    const method = increment ? 'increment' : 'decrement';
 
     const card = await prisma.card.update({
       where: {
         id,
       },
       data: {
-        votes: { [method]: 1 }
+        votes: { [method]: 1 },
       },
       include: {
         children: true,
@@ -58,7 +58,6 @@ export class CardRepository {
       type: CARD_UPDATED_EVENT_NAME,
       payload: card,
     });
-
   }
 
   async updateCard(id: string, payload: any) {
@@ -82,6 +81,7 @@ export class CardRepository {
     // If the cards are grouped
     if (payload.parentId != null) {
       const parentCard = await this.getCardById(payload.parentId);
+
       dependencies.namespaceService.sendEventToBoard(card.column.boardId, {
         type: CARD_UPDATED_EVENT_NAME,
         payload: parentCard,
@@ -89,7 +89,7 @@ export class CardRepository {
 
       if (card.children && card.children.length) {
         for (const childCard of card.children) {
-          await this.updateCard(childCard.id, { parentId: payload.parentId })
+          await this.updateCard(childCard.id, { parentId: payload.parentId });
         }
       }
     }

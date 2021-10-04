@@ -1,11 +1,15 @@
 import { apiClient } from './../api';
 import { useMutation, useQuery } from 'react-query';
-import api from '../api';
 import { Card } from '@prisma/client';
+import { CardType } from '@retro-tool/api-interfaces';
 
 export function useCards(columnId: string) {
-  const { data, isLoading, refetch } = useQuery(['cards', columnId], () =>
-    api.fetchCards({ columnId }),
+  const { data, isLoading, refetch } = useQuery(
+    ['cards', columnId],
+    async () => {
+      const { data } = await apiClient.get('/cards', { params: { columnId } });
+      return data.cards as CardType[];
+    },
   );
   return {
     cards: data,
@@ -14,13 +18,16 @@ export function useCards(columnId: string) {
   };
 }
 
-type createCardArgs = {
+type CreateCardArgs = {
   content: string;
 };
 
 export function useCreateCard(columnId: string) {
   const { mutateAsync, isLoading } = useMutation(
-    ({ content }: createCardArgs) => api.createCard({ columnId, content }),
+    async ({ content }: CreateCardArgs) => {
+      const { data } = await apiClient.post('/cards', { columnId, content });
+      return data.card as CardType;
+    },
   );
   return { createCard: mutateAsync, createCardLoading: isLoading };
 }
@@ -32,8 +39,11 @@ export type UpdateCardArgs = {
 
 export function useUpdateCard() {
   const { mutateAsync, isLoading } = useMutation(
-    ({ cardId, payload }: UpdateCardArgs) => {
-      return api.updateCard({ cardId, payload });
+    async ({ cardId, payload }: UpdateCardArgs) => {
+      const { data } = await apiClient.post(`/cards/${cardId}`, {
+        payload,
+      });
+      return data.card;
     },
   );
   return {
@@ -42,16 +52,16 @@ export function useUpdateCard() {
   };
 }
 
-
 export type VoteCardArgs = {
   increment: boolean;
-}
+};
 export function useVoteCard(cardId: string) {
   const { mutateAsync, isLoading } = useMutation(
-    ({ increment }: VoteCardArgs) => apiClient.post(`/cards/${cardId}/vote`, { increment })
-  )
+    ({ increment }: VoteCardArgs) =>
+      apiClient.post(`/cards/${cardId}/vote`, { increment }),
+  );
   return {
     voteCard: mutateAsync,
-    voteLoading: isLoading
-  }
+    voteLoading: isLoading,
+  };
 }

@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { prisma } from '../prismaClient';
 import {
   COLUMN_CREATED_EVENT_NAME,
@@ -7,11 +7,12 @@ import {
 } from '@retro-tool/api-interfaces';
 import { ColumnRepository } from './ColumnRepository';
 import dependencies from '../dependencies';
+import { ApiRequest } from '../types/ApiRequest';
 
 const columnRepository = new ColumnRepository();
 
 export class ColumnsController {
-  async index(req: Request, res: Response) {
+  async index(req: ApiRequest, res: Response) {
     const { boardId } = req.query;
     const columns = await prisma.column.findMany({
       where: { boardId: boardId as string },
@@ -19,7 +20,7 @@ export class ColumnsController {
     return res.json({ columns });
   }
 
-  async create(req: Request, res: Response) {
+  async create(req: ApiRequest, res: Response) {
     const { title, boardId } = req.body;
     const column = await prisma.column.create({
       data: {
@@ -40,7 +41,7 @@ export class ColumnsController {
     return res.json({ column });
   }
 
-  async update(req: Request, res: Response) {
+  async update(req: ApiRequest, res: Response) {
     const column = await prisma.column.update({
       where: { id: req.params.id },
       data: req.body,
@@ -54,7 +55,7 @@ export class ColumnsController {
     return res.json({ column });
   }
 
-  async destroy(req: Request, res: Response) {
+  async destroy(req: ApiRequest, res: Response) {
     await prisma.card.deleteMany({
       where: { columnId: req.params.id },
     });
@@ -74,14 +75,15 @@ export class ColumnsController {
     return res.json({});
   }
 
-  async updateOrder(req: Request, res: Response) {
-    const { boardId, sourceIndex, destinationIndex, eventTrackingId } = req.body;
+  async updateOrder(req: ApiRequest, res: Response) {
+    const { boardId, sourceIndex, destinationIndex, eventTrackingId } =
+      req.body;
 
     await columnRepository.reorderColumns(
       boardId,
       sourceIndex,
       destinationIndex,
-      eventTrackingId
+      eventTrackingId,
     );
 
     return res.json({});

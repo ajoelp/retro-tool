@@ -1,17 +1,17 @@
 import { User } from '.prisma/client';
+import { SocketEvents } from '@retro-tool/api-interfaces';
 import { Namespace, Server, Socket } from 'socket.io';
 import { v4 as uuid } from 'uuid';
-import { SocketEvents } from '../../../../libs/api-interfaces/src/lib/socket-events';
 import { tokenToUser } from '../utils/JwtService';
 
 interface NamespaceWithData extends Socket {
   boardId: string;
-  user: User
+  user: User;
 }
 
 export class NamespaceService {
   private io: Server;
-  private namespace: Namespace;
+  public namespace: Namespace;
   private path: RegExp;
   public clients: Map<string, NamespaceWithData>;
 
@@ -34,20 +34,19 @@ export class NamespaceService {
       return;
     }
 
-    const token = (socket.handshake.auth.token ?? "").split(" ")?.[1]
+    const token = (socket?.handshake?.auth?.token ?? '').split(' ')?.[1];
 
     if (!token) {
-      socket.disconnect()
+      socket.disconnect();
       return;
     }
 
-    const user = await tokenToUser(token)
+    const user = await tokenToUser(token);
 
     if (!user) {
-      socket.disconnect()
+      socket.disconnect();
       return;
     }
-
 
     const id = uuid();
     const namespace = socket as NamespaceWithData;
@@ -56,7 +55,7 @@ export class NamespaceService {
 
     this.clients.set(id, namespace);
 
-    this.emitUserRoom(boardId)
+    this.emitUserRoom(boardId);
 
     socket.on('disconnect', () => {
       this.clients.delete(id);
@@ -70,21 +69,27 @@ export class NamespaceService {
   }
 
   emitUserRoom(boardId: string) {
-    const boardUsers = this.getUserInBoard(boardId)
-      .reduce<User[]>((carry, client) => {
-        const index = carry.findIndex(user => user.id === client.user.id)
+    const boardUsers = this.getUserInBoard(boardId).reduce<User[]>(
+      (carry, client) => {
+        const index = carry.findIndex((user) => user.id === client.user.id);
         if (index < 0) {
-          return [...carry, client.user]
+          return [...carry, client.user];
         }
         return carry;
-      }, [])
+      },
+      [],
+    );
 
-    this.namespace.emit('users', boardUsers)
+    this.namespace.emit('users', boardUsers);
   }
 
-  sendEventToBoard(boardId: string, event: SocketEvents, eventTrackingId?: string) {
+  sendEventToBoard(
+    boardId: string,
+    event: SocketEvents,
+    eventTrackingId?: string,
+  ) {
     this.getUserInBoard(boardId).forEach((client) => {
-      client.emit('event', { ...event, eventTrackingId },);
+      client.emit('event', { ...event, eventTrackingId });
     });
   }
 

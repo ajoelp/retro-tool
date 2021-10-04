@@ -6,27 +6,13 @@
 
 ## Development
 
-### Starting the API
-
-Start the api using docker-compose
-
-```bash
-docker-compose up
-```
-
-### Starting the client
-
-```bash
-yarn start
-```
-
-## Planning
-
-- [ ] User can create a new board
-- [ ] User is prompted to provide a name
-- [ ] User is given a unique UUID and stored in localstorage
-- [ ] Owner can modify the name of the board
-- [ ] Index is generated with default template
-- [ ] Owner can modify column titles
-- [ ] User can add cards to board
-- [ ] Owner can lock the board
+1. Copy the `.env.example` to `.env`
+2. **Github OAuth**
+   1. Go to https://github.com/settings/developers and create a new OAuth app
+   2. Set **Homepage URL** to `http://localhost:4200`
+   3. Set **Authorization callback URL** to `http://localhost:3333/auth/github/callback`
+   4. Use the Client ID and Client Secret in your `.env` file
+3. Start the database servers using docker `docker-compose up`
+4. Start the client server `yarn start client`
+5. Start the api server `yarn start api`
+6. Run the migrations `yarn prisma migrate dev`

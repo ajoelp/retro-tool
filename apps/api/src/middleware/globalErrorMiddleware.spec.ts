@@ -21,10 +21,8 @@ describe('globalErrorMiddleware', () => {
   it('will throw a NotFoundError', async () => {
     const error = new NotFoundError('This is the message');
     const req = {} as Request;
-    const next = jest.fn().mockImplementationOnce(() => {
-      throw error;
-    });
-    await globalErrorMiddleware(req, responseMock as Response, next);
+    const next = jest.fn();
+    await globalErrorMiddleware(error, req, responseMock as Response, next);
 
     expect(statusSpy).toHaveBeenCalledWith(404);
     expect(jsonSpy).toHaveBeenCalledWith(
@@ -38,10 +36,8 @@ describe('globalErrorMiddleware', () => {
   it('will throw a Error', async () => {
     const error = new Error('This is the message');
     const req = {} as Request;
-    const next = jest.fn().mockImplementationOnce(() => {
-      throw error;
-    });
-    await globalErrorMiddleware(req, responseMock as Response, next);
+    const next = jest.fn();
+    await globalErrorMiddleware(error, req, responseMock as Response, next);
 
     expect(statusSpy).toHaveBeenCalledWith(500);
     expect(jsonSpy).toHaveBeenCalledWith(
