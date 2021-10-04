@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import supertest from 'supertest';
 import { app } from '../app';
 import { User } from '@prisma/client';

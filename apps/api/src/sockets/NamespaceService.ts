@@ -1,7 +1,7 @@
 import { User } from '.prisma/client';
+import { SocketEvents } from '@retro-tool/api-interfaces';
 import { Namespace, Server, Socket } from 'socket.io';
 import { v4 as uuid } from 'uuid';
-import { SocketEvents } from '../../../../libs/api-interfaces/src/lib/socket-events';
 import { tokenToUser } from '../utils/JwtService';
 
 interface NamespaceWithData extends Socket {
@@ -11,7 +11,7 @@ interface NamespaceWithData extends Socket {
 
 export class NamespaceService {
   private io: Server;
-  private namespace: Namespace;
+  public namespace: Namespace;
   private path: RegExp;
   public clients: Map<string, NamespaceWithData>;
 
@@ -34,7 +34,8 @@ export class NamespaceService {
       return;
     }
 
-    const token = (socket.handshake.auth.token ?? "").split(" ")?.[1]
+
+    const token = (socket?.handshake?.auth?.token ?? "").split(" ")?.[1]
 
     if (!token) {
       socket.disconnect()

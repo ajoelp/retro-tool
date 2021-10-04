@@ -1,11 +1,12 @@
+import { ApiRequest } from './../types/ApiRequest.d';
 import { User } from '@prisma/client';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { NotFoundError } from '../errors/NotFoundError';
 
 import { prisma } from '../prismaClient';
 
 export class InvitesController {
-  async acceptInvite(req: Request, res: Response) {
+  async acceptInvite(req: ApiRequest, res: Response) {
     const inviteCode = req.params.inviteCode;
 
     const board = await prisma.board.findFirst({ where: { inviteCode } });
