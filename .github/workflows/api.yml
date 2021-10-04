@@ -15,12 +15,14 @@ jobs:
           node-version: 16.x
           cache: 'yarn'
       - run: yarn install
+      - name: Check Format
+        run: yarn format:check api --base=origin/main
       - name: Check Lint
         run: yarn lint api
       - name: Test
         env:
           TEST_DATABASE_URL: 'postgresql://user:password@localhost:${{ job.services.postgres.ports[5432] }}/database?schema=public'
-        run: yarn test api --codeCoverage --verbose
+        run: yarn test:api --codeCoverage --verbose
       - uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
