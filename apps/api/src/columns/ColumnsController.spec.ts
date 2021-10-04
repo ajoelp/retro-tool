@@ -1,3 +1,4 @@
+import { TestCase } from '../utils/TestCase';
 import { prisma } from '../prismaClient';
 import { COLUMNS_ROOT, COLUMNS_SINGULAR } from './ColumnsRouter';
 import generatePath from '../utils/generatePath';
@@ -8,13 +9,12 @@ import {
   COLUMN_DELETED_EVENT_NAME,
   COLUMN_UPDATED_EVENT_NAME,
 } from '@retro-tool/api-interfaces';
-import { TestCase } from '../utils/TestCase';
 import dependencies from '../dependencies';
 
 const mockSendEventToBoard = jest
   .spyOn(dependencies.namespaceService, 'sendEventToBoard')
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  .mockImplementation(() => {});
+  .mockImplementation(() => { });
 
 describe('ColumnsController', () => {
   let user: User;
@@ -172,4 +172,57 @@ describe('ColumnsController', () => {
       payload: expect.objectContaining(column),
     });
   });
+
+  it("will reorder columns", async () => {
+    const column1 = await prisma.column.create({
+      data: {
+        title: 'column',
+        boardId: board.id,
+        order: 0,
+      },
+    });
+    const column2 = await prisma.column.create({
+      data: {
+        title: 'column',
+        boardId: board.id,
+        order: 1,
+      },
+    });
+    const column3 = await prisma.column.create({
+      data: {
+        title: 'column',
+        boardId: board.id,
+        order: 2,
+      },
+    });
+
+    const response = await TestCase.make()
+      .actingAs(user)
+      .post('/columns/reorder')
+      .send({
+        boardId: board.id,
+        sourceIndex: 2,
+        destinationIndex: 0,
+        eventTrackingId: 'event-tracking-id'
+      })
+
+    expect(response.status).toEqual(200)
+
+    expect(
+      await prisma.column.findFirst({ where: { id: column1.id } }),
+    ).toEqual(expect.objectContaining({ order: 1 }));
+
+    expect(
+      await prisma.column.findFirst({ where: { id: column2.id } }),
+    ).toEqual(expect.objectContaining({ order: 2 }));
+
+    expect(
+      await prisma.column.findFirst({ where: { id: column3.id } }),
+    ).toEqual(expect.objectContaining({ order: 0 }));
+  });
+
+  afterEach(async () => {
+    await prisma.column.deleteMany()
+  })
+
 });

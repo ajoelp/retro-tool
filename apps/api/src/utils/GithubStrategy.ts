@@ -1,4 +1,5 @@
-import OAuth2Strategy, { InternalOAuthError } from 'passport-oauth2';
+/* istanbul ignore file */
+import OAuth2Strategy from 'passport-oauth2';
 import util from 'util';
 
 type Options = {

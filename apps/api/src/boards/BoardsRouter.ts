@@ -1,8 +1,9 @@
 import { User } from '@prisma/client';
 import { prisma } from './../prismaClient';
-import { Request, Router, Response, NextFunction } from 'express';
+import { Router, Response, NextFunction } from 'express';
 import { BoardsController } from './BoardsController';
 import { authenticatedMiddleware } from '../middleware/authMiddleware';
+import { ApiRequest } from '../types/ApiRequest';
 const BoardsRouter = Router();
 
 export const BOARDS_ROOT = '/boards';
@@ -10,8 +11,8 @@ export const BOARDS_SINGULAR = '/boards/:id';
 
 const boardsController = new BoardsController();
 
-const requiredBoardOwner = async (
-  req: Request,
+export const requiredBoardOwner = async (
+  req: ApiRequest,
   Response: Response,
   next: NextFunction,
 ) => {
@@ -25,12 +26,13 @@ const requiredBoardOwner = async (
 };
 
 const userHasAccess = async (
-  req: Request,
+  req: ApiRequest,
   Response: Response,
   next: NextFunction,
 ) => {
   const { id } = req.params;
   const { id: userId } = req.user as User;
+
   const boardAccess = await prisma.boardAccess.findFirst({
     where: { boardId: id, userId: userId },
   });
@@ -38,6 +40,7 @@ const userHasAccess = async (
   if (!boardAccess) {
     throw new Error('Must be invited to board.');
   }
+
   next();
 };
 
