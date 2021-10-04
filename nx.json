@@ -39,6 +39,9 @@
     "client-e2e": {
       "tags": [],
       "implicitDependencies": ["client"]
+    },
+    "scripts": {
+      "tags": []
     }
   }
 }
