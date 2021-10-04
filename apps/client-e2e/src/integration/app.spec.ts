@@ -1,18 +1,10 @@
 import '@4tw/cypress-drag-drop'
+
 describe('client', () => {
-  let userData: any;
-
-  before(() => {
-    cy.exec('yarn prisma migrate reset --force').then(() => {
-      cy.fixture('userData').then((data) => {
-        userData = data
-      })
-    })
-  })
-
   beforeEach(() => cy.visit('/'));
+
   it('will create a board', () => {
-    cy.login(userData.user1Token)
+    cy.login('test-user-1@example.com')
     cy.contains('Create a board')
 
     const boardTitle = 'New Board Title'
@@ -49,9 +41,8 @@ describe('client', () => {
   });
 
   it('will add a card to a column', () => {
-    cy.login(userData.user1Token)
-    cy.visit(`/boards/${userData.board1.id}`)
-
+    cy.login('test-user-1@example.com')
+    cy.newBoard()
 
     cy.getBySel('column-input-0')
       .type('This is some new card info{enter}')

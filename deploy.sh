@@ -1,4 +1,7 @@
 yarn install
+
+yarn prisma generate
+
 yarn build api
 yarn build scripts
 

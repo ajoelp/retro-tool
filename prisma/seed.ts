@@ -1,10 +1,6 @@
-import { User } from '@prisma/client';
 import { prisma } from './../apps/api/src/prismaClient';
 import faker from 'faker'
 import { v4 } from 'uuid'
-import { generateJwtSecret } from './../apps/api/src/utils/JwtService'
-import path from 'path'
-import fs from 'fs/promises'
 
 async function findOrCreateUser(email: string) {
   let user = await prisma.user.findFirst({ where: { email }, include: { boards: true } })
@@ -41,26 +37,10 @@ async function createOrGetBoardForUser({ id, boards }: UserResult) {
   return board
 }
 
-async function generateFixture(data: any) {
-  await fs.writeFile(
-    path.resolve(__dirname, '../apps/client-e2e/src/fixtures/userData.json'),
-    JSON.stringify(data, null, 2)
-  )
-}
-
 async function seed() {
   const user1 = await findOrCreateUser('test-user-1@example.com')
   const user2 = await findOrCreateUser('test-user-2@example.com')
   const board1 = await createOrGetBoardForUser(user1)
-
-  await generateFixture({
-    user1,
-    user1Token: generateJwtSecret(user1),
-    user2,
-    user2Token: generateJwtSecret(user1),
-    board1
-  })
-
 }
 
 seed()
