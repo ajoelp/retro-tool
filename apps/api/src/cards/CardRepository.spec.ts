@@ -102,14 +102,13 @@ describe('CardRepository', () => {
       expect(await cardRepository.getCardById(card.id)).toEqual(
         expect.objectContaining({
           id: card.id,
-          content: card.content
-        })
-      )
-    })
-  })
+          content: card.content,
+        }),
+      );
+    });
+  });
 
   describe('updateCard', () => {
-
     function createCard(parentId?: string) {
       return prisma.card.create({
         data: {
@@ -117,71 +116,70 @@ describe('CardRepository', () => {
           columnId: column.id,
           order: 2,
           ownerId: user.id,
-          parentId
+          parentId,
         },
       });
     }
 
     function reloadCard(card: Card) {
-      return prisma.card.findFirst({ where: { id: card.id } })
+      return prisma.card.findFirst({ where: { id: card.id } });
     }
 
     it('will update a card', async () => {
+      const sendEventToBoard = jest
+        .spyOn(dependencies.namespaceService, 'sendEventToBoard')
+        .mockImplementation(jest.fn());
 
-      const sendEventToBoard = jest.spyOn(dependencies.namespaceService, 'sendEventToBoard').mockImplementation(jest.fn())
+      const card = await createCard();
 
-      const card = await createCard()
+      const payload = { content: 'updated-card-content' };
+      await cardRepository.updateCard(card.id, payload);
 
-      const payload = { content: 'updated-card-content' }
-      await cardRepository.updateCard(card.id, payload)
+      expect(await cardRepository.getCardById(card.id)).toEqual(
+        expect.objectContaining(payload),
+      );
 
-      expect(
-        await cardRepository.getCardById(card.id)
-      ).toEqual(expect.objectContaining(payload))
-
-      expect(sendEventToBoard).toHaveBeenCalledWith(board.id, expect.objectContaining({
-        payload: expect.objectContaining({ id: card.id })
-      }))
-    })
+      expect(sendEventToBoard).toHaveBeenCalledWith(
+        board.id,
+        expect.objectContaining({
+          payload: expect.objectContaining({ id: card.id }),
+        }),
+      );
+    });
 
     it('will merge groups if the card is being grouped', async () => {
-      const parentCard1 = await createCard()
-      const childCard1 = await createCard(parentCard1.id)
-      const parentCard2 = await createCard()
-      const childCard2 = await createCard(parentCard2.id)
+      const parentCard1 = await createCard();
+      const childCard1 = await createCard(parentCard1.id);
+      const parentCard2 = await createCard();
+      const childCard2 = await createCard(parentCard2.id);
 
-      await cardRepository.updateCard(parentCard2.id, { parentId: parentCard1.id })
+      await cardRepository.updateCard(parentCard2.id, {
+        parentId: parentCard1.id,
+      });
 
-      expect(
-        (await reloadCard(childCard1)).parentId
-      ).toEqual(parentCard1.id)
+      expect((await reloadCard(childCard1)).parentId).toEqual(parentCard1.id);
 
-      expect(
-        (await reloadCard(parentCard2)).parentId
-      ).toEqual(parentCard1.id)
+      expect((await reloadCard(parentCard2)).parentId).toEqual(parentCard1.id);
 
-      expect(
-        (await reloadCard(childCard2)).parentId
-      ).toEqual(parentCard1.id)
-    })
+      expect((await reloadCard(childCard2)).parentId).toEqual(parentCard1.id);
+    });
 
     it('will move all child cards when parent card is moved between columns', async () => {
-      const newColumn = await prisma.column.create({ data: { title: 'title', order: 0, boardId: board.id } })
-      const parentCard1 = await createCard()
-      const childCard1 = await createCard(parentCard1.id)
+      const newColumn = await prisma.column.create({
+        data: { title: 'title', order: 0, boardId: board.id },
+      });
+      const parentCard1 = await createCard();
+      const childCard1 = await createCard(parentCard1.id);
 
-      await cardRepository.updateCard(parentCard1.id, { columnId: newColumn.id })
+      await cardRepository.updateCard(parentCard1.id, {
+        columnId: newColumn.id,
+      });
 
-      expect(
-        (await reloadCard(childCard1)).columnId
-      ).toEqual(newColumn.id)
+      expect((await reloadCard(childCard1)).columnId).toEqual(newColumn.id);
 
-      expect(
-        (await reloadCard(parentCard1)).columnId
-      ).toEqual(newColumn.id)
-    })
-
-  })
+      expect((await reloadCard(parentCard1)).columnId).toEqual(newColumn.id);
+    });
+  });
 
   afterEach(async () => {
     await prisma.card.deleteMany();

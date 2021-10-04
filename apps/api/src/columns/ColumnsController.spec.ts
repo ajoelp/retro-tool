@@ -14,7 +14,7 @@ import dependencies from '../dependencies';
 const mockSendEventToBoard = jest
   .spyOn(dependencies.namespaceService, 'sendEventToBoard')
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  .mockImplementation(() => { });
+  .mockImplementation(() => {});
 
 describe('ColumnsController', () => {
   let user: User;
@@ -173,7 +173,7 @@ describe('ColumnsController', () => {
     });
   });
 
-  it("will reorder columns", async () => {
+  it('will reorder columns', async () => {
     const column1 = await prisma.column.create({
       data: {
         title: 'column',
@@ -203,10 +203,10 @@ describe('ColumnsController', () => {
         boardId: board.id,
         sourceIndex: 2,
         destinationIndex: 0,
-        eventTrackingId: 'event-tracking-id'
-      })
+        eventTrackingId: 'event-tracking-id',
+      });
 
-    expect(response.status).toEqual(200)
+    expect(response.status).toEqual(200);
 
     expect(
       await prisma.column.findFirst({ where: { id: column1.id } }),
@@ -222,7 +222,6 @@ describe('ColumnsController', () => {
   });
 
   afterEach(async () => {
-    await prisma.column.deleteMany()
-  })
-
+    await prisma.column.deleteMany();
+  });
 });

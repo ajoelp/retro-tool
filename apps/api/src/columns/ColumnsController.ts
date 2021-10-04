@@ -53,7 +53,6 @@ export class ColumnsController {
     });
 
     return res.json({ column });
-
   }
 
   async destroy(req: ApiRequest, res: Response) {
@@ -77,13 +76,14 @@ export class ColumnsController {
   }
 
   async updateOrder(req: ApiRequest, res: Response) {
-    const { boardId, sourceIndex, destinationIndex, eventTrackingId } = req.body;
+    const { boardId, sourceIndex, destinationIndex, eventTrackingId } =
+      req.body;
 
     await columnRepository.reorderColumns(
       boardId,
       sourceIndex,
       destinationIndex,
-      eventTrackingId
+      eventTrackingId,
     );
 
     return res.json({});

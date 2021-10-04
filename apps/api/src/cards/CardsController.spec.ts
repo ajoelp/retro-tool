@@ -85,7 +85,7 @@ describe('CardsController', () => {
           columnId: column.id,
           content: 'random-content',
           order: 1,
-        }
+        },
       });
 
       const card2 = await prisma.card.create({
@@ -94,8 +94,8 @@ describe('CardsController', () => {
           columnId: column.id,
           content: 'random-content2',
           order: 2,
-          parentId: card1.id
-        }
+          parentId: card1.id,
+        },
       });
 
       const response = await TestCase.make()
@@ -106,17 +106,18 @@ describe('CardsController', () => {
       expect(response.body.cards).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            id: card2.id
+            id: card2.id,
           }),
         ]),
       );
       expect(response.body.cards).not.toEqual(
-        expect.arrayContaining([expect.objectContaining({
-          id: card1.id
-        })]),
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: card1.id,
+          }),
+        ]),
       );
-    })
-
+    });
   });
   describe('create', () => {
     it('will create a card', async () => {
@@ -136,9 +137,7 @@ describe('CardsController', () => {
     });
   });
 
-
   describe('update', () => {
-
     it('will update a card', async () => {
       const card = await prisma.card.create({
         data: {
@@ -146,10 +145,10 @@ describe('CardsController', () => {
           columnId: column.id,
           content: 'random-content2',
           order: 2,
-        }
-      })
+        },
+      });
 
-      const payload = { content: 'updated-content' }
+      const payload = { content: 'updated-content' };
 
       const response = await TestCase.make()
         .actingAs(user)
@@ -157,11 +156,11 @@ describe('CardsController', () => {
         .send({ payload });
 
       expect(response.status).toEqual(200);
-      expect(
-        await prisma.card.findFirst({ where: { id: card.id } })
-      ).toEqual(expect.objectContaining(payload))
-    })
-  })
+      expect(await prisma.card.findFirst({ where: { id: card.id } })).toEqual(
+        expect.objectContaining(payload),
+      );
+    });
+  });
   describe('vote', () => {
     it('will increment a card vote', async () => {
       const card = await prisma.card.create({
@@ -170,9 +169,9 @@ describe('CardsController', () => {
           columnId: column.id,
           content: 'random-content2',
           order: 2,
-          votes: 3
-        }
-      })
+          votes: 3,
+        },
+      });
 
       const response = await TestCase.make()
         .actingAs(user)
@@ -180,10 +179,10 @@ describe('CardsController', () => {
         .send({ increment: true });
 
       expect(response.status).toEqual(200);
-      expect(
-        await prisma.card.findFirst({ where: { id: card.id } })
-      ).toEqual(expect.objectContaining({ votes: 4 }))
-    })
+      expect(await prisma.card.findFirst({ where: { id: card.id } })).toEqual(
+        expect.objectContaining({ votes: 4 }),
+      );
+    });
 
     it('will decrement a card vote', async () => {
       const card = await prisma.card.create({
@@ -192,9 +191,9 @@ describe('CardsController', () => {
           columnId: column.id,
           content: 'random-content2',
           order: 2,
-          votes: 3
-        }
-      })
+          votes: 3,
+        },
+      });
 
       const response = await TestCase.make()
         .actingAs(user)
@@ -202,10 +201,9 @@ describe('CardsController', () => {
         .send({ increment: false });
 
       expect(response.status).toEqual(200);
-      expect(
-        await prisma.card.findFirst({ where: { id: card.id } })
-      ).toEqual(expect.objectContaining({ votes: 2 }))
-    })
-  })
-
+      expect(await prisma.card.findFirst({ where: { id: card.id } })).toEqual(
+        expect.objectContaining({ votes: 2 }),
+      );
+    });
+  });
 });
