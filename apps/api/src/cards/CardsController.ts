@@ -68,4 +68,12 @@ export class CardsController {
     const card = await cardRepository.vote(cardId, increment);
     return res.json({ card });
   }
+
+  async delete(req: ApiRequest, res: Response) {
+    const { cardId } = req.params;
+
+    await cardRepository.deleteCard(cardId);
+
+    return res.send();
+  }
 }

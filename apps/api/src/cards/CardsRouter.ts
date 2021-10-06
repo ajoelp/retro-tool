@@ -25,6 +25,13 @@ CardsRouter.post('/cards/:cardId', [
   cardsController.update,
 ]);
 
+CardsRouter.delete('/cards/:cardId', [
+  authenticatedMiddleware,
+  canEditCard,
+  hasAccessToBoard,
+  cardsController.delete,
+]);
+
 CardsRouter.get('/cards', [
   authenticatedMiddleware,
   hasAccessToBoard,
@@ -35,7 +42,7 @@ CardsRouter.get('/cards', [
 CardsRouter.post('/cards/:cardId/vote', [
   authenticatedMiddleware,
   hasAccessToBoard,
-  cardsController.vote
-])
+  cardsController.vote,
+]);
 
 export { CardsRouter };

@@ -13,7 +13,7 @@ import GithubButton from 'react-github-login-button';
 import { useAuth } from '../contexts/AuthProvider';
 import styled from 'styled-components';
 import queryString from 'query-string';
-import { useCreateBoard } from '../hooks/boards';
+import { useBoards, useCreateBoard } from '../hooks/boards';
 
 const LoginWrapper = styled.div`
   width: 100vw;
@@ -36,6 +36,7 @@ const Landing = () => {
   const { mutateAsync } = useCreateBoard();
   const { redirect } = useQueryParams();
   const { user, login } = useAuth();
+  const { data } = useBoards();
 
   const history = useHistory();
 
@@ -119,6 +120,15 @@ const Landing = () => {
         <Button data-testid="create_board_button" onClick={onSubmit}>
           Create board
         </Button>
+      </Box>
+      <Box>
+        {data &&
+          data.map((board) => (
+            <div>
+              {' '}
+              <a href={`/boards/${board.id}`}>{board.title}</a>
+            </div>
+          ))}
       </Box>
     </>
   );
