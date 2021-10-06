@@ -65,3 +65,13 @@ export function useVoteCard(cardId: string) {
     voteLoading: isLoading,
   };
 }
+
+export function useDeleteCard(cardId: string) {
+  const { mutateAsync, isLoading } = useMutation(() =>
+    apiClient.delete(`/cards/${cardId}`),
+  );
+  return {
+    deleteCard: mutateAsync,
+    deleteCardLoading: isLoading,
+  };
+}

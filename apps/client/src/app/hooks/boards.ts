@@ -1,3 +1,4 @@
+import { Board } from '.prisma/client';
 import { useMutation, useQuery } from 'react-query';
 import { apiClient, BoardWithColumn } from '../api';
 
@@ -24,4 +25,12 @@ export const useCreateBoard = () => {
   return useMutation((params: CreateBoardArgs) =>
     apiClient.post('/boards', params),
   );
+};
+
+export const useBoards = () => {
+  return useQuery<Board[]>(['boards'], async () => {
+    const { data } = await apiClient.get('/boards');
+
+    return data.boards;
+  });
 };
