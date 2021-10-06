@@ -2,7 +2,7 @@ import { Column } from '@prisma/client';
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useAuth } from '../../contexts/AuthProvider';
-import { useUpdateCard, useVoteCard } from '../../hooks/cards';
+import { useDeleteCard, useUpdateCard, useVoteCard } from '../../hooks/cards';
 import { RingShadow } from '../../theme/shadows';
 import { Avatar, Badge, Spinner, Tooltip } from '@chakra-ui/react';
 import { CardType } from '@retro-tool/api-interfaces';
@@ -19,6 +19,7 @@ import {
   ArrowCircleUpIcon,
   MenuIcon,
 } from '@heroicons/react/outline';
+import { DeleteIcon } from '@chakra-ui/icons';
 import { Textarea } from '../Textarea';
 
 type CardProps = {
@@ -140,6 +141,10 @@ const DragWrapper = styled.div`
   width: 100%;
 `;
 
+const DeleteIconButton = styled.button`
+  margin: 0 0.5rem;
+`;
+
 function getStyle(
   style: DraggingStyle | NotDraggingStyle | undefined,
   snapshot: DraggableStateSnapshot,
@@ -158,6 +163,7 @@ export const Card: React.FC<CardProps> = ({ card, index }) => {
   const { updateCard, updateCardLoading } = useUpdateCard();
   const { user } = useAuth();
   const { voteCard } = useVoteCard(card.id);
+  const { deleteCard, deleteCardLoading } = useDeleteCard(card.id);
 
   const hasChildren = useMemo(() => {
     if (!card.children) return false;
@@ -179,7 +185,12 @@ export const Card: React.FC<CardProps> = ({ card, index }) => {
   const isOwner = user?.id === card.ownerId;
 
   return (
-    <Draggable key={card.id} draggableId={card.id} index={index}>
+    <Draggable
+      key={card.id}
+      draggableId={card.id}
+      index={index}
+      isDragDisabled={!isOwner}
+    >
       {(
         dragProvided: DraggableProvided,
         dragSnapshot: DraggableStateSnapshot,
@@ -223,6 +234,13 @@ export const Card: React.FC<CardProps> = ({ card, index }) => {
                 </CardVotesButton>
               </CardVotesContainer>
               <div>
+                {isOwner && (
+                  <Tooltip title="Delete card">
+                    <DeleteIconButton onClick={() => deleteCard()}>
+                      {deleteCardLoading ? <Spinner /> : <DeleteIcon />}
+                    </DeleteIconButton>
+                  </Tooltip>
+                )}
                 {hasChildren && (
                   <Badge mr="2">{card.children?.length ?? 0 + 1}</Badge>
                 )}

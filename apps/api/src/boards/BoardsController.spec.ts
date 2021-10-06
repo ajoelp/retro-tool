@@ -66,8 +66,13 @@ describe('BoardsController', () => {
 
   it('lists the boards', async () => {
     const board = await prisma.board.create({
-      data: { title: 'testTitle', ownerId: user.id },
+      data: {
+        title: 'testTitle',
+        ownerId: user.id,
+        boardAccesses: { create: [{ userId: user.id }] },
+      },
     });
+
     const response = await TestCase.make()
       .actingAs(user)
       .get(BOARDS_ROOT)

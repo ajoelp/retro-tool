@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import {
   BOARD_UPDATED_EVENT_NAME,
   CARD_CREATED_EVENT_NAME,
+  CARD_DELETED_EVENT_NAME,
   CARD_UPDATED_EVENT_NAME,
   COLUMN_CREATED_EVENT_NAME,
   COLUMN_DELETED_EVENT_NAME,
@@ -103,6 +104,17 @@ export function useBoardEvents(boardId: string) {
             (oldData = []) => {
               const index = oldData.findIndex(
                 (column) => column.id === event.payload.id,
+              );
+              return update(oldData, { $splice: [[index, 1]] });
+            },
+          );
+          return;
+        case CARD_DELETED_EVENT_NAME:
+          queryClient.setQueryData<Card[]>(
+            ['cards', event.payload.columnId],
+            (oldData = []) => {
+              const index = oldData.findIndex(
+                (card) => card.id === event.payload.id,
               );
               return update(oldData, { $splice: [[index, 1]] });
             },

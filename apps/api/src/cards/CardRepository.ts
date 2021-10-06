@@ -1,5 +1,8 @@
 import { prisma } from '../prismaClient';
-import { CARD_UPDATED_EVENT_NAME } from '@retro-tool/api-interfaces';
+import {
+  CARD_DELETED_EVENT_NAME,
+  CARD_UPDATED_EVENT_NAME,
+} from '@retro-tool/api-interfaces';
 import dependencies from '../dependencies';
 
 export class CardRepository {
@@ -102,5 +105,27 @@ export class CardRepository {
     }
 
     return card;
+  }
+
+  async deleteCard(id: string) {
+    const card = await prisma.card.findFirst({
+      where: {
+        id,
+      },
+      include: {
+        children: true,
+        column: true,
+        owner: true,
+      },
+    });
+
+    await prisma.card.delete({
+      where: { id },
+    });
+
+    dependencies.namespaceService.sendEventToBoard(card.column.boardId, {
+      type: CARD_DELETED_EVENT_NAME,
+      payload: card,
+    });
   }
 }
