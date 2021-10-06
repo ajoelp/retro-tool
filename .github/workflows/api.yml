@@ -7,6 +7,14 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      TOKEN_SECRET: randomSecret123
+      GITHUB_CLIENT_ID: randomClientId
+      GITHUB_CLIENT_SECRET: randomClientSecret
+      GITHUB_CALLBACK_URL: http://localhost:3333/auth/github/callback
+      SPA_URL: http://localhost:4200
+      COOKIE_DOMAIN: localhost
+      NX_API_URL: http://localhost:3333
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js

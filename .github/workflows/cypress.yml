@@ -3,6 +3,8 @@ name: E2E
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   run:
@@ -16,6 +18,7 @@ jobs:
       SPA_URL: http://localhost:4200
       COOKIE_DOMAIN: localhost
       NX_API_URL: http://localhost:3333
+      USE_MOCK_AUTH: true
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -26,7 +29,6 @@ jobs:
       - run: yarn prisma db push
         env:
           DATABASE_URL: 'postgresql://user:password@localhost:${{ job.services.postgres.ports[5432] }}/database?schema=public'
-      - run: ls -la apps/client-e2e/src/fixtures
       - run: yarn prisma migrate reset --force
         env:
           DATABASE_URL: 'postgresql://user:password@localhost:${{ job.services.postgres.ports[5432] }}/database?schema=public'

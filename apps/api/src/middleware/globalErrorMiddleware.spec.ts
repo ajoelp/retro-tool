@@ -1,6 +1,7 @@
 import globalErrorMiddleware from './globalErrorMiddleware';
 import { NotFoundError } from '../errors/NotFoundError';
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import { ApiRequest } from '../types/ApiRequest';
 
 class ResponseMock {
   status(status: any) {
@@ -20,7 +21,7 @@ describe('globalErrorMiddleware', () => {
 
   it('will throw a NotFoundError', async () => {
     const error = new NotFoundError('This is the message');
-    const req = {} as Request;
+    const req = {} as ApiRequest;
     const next = jest.fn();
     await globalErrorMiddleware(error, req, responseMock as Response, next);
 
@@ -35,7 +36,7 @@ describe('globalErrorMiddleware', () => {
 
   it('will throw a Error', async () => {
     const error = new Error('This is the message');
-    const req = {} as Request;
+    const req = {} as ApiRequest;
     const next = jest.fn();
     await globalErrorMiddleware(error, req, responseMock as Response, next);
 
