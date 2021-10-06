@@ -52,6 +52,7 @@
     "cookie-session": "^1.4.0",
     "core-js": "^3.17.3",
     "cors": "^2.8.5",
+    "date-fns": "^2.25.0",
     "dialog-manager-react": "^2.0.4",
     "eventemitter3": "^4.0.7",
     "express": "4.17.1",
