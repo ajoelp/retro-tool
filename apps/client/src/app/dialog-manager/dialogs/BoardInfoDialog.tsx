@@ -24,7 +24,7 @@ import { Board } from '@prisma/client';
 import { useCopyToClipboard, useLocation } from 'react-use';
 
 type BoardInfoDialogProps = {
-  board: Board
+  board: Board;
 } & DialogProps;
 
 export default function BoardInfoDialog(props: BoardInfoDialogProps) {
@@ -35,10 +35,9 @@ export default function BoardInfoDialog(props: BoardInfoDialogProps) {
   const inviteCode = `${location.origin}/invites/${board.inviteCode}`;
 
   const confirmDialog = () => {
-    window.localStorage.setItem(`board-info-shown-${board.id}`, 'true')
+    window.localStorage.setItem(`board-info-shown-${board.id}`, 'true');
     closeDialog();
   };
-
 
   return (
     <Modal isOpen={active} onClose={confirmDialog}>
@@ -49,11 +48,7 @@ export default function BoardInfoDialog(props: BoardInfoDialogProps) {
         <ModalBody>
           <p>Invite users to your board using the link below.</p>
           <InputGroup size="md" mt="2">
-            <Input
-              pr="4.5rem"
-              disabled={true}
-              value={inviteCode}
-            />
+            <Input pr="4.5rem" disabled={true} value={inviteCode} />
             <InputRightElement width="4.5rem">
               <Button h="1.75rem" size="sm" onClick={() => copy(inviteCode)}>
                 Copy
@@ -64,11 +59,7 @@ export default function BoardInfoDialog(props: BoardInfoDialogProps) {
 
         <ModalFooter>
           <Flex alignItems="center" justifyContent="center">
-            <Button
-              colorScheme="blue"
-              mr={3}
-              onClick={() => confirmDialog()}
-            >
+            <Button colorScheme="blue" mr={3} onClick={() => confirmDialog()}>
               Continue
             </Button>
           </Flex>

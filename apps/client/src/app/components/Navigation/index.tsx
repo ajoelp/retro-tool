@@ -42,13 +42,15 @@ export function Navigation({ board }: NavigationProps) {
   const { mutateAsync: addColumnAsync } = useAddColumn(board.id);
   const { openDialog } = useDialogs();
   const activeUsers = useActiveUsers(board.id);
-  const { isBoardOwner } = useBoardState()
+  const { isBoardOwner } = useBoardState();
 
   useEffect(() => {
-    if (window.localStorage.getItem(`board-info-shown-${board.id}`) !== 'true') {
-      openDialog('boardInfo', { board })
+    if (
+      window.localStorage.getItem(`board-info-shown-${board.id}`) !== 'true'
+    ) {
+      openDialog('boardInfo', { board });
     }
-  }, [board, openDialog])
+  }, [board, openDialog]);
 
   const addColumn = async () => {
     openDialog('addColumn', {
@@ -57,7 +59,6 @@ export function Navigation({ board }: NavigationProps) {
       },
     });
   };
-
 
   return (
     <NavigationWrapper>
@@ -73,9 +74,15 @@ export function Navigation({ board }: NavigationProps) {
           ))}
         </AvatarGroup>
       </AvatarContainer>
-      {isBoardOwner && <Button size="xs" ml="4" onClick={() => openDialog('boardInfo', { board })}>
-        Invite
-      </Button>}
+      {isBoardOwner && (
+        <Button
+          size="xs"
+          ml="4"
+          onClick={() => openDialog('boardInfo', { board })}
+        >
+          Invite
+        </Button>
+      )}
       <AddColumnButton onClick={addColumn}>
         <AddIcon />
       </AddColumnButton>
