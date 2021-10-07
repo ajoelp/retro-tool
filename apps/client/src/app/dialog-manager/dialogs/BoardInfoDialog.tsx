@@ -40,7 +40,7 @@ export default function BoardInfoDialog(props: BoardInfoDialogProps) {
   };
 
   return (
-    <Modal isOpen={active} onClose={confirmDialog}>
+    <Modal isOpen={active} onClose={confirmDialog} size="lg">
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>{board.title}</ModalHeader>
@@ -48,7 +48,7 @@ export default function BoardInfoDialog(props: BoardInfoDialogProps) {
         <ModalBody>
           <p>Invite users to your board using the link below.</p>
           <InputGroup size="md" mt="2">
-            <Input pr="4.5rem" disabled={true} value={inviteCode} />
+            <Input pr="4.5rem" value={inviteCode} />
             <InputRightElement width="4.5rem">
               <Button h="1.75rem" size="sm" onClick={() => copy(inviteCode)}>
                 Copy
