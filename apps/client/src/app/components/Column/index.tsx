@@ -20,6 +20,8 @@ import { KeyboardEvent, useMemo, useRef } from 'react';
 import { Card } from '../Card';
 import { RingShadow } from '../../theme/shadows';
 import { CardType } from '@retro-tool/api-interfaces';
+import { eventEmitter } from '../../utils/EventEmitter';
+import { useEffect } from 'react';
 
 const Wrapper = styled.div`
   width: ${ColumnWidth}px;
@@ -100,7 +102,31 @@ type CardsListProps = {
   name: string;
 };
 
-export function CardList({ cards, column, listType, listId, name }: CardsListProps) {
+export function CardList({
+  cards,
+  column,
+  listType,
+  listId,
+  name,
+}: CardsListProps) {
+  const cardsRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const cardsContainerRef = useRef<HTMLDivElement | null>();
+
+  useEffect(() => {
+    const onFocus = (id: string) => {
+      const htmlElement = cardsRefs.current[id];
+      const containerElement = cardsContainerRef.current;
+      console.log({ htmlElement, containerElement });
+      htmlElement?.scrollIntoView({
+        behavior: 'smooth',
+      });
+    };
+    eventEmitter.addListener('focus', onFocus);
+    return () => {
+      eventEmitter.removeListener('focus', onFocus);
+    };
+  }, []);
+
   return (
     <Droppable droppableId={listId} type={listType} isCombineEnabled={true}>
       {(
@@ -108,14 +134,25 @@ export function CardList({ cards, column, listType, listId, name }: CardsListPro
         dropSnapshot: DroppableStateSnapshot,
       ) => (
         <CardsContainer
-          ref={dropProvided.innerRef}
+          ref={(ref) => {
+            dropProvided.innerRef(ref);
+            cardsContainerRef.current = ref;
+          }}
           isDraggingOver={dropSnapshot.isDraggingOver}
           isDraggingFrom={Boolean(dropSnapshot.draggingFromThisWith)}
           data-testid={name}
           {...dropProvided.droppableProps}
         >
           {cards?.map((card, index) => (
-            <Card key={card.id} card={card} column={column} index={index} />
+            <Card
+              key={card.id}
+              card={card}
+              column={column}
+              index={index}
+              ref={(ref) => {
+                cardsRefs.current[card.id] = ref;
+              }}
+            />
           ))}
           {dropProvided.placeholder}
         </CardsContainer>
@@ -174,7 +211,11 @@ export default function Column({ column, board, title, index }: ColumnProps) {
   return (
     <Draggable draggableId={title} index={index}>
       {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
-        <Wrapper ref={provided.innerRef} {...provided.draggableProps} data-testid={`column-${index}`}>
+        <Wrapper
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          data-testid={`column-${index}`}
+        >
           <HeadingContainer {...provided.dragHandleProps}>
             <Heading size="md">{column.title}</Heading>
             <button onClick={() => deleteColumn(column.id)}>

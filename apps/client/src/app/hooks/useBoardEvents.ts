@@ -6,6 +6,7 @@ import {
   BOARD_UPDATED_EVENT_NAME,
   CARD_CREATED_EVENT_NAME,
   CARD_DELETED_EVENT_NAME,
+  CARD_FOCUS_EVENT_NAME,
   CARD_UPDATED_EVENT_NAME,
   COLUMN_CREATED_EVENT_NAME,
   COLUMN_DELETED_EVENT_NAME,
@@ -17,6 +18,7 @@ import { Board, Card, Column } from '@prisma/client';
 import Cookies from 'js-cookie';
 import { environment } from '../../environments/environment.prod';
 import update from 'immutability-helper';
+import { eventEmitter } from '../utils/EventEmitter';
 
 type EventType = SocketEvents & { eventTrackingId?: string };
 
@@ -120,6 +122,9 @@ export function useBoardEvents(boardId: string) {
             },
           );
           return;
+        case CARD_FOCUS_EVENT_NAME:
+          eventEmitter.emit('focus', event.payload.id);
+          return;
         case BOARD_UPDATED_EVENT_NAME:
           queryClient.setQueryData<Board>(
             ['board', event.payload.id],
@@ -130,7 +135,7 @@ export function useBoardEvents(boardId: string) {
           return;
       }
     },
-    [ignoredEvents, queryClient],
+    [boardId, ignoredEvents, queryClient],
   );
 
   const setUsers = useCallback(

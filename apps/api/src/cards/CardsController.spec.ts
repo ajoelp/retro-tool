@@ -1,6 +1,8 @@
 import { prisma } from '../prismaClient';
 import { Board, Column, User } from '@prisma/client';
 import { TestCase } from '../utils/TestCase';
+import dependencies from '../dependencies';
+import { CARD_FOCUS_EVENT_NAME } from '../../../../libs/api-interfaces/src';
 
 describe('CardsController', () => {
   let board: Board;
@@ -225,6 +227,34 @@ describe('CardsController', () => {
       expect(
         await prisma.card.findFirst({ where: { id: card.id } }),
       ).toBeFalsy();
+    });
+  });
+
+  describe('focus', () => {
+    it('can focus a card', async () => {
+      const sendEventToBoardSpy = jest
+        .spyOn(dependencies.namespaceService, 'sendEventToBoard')
+        .mockImplementation(jest.fn());
+
+      const card = await prisma.card.create({
+        data: {
+          ownerId: user.id,
+          columnId: column.id,
+          content: 'random-content2',
+          order: 2,
+        },
+      });
+
+      const response = await TestCase.make()
+        .actingAs(user)
+        .post(`/cards/${card.id}/focusCard`);
+
+      expect(response.status).toEqual(200);
+
+      expect(sendEventToBoardSpy).toHaveBeenCalledWith(board.id, {
+        type: CARD_FOCUS_EVENT_NAME,
+        payload: expect.objectContaining({ id: card.id }),
+      });
     });
   });
 });

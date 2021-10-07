@@ -1,8 +1,20 @@
 import { Column } from '@prisma/client';
-import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  ChangeEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  forwardRef,
+} from 'react';
 import styled, { css } from 'styled-components';
 import { useAuth } from '../../contexts/AuthProvider';
-import { useDeleteCard, useUpdateCard, useVoteCard } from '../../hooks/cards';
+import {
+  useDeleteCard,
+  useFocusCard,
+  useUpdateCard,
+  useVoteCard,
+} from '../../hooks/cards';
 import { RingShadow } from '../../theme/shadows';
 import { Avatar, Badge, Spinner, Tooltip } from '@chakra-ui/react';
 import { CardType } from '@retro-tool/api-interfaces';
@@ -19,8 +31,9 @@ import {
   ArrowCircleUpIcon,
   MenuIcon,
 } from '@heroicons/react/outline';
-import { DeleteIcon } from '@chakra-ui/icons';
+import { DeleteIcon, ViewIcon } from '@chakra-ui/icons';
 import { Textarea } from '../Textarea';
+import { eventEmitter } from '../../utils/EventEmitter';
 
 type CardProps = {
   column: Column;
@@ -33,6 +46,7 @@ type CardWrapperProps = {
   isDragging: boolean;
   isGroupedOver: boolean;
   hasChildren: boolean;
+  highlightCard: boolean;
 };
 
 const StackedBoxShadow = `0 1px 1px rgba(0,0,0,0.15), 0 10px 0 -5px #eee, 0 10px 1px -4px rgba(0,0,0,0.15), 0 20px 0 -10px #eee, 0 20px 1px -9px rgba(0,0,0,0.15)`;
@@ -44,8 +58,8 @@ export const CardWrapper = styled.div<CardWrapperProps>`
       opacity: 0.8;
     `}
   background-color: white;
-  ${({ isGroupedOver }) =>
-    isGroupedOver &&
+  ${({ isGroupedOver, highlightCard }) =>
+    (isGroupedOver || highlightCard) &&
     css`
       box-shadow: ${RingShadow};
     `}
@@ -141,7 +155,7 @@ const DragWrapper = styled.div`
   width: 100%;
 `;
 
-const DeleteIconButton = styled.button`
+const IconButton = styled.button`
   margin: 0 0.5rem;
 `;
 
@@ -157,101 +171,132 @@ function getStyle(
   };
 }
 
-export const Card: React.FC<CardProps> = ({ card, index }) => {
-  const [value, setValue] = useState(card?.content);
-  const [isFocused, setIsFocused] = useState(false);
-  const { updateCard, updateCardLoading } = useUpdateCard();
-  const { user } = useAuth();
-  const { voteCard } = useVoteCard(card.id);
-  const { deleteCard, deleteCardLoading } = useDeleteCard(card.id);
+export const Card = forwardRef<HTMLDivElement, CardProps>(
+  ({ card, index }, ref) => {
+    const [value, setValue] = useState(card?.content);
+    const [isFocused, setIsFocused] = useState(false);
+    const { updateCard, updateCardLoading } = useUpdateCard();
+    const { user } = useAuth();
+    const { voteCard } = useVoteCard(card.id);
+    const { deleteCard, deleteCardLoading } = useDeleteCard(card.id);
+    const { focusCard, focusCardLoading } = useFocusCard(card.id);
+    const [highlightCard, setHighlightCard] = useState(false);
 
-  const hasChildren = useMemo(() => {
-    if (!card.children) return false;
-    return card.children.length > 0;
-  }, [card]);
+    useEffect(() => {
+      const onFocus = (id: string) => {
+        if (id !== card.id) return;
+        setHighlightCard(true);
+        setTimeout(() => {
+          setHighlightCard(false);
+        }, 3000);
+      };
+      eventEmitter.addListener('focus', onFocus);
+      return () => {
+        eventEmitter.removeListener('focus', onFocus);
+      };
+    }, []);
 
-  useEffect(() => {
-    if (isFocused) return;
-    if (value !== card?.content) {
-      setValue(card?.content);
-    }
-  }, [value, card?.content, isFocused]);
+    const hasChildren = useMemo(() => {
+      if (!card.children) return false;
+      return card.children.length > 0;
+    }, [card]);
 
-  const handleChange = (value: string) => {
-    setValue(value);
-    updateCard({ cardId: card.id, payload: { content: value } });
-  };
+    useEffect(() => {
+      if (isFocused) return;
+      if (value !== card?.content) {
+        setValue(card?.content);
+      }
+    }, [value, card?.content, isFocused]);
 
-  const isOwner = user?.id === card.ownerId;
+    const handleChange = (value: string) => {
+      setValue(value);
+      updateCard({ cardId: card.id, payload: { content: value } });
+    };
 
-  return (
-    <Draggable
-      key={card.id}
-      draggableId={card.id}
-      index={index}
-      isDragDisabled={!isOwner}
-    >
-      {(
-        dragProvided: DraggableProvided,
-        dragSnapshot: DraggableStateSnapshot,
-      ) => (
-        <DragWrapper
-          {...dragProvided.draggableProps}
-          {...dragProvided.dragHandleProps}
-          data-testid={`card-${index}`}
-          ref={dragProvided.innerRef}
-          style={getStyle(dragProvided.draggableProps.style, dragSnapshot)}
-        >
-          <CardWrapper
-            key={card.id}
-            isDragging={dragSnapshot.isDragging}
-            isGroupedOver={Boolean(dragSnapshot.combineTargetFor)}
-            hasChildren={hasChildren}
+    const isOwner = user?.id === card.ownerId;
+
+    return (
+      <Draggable
+        key={card.id}
+        draggableId={card.id}
+        index={index}
+        isDragDisabled={!isOwner}
+      >
+        {(
+          dragProvided: DraggableProvided,
+          dragSnapshot: DraggableStateSnapshot,
+        ) => (
+          <DragWrapper
+            {...dragProvided.draggableProps}
+            {...dragProvided.dragHandleProps}
+            data-testid={`card-${index}`}
+            ref={dragProvided.innerRef}
+            style={getStyle(dragProvided.draggableProps.style, dragSnapshot)}
           >
-            <HoldBar data-testid={`card-${index}-hold`} />
-            <InputContainer>
-              <HoldIcon />
-              {isOwner ? (
-                <CardInput
-                  value={value}
-                  onChange={handleChange}
-                  disabled={!isOwner}
-                  onFocus={() => setIsFocused(true)}
-                  onBlur={() => setIsFocused(false)}
-                />
-              ) : (
-                <CardInput as="p">{value}</CardInput>
-              )}
-            </InputContainer>
-            <CardDetails>
-              <CardVotesContainer>
-                <CardVotesButton onClick={() => voteCard({ increment: true })}>
-                  <ArrowCircleUpIcon />
-                </CardVotesButton>
-                <p>{card.votes}</p>
-                <CardVotesButton onClick={() => voteCard({ increment: false })}>
-                  <ArrowCircleDownIcon />
-                </CardVotesButton>
-              </CardVotesContainer>
-              <div>
-                {isOwner && (
-                  <Tooltip title="Delete card">
-                    <DeleteIconButton onClick={() => deleteCard()}>
-                      {deleteCardLoading ? <Spinner /> : <DeleteIcon />}
-                    </DeleteIconButton>
+            <div ref={ref} />
+            <CardWrapper
+              key={card.id}
+              isDragging={dragSnapshot.isDragging}
+              isGroupedOver={Boolean(dragSnapshot.combineTargetFor)}
+              hasChildren={hasChildren}
+              highlightCard={highlightCard}
+            >
+              <HoldBar data-testid={`card-${index}-hold`} />
+              <InputContainer>
+                <HoldIcon />
+                {isOwner ? (
+                  <CardInput
+                    value={value}
+                    onChange={handleChange}
+                    disabled={!isOwner}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
+                  />
+                ) : (
+                  <CardInput as="p">{value}</CardInput>
+                )}
+              </InputContainer>
+              <CardDetails>
+                <CardVotesContainer>
+                  <CardVotesButton
+                    onClick={() => voteCard({ increment: true })}
+                  >
+                    <ArrowCircleUpIcon />
+                  </CardVotesButton>
+                  <p>{card.votes}</p>
+                  <CardVotesButton
+                    onClick={() => voteCard({ increment: false })}
+                  >
+                    <ArrowCircleDownIcon />
+                  </CardVotesButton>
+                </CardVotesContainer>
+                <div>
+                  {isOwner && (
+                    <>
+                      <Tooltip title="Delete card">
+                        <IconButton onClick={() => deleteCard()}>
+                          {deleteCardLoading ? <Spinner /> : <DeleteIcon />}
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Focus card">
+                        <IconButton onClick={() => focusCard()}>
+                          {<ViewIcon />}
+                        </IconButton>
+                      </Tooltip>
+                    </>
+                  )}
+                  {hasChildren && (
+                    <Badge mr="2">{card.children?.length ?? 0 + 1}</Badge>
+                  )}
+                  <Tooltip label={card.owner.githubNickname}>
+                    <Avatar size="xs" src={card.owner.avatar} />
                   </Tooltip>
-                )}
-                {hasChildren && (
-                  <Badge mr="2">{card.children?.length ?? 0 + 1}</Badge>
-                )}
-                <Tooltip label={card.owner.githubNickname}>
-                  <Avatar size="xs" src={card.owner.avatar} />
-                </Tooltip>
-              </div>
-            </CardDetails>
-          </CardWrapper>
-        </DragWrapper>
-      )}
-    </Draggable>
-  );
-};
+                </div>
+              </CardDetails>
+            </CardWrapper>
+          </DragWrapper>
+        )}
+      </Draggable>
+    );
+  },
+);

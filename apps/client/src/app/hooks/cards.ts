@@ -75,3 +75,13 @@ export function useDeleteCard(cardId: string) {
     deleteCardLoading: isLoading,
   };
 }
+
+export function useFocusCard(cardId: string) {
+  const { mutateAsync, isLoading } = useMutation(() =>
+    apiClient.post(`/cards/${cardId}/focusCard`),
+  );
+  return {
+    focusCard: mutateAsync,
+    focusCardLoading: isLoading,
+  };
+}

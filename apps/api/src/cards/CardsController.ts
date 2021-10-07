@@ -1,6 +1,9 @@
 import { Response } from 'express';
 import { prisma } from '../prismaClient';
-import { CARD_CREATED_EVENT_NAME } from '@retro-tool/api-interfaces';
+import {
+  CARD_CREATED_EVENT_NAME,
+  CARD_FOCUS_EVENT_NAME,
+} from '@retro-tool/api-interfaces';
 import { User } from '@prisma/client';
 import dependencies from '../dependencies';
 import { CardRepository } from './CardRepository';
@@ -73,6 +76,26 @@ export class CardsController {
     const { cardId } = req.params;
 
     await cardRepository.deleteCard(cardId);
+
+    return res.send();
+  }
+
+  async focus(req: ApiRequest, res: Response) {
+    const { cardId } = req.params;
+
+    const card = await prisma.card.findFirst({
+      where: {
+        id: cardId as string,
+      },
+      include: {
+        column: true,
+      },
+    });
+
+    dependencies.namespaceService.sendEventToBoard(card.column.boardId, {
+      type: CARD_FOCUS_EVENT_NAME,
+      payload: card,
+    });
 
     return res.send();
   }
