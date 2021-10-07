@@ -13,8 +13,12 @@ const boardResource = new BoardResource();
 
 export class BoardsController {
   async index(req: ApiRequest, res: Response) {
-    const boards = await prisma.board.findMany();
-    return res.json({ boards });
+    const boards = await prisma.boardAccess.findMany({
+      where: { userId: req.user.id },
+      include: { board: true },
+    });
+
+    return res.json({ boards: boards.map((board) => board.board) });
   }
 
   async fetch(req: ApiRequest, res: Response) {

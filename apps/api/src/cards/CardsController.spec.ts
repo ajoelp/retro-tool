@@ -206,4 +206,25 @@ describe('CardsController', () => {
       );
     });
   });
+  describe('delete', () => {
+    it('can delete a card', async () => {
+      const card = await prisma.card.create({
+        data: {
+          ownerId: user.id,
+          columnId: column.id,
+          content: 'random-content2',
+          order: 2,
+        },
+      });
+
+      const response = await TestCase.make()
+        .actingAs(user)
+        .delete(`/cards/${card.id}`);
+
+      expect(response.status).toEqual(200);
+      expect(
+        await prisma.card.findFirst({ where: { id: card.id } }),
+      ).toBeFalsy();
+    });
+  });
 });

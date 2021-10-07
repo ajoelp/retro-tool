@@ -8,12 +8,13 @@ import {
   Input,
 } from '@chakra-ui/react';
 import { useRef } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { Link, useHistory, useLocation } from 'react-router-dom';
 import GithubButton from 'react-github-login-button';
 import { useAuth } from '../contexts/AuthProvider';
 import styled from 'styled-components';
 import queryString from 'query-string';
-import { useCreateBoard } from '../hooks/boards';
+import { useBoards, useCreateBoard } from '../hooks/boards';
+import { dateAgo } from '../utils/dates';
 
 const LoginWrapper = styled.div`
   width: 100vw;
@@ -22,6 +23,13 @@ const LoginWrapper = styled.div`
   align-items: center;
   justify-content: center;
   flex-direction: column;
+`;
+
+const HistoryLink = styled(Link)`
+  text-decoration: underline;
+  &:hover {
+    opacity: 0.7;
+  }
 `;
 
 const DEFAULT_COLUMNS = 'Mad, Glad, Sad';
@@ -36,6 +44,7 @@ const Landing = () => {
   const { mutateAsync } = useCreateBoard();
   const { redirect } = useQueryParams();
   const { user, login } = useAuth();
+  const { data } = useBoards();
 
   const history = useHistory();
 
@@ -119,6 +128,19 @@ const Landing = () => {
         <Button data-testid="create_board_button" onClick={onSubmit}>
           Create board
         </Button>
+      </Box>
+      <Heading textAlign="center" my="10">
+        Previous Boards
+      </Heading>
+      <Box maxW="md" borderRadius="lg" marginX="auto" marginY="10" p="5">
+        {data &&
+          data.map((board) => (
+            <div>
+              <HistoryLink to={`/boards/${board.id}`}>
+                {board.title} ({dateAgo(board.createdAt as any)} ago)
+              </HistoryLink>
+            </div>
+          ))}
       </Box>
     </>
   );
