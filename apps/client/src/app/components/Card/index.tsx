@@ -34,6 +34,7 @@ import {
 import { DeleteIcon, ViewIcon } from '@chakra-ui/icons';
 import { Textarea } from '../Textarea';
 import { eventEmitter } from '../../utils/EventEmitter';
+import { useBoardState } from '../../contexts/BoardProvider';
 
 type CardProps = {
   column: Column;
@@ -81,7 +82,7 @@ export const CardWrapper = styled.div<CardWrapperProps>`
     border: none;
     box-shadow: ${RingShadow};
   }
-  ${({ hasChildren, isGroupedOver }) =>
+  ${({ hasChildren, isGroupedOver, highlightCard }) =>
     hasChildren &&
     css`
       box-shadow: ${StackedBoxShadow};
@@ -91,7 +92,7 @@ export const CardWrapper = styled.div<CardWrapperProps>`
         box-shadow: ${RingShadow}, ${StackedBoxShadow};
       }
 
-      ${isGroupedOver &&
+      ${(isGroupedOver || highlightCard) &&
       css`
         box-shadow: ${RingShadow}, ${StackedBoxShadow};
       `}
@@ -181,6 +182,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
     const { deleteCard, deleteCardLoading } = useDeleteCard(card.id);
     const { focusCard, focusCardLoading } = useFocusCard(card.id);
     const [highlightCard, setHighlightCard] = useState(false);
+    const { isBoardOwner } = useBoardState();
 
     useEffect(() => {
       const onFocus = (id: string) => {
@@ -194,7 +196,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
       return () => {
         eventEmitter.removeListener('focus', onFocus);
       };
-    }, []);
+    }, [card.id]);
 
     const hasChildren = useMemo(() => {
       if (!card.children) return false;
@@ -213,14 +215,14 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
       updateCard({ cardId: card.id, payload: { content: value } });
     };
 
-    const isOwner = user?.id === card.ownerId;
+    const isCardOwner = user?.id === card.ownerId;
 
     return (
       <Draggable
         key={card.id}
         draggableId={card.id}
         index={index}
-        isDragDisabled={!isOwner}
+        isDragDisabled={!isCardOwner}
       >
         {(
           dragProvided: DraggableProvided,
@@ -244,11 +246,11 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
               <HoldBar data-testid={`card-${index}-hold`} />
               <InputContainer>
                 <HoldIcon />
-                {isOwner ? (
+                {isCardOwner ? (
                   <CardInput
                     value={value}
                     onChange={handleChange}
-                    disabled={!isOwner}
+                    disabled={!isCardOwner}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
                   />
@@ -271,19 +273,20 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
                   </CardVotesButton>
                 </CardVotesContainer>
                 <div>
-                  {isOwner && (
-                    <>
-                      <Tooltip title="Delete card">
+                  {isCardOwner ||
+                    (isBoardOwner && (
+                      <Tooltip label="Delete card">
                         <IconButton onClick={() => deleteCard()}>
                           {deleteCardLoading ? <Spinner /> : <DeleteIcon />}
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="Focus card">
-                        <IconButton onClick={() => focusCard()}>
-                          {<ViewIcon />}
-                        </IconButton>
-                      </Tooltip>
-                    </>
+                    ))}
+                  {isBoardOwner && (
+                    <Tooltip label="Focus card">
+                      <IconButton onClick={() => focusCard()}>
+                        {<ViewIcon />}
+                      </IconButton>
+                    </Tooltip>
                   )}
                   {hasChildren && (
                     <Badge mr="2">{card.children?.length ?? 0 + 1}</Badge>

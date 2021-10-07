@@ -1,13 +1,14 @@
-import styled from 'styled-components';
-import { ContainerWidth, NavHeight } from '../../theme/sizes';
-import { Board } from '@prisma/client';
-import { AddIcon } from '@chakra-ui/icons';
-import { useAddColumn } from '../../hooks/columns';
-import { useDialogs } from '../../dialog-manager';
-import { useActiveUsers } from '../../hooks/users';
 import { Avatar, AvatarGroup } from '@chakra-ui/avatar';
+import { AddIcon } from '@chakra-ui/icons';
 import { Button, Tooltip } from '@chakra-ui/react';
-import { useCopyToClipboard, useLocation } from 'react-use';
+import { Board } from '@prisma/client';
+import { useEffect } from 'react';
+import styled from 'styled-components';
+import { useBoardState } from '../../contexts/BoardProvider';
+import { useDialogs } from '../../dialog-manager';
+import { useAddColumn } from '../../hooks/columns';
+import { useActiveUsers } from '../../hooks/users';
+import { ContainerWidth, NavHeight } from '../../theme/sizes';
 
 const NavigationWrapper = styled.div`
   margin: 1rem auto;
@@ -41,8 +42,15 @@ export function Navigation({ board }: NavigationProps) {
   const { mutateAsync: addColumnAsync } = useAddColumn(board.id);
   const { openDialog } = useDialogs();
   const activeUsers = useActiveUsers(board.id);
-  const location = useLocation();
-  const [, copy] = useCopyToClipboard();
+  const { isBoardOwner } = useBoardState();
+
+  useEffect(() => {
+    if (
+      window.localStorage.getItem(`board-info-shown-${board.id}`) !== 'true'
+    ) {
+      openDialog('boardInfo', { board });
+    }
+  }, [board, openDialog]);
 
   const addColumn = async () => {
     openDialog('addColumn', {
@@ -51,8 +59,6 @@ export function Navigation({ board }: NavigationProps) {
       },
     });
   };
-
-  const inviteCode = `${location.origin}/invites/${board.inviteCode}`;
 
   return (
     <NavigationWrapper>
@@ -68,11 +74,15 @@ export function Navigation({ board }: NavigationProps) {
           ))}
         </AvatarGroup>
       </AvatarContainer>
-      <Tooltip title={inviteCode}>
-        <Button size="xs" ml="4" onClick={() => copy(inviteCode)}>
-          Copy Invite Code
+      {isBoardOwner && (
+        <Button
+          size="xs"
+          ml="4"
+          onClick={() => openDialog('boardInfo', { board })}
+        >
+          Invite
         </Button>
-      </Tooltip>
+      )}
       <AddColumnButton onClick={addColumn}>
         <AddIcon />
       </AddColumnButton>

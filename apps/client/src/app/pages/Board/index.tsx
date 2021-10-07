@@ -18,6 +18,7 @@ import { useBoardEvents } from '../../hooks/useBoardEvents';
 import { useUpdateCard } from '../../hooks/cards';
 import { NavHeight } from '../../theme/sizes';
 import { Helmet } from 'react-helmet';
+import { BoardProvider } from '../../contexts/BoardProvider';
 
 const PageWrapper = styled.div`
   display: flex;
@@ -137,32 +138,34 @@ const Board = () => {
   };
 
   return (
-    <PageWrapper>
-      <Helmet>
-        <title>Retro - {data.title}</title>
-      </Helmet>
-      <Navigation board={data} />
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="board" type="COLUMN" direction="horizontal">
-          {(provided: DroppableProvided) => (
-            <Wrapper ref={provided.innerRef} {...provided.droppableProps}>
-              {columns?.map((column, index) => {
-                return (
-                  <Column
-                    column={column}
-                    board={data}
-                    key={column.id}
-                    title={column.id}
-                    index={index}
-                  />
-                );
-              })}
-              {provided.placeholder}
-            </Wrapper>
-          )}
-        </Droppable>
-      </DragDropContext>
-    </PageWrapper>
+    <BoardProvider boardId={data.id}>
+      <PageWrapper>
+        <Helmet>
+          <title>Retro - {data.title}</title>
+        </Helmet>
+        <Navigation board={data} />
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="board" type="COLUMN" direction="horizontal">
+            {(provided: DroppableProvided) => (
+              <Wrapper ref={provided.innerRef} {...provided.droppableProps}>
+                {columns?.map((column, index) => {
+                  return (
+                    <Column
+                      column={column}
+                      board={data}
+                      key={column.id}
+                      title={column.id}
+                      index={index}
+                    />
+                  );
+                })}
+                {provided.placeholder}
+              </Wrapper>
+            )}
+          </Droppable>
+        </DragDropContext>
+      </PageWrapper>
+    </BoardProvider>
   );
 };
 
