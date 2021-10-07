@@ -182,7 +182,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
     const { deleteCard, deleteCardLoading } = useDeleteCard(card.id);
     const { focusCard, focusCardLoading } = useFocusCard(card.id);
     const [highlightCard, setHighlightCard] = useState(false);
-    const { isBoardOwner } = useBoardState()
+    const { isBoardOwner } = useBoardState();
 
     useEffect(() => {
       const onFocus = (id: string) => {
@@ -273,13 +273,14 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
                   </CardVotesButton>
                 </CardVotesContainer>
                 <div>
-                  {isCardOwner || isBoardOwner && (
-                    <Tooltip label="Delete card">
-                      <IconButton onClick={() => deleteCard()}>
-                        {deleteCardLoading ? <Spinner /> : <DeleteIcon />}
-                      </IconButton>
-                    </Tooltip>
-                  )}
+                  {isCardOwner ||
+                    (isBoardOwner && (
+                      <Tooltip label="Delete card">
+                        <IconButton onClick={() => deleteCard()}>
+                          {deleteCardLoading ? <Spinner /> : <DeleteIcon />}
+                        </IconButton>
+                      </Tooltip>
+                    ))}
                   {isBoardOwner && (
                     <Tooltip label="Focus card">
                       <IconButton onClick={() => focusCard()}>

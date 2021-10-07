@@ -120,7 +120,7 @@ export function CardList({
       htmlElement?.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
-        inline: 'center'
+        inline: 'center',
       });
     };
     eventEmitter.addListener('focus', onFocus);
@@ -195,7 +195,7 @@ export default function Column({ column, board, title, index }: ColumnProps) {
         await refetch();
       },
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      onCancel: () => { },
+      onCancel: () => {},
     });
   };
 

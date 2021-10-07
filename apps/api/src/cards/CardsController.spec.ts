@@ -2,7 +2,7 @@ import { prisma } from '../prismaClient';
 import { Board, Column, User } from '@prisma/client';
 import { TestCase } from '../utils/TestCase';
 import dependencies from '../dependencies';
-import { CARD_FOCUS_EVENT_NAME } from '../../../../libs/api-interfaces/src';
+import { CARD_FOCUS_EVENT_NAME } from '@retro-tool/api-interfaces';
 
 describe('CardsController', () => {
   let board: Board;
