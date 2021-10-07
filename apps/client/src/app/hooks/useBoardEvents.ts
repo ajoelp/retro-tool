@@ -18,7 +18,7 @@ import { Board, Card, Column } from '@prisma/client';
 import Cookies from 'js-cookie';
 import { environment } from '../../environments/environment.prod';
 import update from 'immutability-helper';
-import { eventEmitter } from '../contexts/EventEmitterContext';
+import { eventEmitter } from '../utils/EventEmitter';
 
 type EventType = SocketEvents & { eventTrackingId?: string };
 
