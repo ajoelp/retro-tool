@@ -45,4 +45,10 @@ CardsRouter.post('/cards/:cardId/vote', [
   cardsController.vote,
 ]);
 
+CardsRouter.post('/cards/:cardId/focusCard', [
+  authenticatedMiddleware,
+  hasAccessToBoard,
+  cardsController.focus,
+]);
+
 export { CardsRouter };
