@@ -119,6 +119,8 @@ export function CardList({
       console.log({ htmlElement, containerElement });
       htmlElement?.scrollIntoView({
         behavior: 'smooth',
+        block: 'center',
+        inline: 'center'
       });
     };
     eventEmitter.addListener('focus', onFocus);
