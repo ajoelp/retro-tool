@@ -33,7 +33,7 @@ import {
 } from '@heroicons/react/outline';
 import { DeleteIcon, ViewIcon } from '@chakra-ui/icons';
 import { Textarea } from '../Textarea';
-import { eventEmitter } from '../../contexts/EventEmitterContext';
+import { eventEmitter } from '../../utils/EventEmitter';
 
 type CardProps = {
   column: Column;

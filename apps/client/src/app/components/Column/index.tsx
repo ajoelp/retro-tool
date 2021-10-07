@@ -20,7 +20,7 @@ import { KeyboardEvent, useMemo, useRef } from 'react';
 import { Card } from '../Card';
 import { RingShadow } from '../../theme/shadows';
 import { CardType } from '@retro-tool/api-interfaces';
-import { eventEmitter, useEmitter } from '../../contexts/EventEmitterContext';
+import { eventEmitter } from '../../utils/EventEmitter';
 import { useEffect } from 'react';
 
 const Wrapper = styled.div`
@@ -193,7 +193,7 @@ export default function Column({ column, board, title, index }: ColumnProps) {
         await refetch();
       },
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      onCancel: () => {},
+      onCancel: () => { },
     });
   };
 
