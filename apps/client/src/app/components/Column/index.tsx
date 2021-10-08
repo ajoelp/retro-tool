@@ -22,6 +22,7 @@ import { RingShadow } from '../../theme/shadows';
 import { CardType } from '@retro-tool/api-interfaces';
 import { eventEmitter } from '../../utils/EventEmitter';
 import { useEffect } from 'react';
+import { useBoardState } from '../../contexts/BoardProvider';
 
 const Wrapper = styled.div`
   width: ${ColumnWidth}px;
@@ -170,6 +171,7 @@ export default function Column({ column, board, title, index }: ColumnProps) {
   const { cards } = useCards(column.id);
   const { createCard } = useCreateCard(column.id);
   const newCardRef = useRef<HTMLTextAreaElement>(null);
+  const { isBoardOwner } = useBoardState()
 
   const filteredCards = useMemo(() => {
     return cards?.filter((card) => card.parentId == null) ?? [];
@@ -195,7 +197,7 @@ export default function Column({ column, board, title, index }: ColumnProps) {
         await refetch();
       },
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      onCancel: () => {},
+      onCancel: () => { },
     });
   };
 
@@ -220,9 +222,9 @@ export default function Column({ column, board, title, index }: ColumnProps) {
         >
           <HeadingContainer {...provided.dragHandleProps}>
             <Heading size="md">{column.title}</Heading>
-            <button onClick={() => deleteColumn(column.id)}>
+            {isBoardOwner && <button onClick={() => deleteColumn(column.id)}>
               <DeleteIcon />
-            </button>
+            </button>}
           </HeadingContainer>
 
           <Container>
