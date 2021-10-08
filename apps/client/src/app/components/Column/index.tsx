@@ -213,7 +213,7 @@ export default function Column({ column, board, title, index }: ColumnProps) {
     'Add a new card.\nPress Enter to submit.\nPress Shift + Enter for a new line';
 
   return (
-    <Draggable draggableId={title} index={index}>
+    <Draggable draggableId={title} index={index} isDragDisabled={!isBoardOwner}>
       {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
         <Wrapper
           ref={provided.innerRef}
