@@ -13,7 +13,7 @@ const columnRepository = new ColumnRepository();
 
 export class ColumnsController {
   async index(req: ApiRequest, res: Response) {
-    const { boardId } = req.query;
+    const { boardId } = req.params;
     const columns = await prisma.column.findMany({
       where: { boardId: boardId as string },
     });
@@ -21,7 +21,8 @@ export class ColumnsController {
   }
 
   async create(req: ApiRequest, res: Response) {
-    const { title, boardId } = req.body;
+    const { boardId } = req.params
+    const { title } = req.body;
     const column = await prisma.column.create({
       data: {
         title,
@@ -76,7 +77,8 @@ export class ColumnsController {
   }
 
   async updateOrder(req: ApiRequest, res: Response) {
-    const { boardId, sourceIndex, destinationIndex, eventTrackingId } =
+    const { boardId } = req.params
+    const { sourceIndex, destinationIndex, eventTrackingId } =
       req.body;
 
     await columnRepository.reorderColumns(
