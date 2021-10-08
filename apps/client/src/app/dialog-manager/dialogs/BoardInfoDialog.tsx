@@ -1,26 +1,13 @@
-import { DialogProps } from 'dialog-manager-react';
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
   Button,
   Flex,
   Input,
   InputGroup,
-  InputRightElement,
+  InputRightElement, Modal, ModalBody,
+  ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay
 } from '@chakra-ui/react';
-import {
-  FormControl,
-  FormLabel,
-  FormErrorMessage,
-  FormHelperText,
-} from '@chakra-ui/react';
-import { useForm } from 'react-hook-form';
 import { Board } from '@prisma/client';
+import { DialogProps } from 'dialog-manager-react';
 import { useCopyToClipboard, useLocation } from 'react-use';
 
 type BoardInfoDialogProps = {

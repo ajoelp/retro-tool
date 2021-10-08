@@ -47,10 +47,11 @@ export function Navigation({ board }: NavigationProps) {
   useEffect(() => {
     if (
       window.localStorage.getItem(`board-info-shown-${board.id}`) !== 'true'
+      && isBoardOwner
     ) {
       openDialog('boardInfo', { board });
     }
-  }, [board, openDialog]);
+  }, [board, isBoardOwner, openDialog]);
 
   const addColumn = async () => {
     openDialog('addColumn', {
