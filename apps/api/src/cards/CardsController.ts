@@ -24,7 +24,9 @@ export class CardsController {
       },
       orderBy: { createdAt: 'asc' },
       include: {
-        children: true,
+        children: {
+          include: { owner: true },
+        },
         owner: true,
       },
     });
@@ -42,7 +44,9 @@ export class CardsController {
         order: await cardRepository.getNextOrderValue(columnId),
       },
       include: {
-        children: true,
+        children: {
+          include: { owner: true },
+        },
         column: true,
         owner: true,
       },

@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 
 type TextareaProps = {
   value: string;
-  onChange: (value: string) => void;
+  onChange?: (value: string) => void;
   className?: string;
   disabled?: boolean;
   onFocus?: () => void;
@@ -46,7 +46,7 @@ export function Textarea({
   const onValueChange = useCallback(
     (e: ChangeEvent<HTMLTextAreaElement>) => {
       setValue(e.target.value);
-      onChange(e.target.value);
+      onChange?.(e.target.value);
     },
     [onChange],
   );
