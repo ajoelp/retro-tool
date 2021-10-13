@@ -46,8 +46,8 @@ export function Navigation({ board }: NavigationProps) {
 
   useEffect(() => {
     if (
-      window.localStorage.getItem(`board-info-shown-${board.id}`) !== 'true'
-      && isBoardOwner
+      window.localStorage.getItem(`board-info-shown-${board.id}`) !== 'true' &&
+      isBoardOwner
     ) {
       openDialog('boardInfo', { board });
     }
@@ -76,13 +76,22 @@ export function Navigation({ board }: NavigationProps) {
         </AvatarGroup>
       </AvatarContainer>
       {isBoardOwner && (
-        <Button
-          size="xs"
-          ml="4"
-          onClick={() => openDialog('boardInfo', { board })}
-        >
-          Invite
-        </Button>
+        <>
+          <Button
+            size="xs"
+            ml="2"
+            onClick={() => openDialog('boardInfo', { board })}
+          >
+            Invite
+          </Button>
+          <Button
+            size="xs"
+            ml="2"
+            onClick={() => openDialog('boardExport', { board })}
+          >
+            Export
+          </Button>
+        </>
       )}
       <AddColumnButton onClick={addColumn}>
         <AddIcon />

@@ -14,7 +14,7 @@ import dependencies from '../dependencies';
 const mockSendEventToBoard = jest
   .spyOn(dependencies.namespaceService, 'sendEventToBoard')
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  .mockImplementation(() => {});
+  .mockImplementation(() => { });
 
 describe('ColumnsController', () => {
   let user: User;
@@ -31,12 +31,17 @@ describe('ColumnsController', () => {
       data: {
         title: 'test board',
         ownerId: user.id,
+        boardAccesses: {
+          create: [
+            { userId: user.id }
+          ]
+        }
       },
     });
   });
 
-  it('will throw an error if no board id is provided', async () => {
-    const response = await TestCase.make().actingAs(user).get(`/columns`);
+  it('will throw an error if boardId is invalid', async () => {
+    const response = await TestCase.make().actingAs(user).get(`/boards/90210/columns`);
     expect(response.status).toEqual(500);
   });
 
@@ -50,8 +55,9 @@ describe('ColumnsController', () => {
     });
     const response = await TestCase.make()
       .actingAs(user)
-      .get(`/columns?boardId=${board.id}`)
-      .expect(200);
+      .get(`/boards/${board.id}/columns`)
+
+    expect(response.status).toBe(200)
     expect(response.body).toEqual({
       columns: expect.arrayContaining([
         expect.objectContaining({ title: column.title, boardId: board.id }),
@@ -67,9 +73,10 @@ describe('ColumnsController', () => {
 
     const response = await TestCase.make()
       .actingAs(user)
-      .post(COLUMNS_ROOT)
+      .post(`/boards/${board.id}/columns`)
       .send(testColumn)
-      .expect(200);
+
+    expect(response.status).toBe(200)
 
     expect(response.body.column).toEqual(
       expect.objectContaining({
@@ -99,9 +106,10 @@ describe('ColumnsController', () => {
 
     const response = await TestCase.make()
       .actingAs(user)
-      .patch(generatePath(COLUMNS_SINGULAR, { id: column.id }))
+      .patch(generatePath(COLUMNS_SINGULAR, { id: column.id, boardId: board.id }))
       .send(payload)
-      .expect(200);
+
+    expect(response.status).toBe(200)
 
     expect(response.body.column).toEqual(expect.objectContaining(payload));
     expect(await prisma.column.findFirst({ where: { id: column.id } })).toEqual(
@@ -125,8 +133,9 @@ describe('ColumnsController', () => {
 
     const response = await TestCase.make()
       .actingAs(user)
-      .delete(generatePath(COLUMNS_SINGULAR, { id: column.id }))
-      .expect(200);
+      .delete(generatePath(COLUMNS_SINGULAR, { id: column.id, boardId: board.id }))
+
+    expect(response.status).toBe(200)
 
     expect(response.status).toEqual(200);
     expect(
@@ -159,8 +168,9 @@ describe('ColumnsController', () => {
 
     const response = await TestCase.make()
       .actingAs(user)
-      .delete(generatePath(COLUMNS_SINGULAR, { id: column.id }))
-      .expect(200);
+      .delete(generatePath(COLUMNS_SINGULAR, { id: column.id, boardId: board.id }))
+
+    expect(response.status).toBe(200)
 
     expect(response.status).toEqual(200);
     expect(
@@ -198,9 +208,8 @@ describe('ColumnsController', () => {
 
     const response = await TestCase.make()
       .actingAs(user)
-      .post('/columns/reorder')
+      .post(`/boards/${board.id}/columns/reorder`)
       .send({
-        boardId: board.id,
         sourceIndex: 2,
         destinationIndex: 0,
         eventTrackingId: 'event-tracking-id',
