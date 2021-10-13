@@ -36,7 +36,13 @@ export class CardRepository {
   getCardById(id: string) {
     return prisma.card.findFirst({
       where: { id },
-      include: { children: true, column: true, owner: true },
+      include: {
+        children: {
+          include: { owner: true },
+        },
+        column: true,
+        owner: true,
+      },
     });
   }
 
@@ -51,7 +57,9 @@ export class CardRepository {
         votes: { [method]: 1 },
       },
       include: {
-        children: true,
+        children: {
+          include: { owner: true },
+        },
         column: true,
         owner: true,
       },
@@ -70,7 +78,9 @@ export class CardRepository {
       },
       data: payload,
       include: {
-        children: true,
+        children: {
+          include: { owner: true },
+        },
         column: true,
         owner: true,
       },
@@ -113,7 +123,9 @@ export class CardRepository {
         id,
       },
       include: {
-        children: true,
+        children: {
+          include: { owner: true },
+        },
         column: true,
         owner: true,
       },
