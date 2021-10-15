@@ -125,7 +125,7 @@ const Landing = () => {
           <FormHelperText>Comma separated</FormHelperText>
         </FormControl>
 
-        <Button data-testid="create_board_button" onClick={onSubmit}>
+        <Button colorScheme="blue" data-testid="create_board_button" onClick={onSubmit}>
           Create board
         </Button>
       </Box>

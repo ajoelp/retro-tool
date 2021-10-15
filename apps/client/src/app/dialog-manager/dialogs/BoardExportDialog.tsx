@@ -26,6 +26,8 @@ const Code = styled(Textarea)`
   border: 1px solid #efefef;
   padding: 1rem;
   white-space: pre;
+  background-color: transparent;
+  border-radius: 0.5rem;
 `;
 
 export default function BoardExportDialog(props: BoardExportDialogProps) {
