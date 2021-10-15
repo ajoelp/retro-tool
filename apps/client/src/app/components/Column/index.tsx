@@ -40,12 +40,6 @@ type CardsContainerProps = {
 };
 
 const CardsContainer = styled(Box) <CardsContainerProps>`
-  /* background-color: ${backgroundColor}; */
-  /* ${({ isDraggingOver }) =>
-    isDraggingOver &&
-    css`
-      background-color: ${backgroundColorDarker};
-    `}; */
   height: 100%;
   margin: 20px 0;
   border-radius: ${BorderRadius}px;
@@ -184,7 +178,7 @@ export default function Column({ column, board, title, index }: ColumnProps) {
 
   const submitCard = async (event: any) => {
     event.preventDefault();
-    if (!newCardRef.current) return;
+    if (!newCardRef.current || !newCardRef.current.value?.length) return;
 
     await createCard({
       content: newCardRef.current.value ?? '',
