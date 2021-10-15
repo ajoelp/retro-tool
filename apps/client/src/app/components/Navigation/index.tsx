@@ -1,6 +1,6 @@
 import { Avatar, AvatarGroup } from '@chakra-ui/avatar';
 import { AddIcon } from '@chakra-ui/icons';
-import { Button, Tooltip } from '@chakra-ui/react';
+import { Button, Tooltip, useColorMode } from '@chakra-ui/react';
 import { Board } from '@prisma/client';
 import { useEffect } from 'react';
 import styled from 'styled-components';
@@ -43,6 +43,7 @@ export function Navigation({ board }: NavigationProps) {
   const { openDialog } = useDialogs();
   const activeUsers = useActiveUsers(board.id);
   const { isBoardOwner } = useBoardState();
+  const { colorMode, toggleColorMode } = useColorMode()
 
   useEffect(() => {
     if (
@@ -75,6 +76,13 @@ export function Navigation({ board }: NavigationProps) {
           ))}
         </AvatarGroup>
       </AvatarContainer>
+      <Button
+        size="xs"
+        ml="2"
+        onClick={toggleColorMode}
+      >
+        Toggle {colorMode === "light" ? "Dark" : "Light"}
+      </Button>
       {isBoardOwner && (
         <>
           <Button
