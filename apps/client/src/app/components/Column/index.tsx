@@ -1,6 +1,6 @@
 import { Board, Column as ColumnType } from '@prisma/client';
 import styled, { css } from 'styled-components';
-import { Heading } from '@chakra-ui/react';
+import { Box, Heading, useColorModeValue } from '@chakra-ui/react';
 import {
   Draggable,
   DraggableProvided,
@@ -39,13 +39,13 @@ type CardsContainerProps = {
   isDraggingFrom: boolean;
 };
 
-const CardsContainer = styled.div<CardsContainerProps>`
-  background-color: ${backgroundColor};
-  ${({ isDraggingOver }) =>
+const CardsContainer = styled(Box) <CardsContainerProps>`
+  /* background-color: ${backgroundColor}; */
+  /* ${({ isDraggingOver }) =>
     isDraggingOver &&
     css`
       background-color: ${backgroundColorDarker};
-    `};
+    `}; */
   height: 100%;
   margin: 20px 0;
   border-radius: ${BorderRadius}px;
@@ -63,17 +63,17 @@ const Container = styled.div`
 `;
 const AddCardContainer = styled.form`
   margin-top: auto;
-  background-color: ${backgroundColor};
   border-radius: ${BorderRadius}px;
+  overflow: hidden;
 `;
 
 const AddCardInput = styled.textarea`
   width: 100%;
   height: 200px;
   resize: none;
-  background-color: transparent;
   padding: 10px;
   display: flex;
+  background-color: transparent;
   &:focus {
     outline: none;
     border: none;
@@ -113,6 +113,9 @@ export function CardList({
   const cardsRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const cardsContainerRef = useRef<HTMLDivElement | null>();
 
+  const containerBackgroundColor = useColorModeValue("gray.100", "gray.900")
+  const draggingContainerBackgroundColor = useColorModeValue("gray.200", "gray.700")
+
   useEffect(() => {
     const onFocus = (id: string) => {
       const htmlElement = cardsRefs.current[id];
@@ -137,13 +140,14 @@ export function CardList({
         dropSnapshot: DroppableStateSnapshot,
       ) => (
         <CardsContainer
-          ref={(ref) => {
+          ref={(ref: any) => {
             dropProvided.innerRef(ref);
             cardsContainerRef.current = ref;
           }}
           isDraggingOver={dropSnapshot.isDraggingOver}
           isDraggingFrom={Boolean(dropSnapshot.draggingFromThisWith)}
           data-testid={name}
+          backgroundColor={dropSnapshot.isDraggingOver ? draggingContainerBackgroundColor : containerBackgroundColor}
           {...dropProvided.droppableProps}
         >
           {cards?.map((card, index) => (
@@ -172,6 +176,7 @@ export default function Column({ column, board, title, index }: ColumnProps) {
   const { createCard } = useCreateCard(column.id);
   const newCardRef = useRef<HTMLTextAreaElement>(null);
   const { isBoardOwner } = useBoardState()
+  const containerBackgroundColor = useColorModeValue("gray.100", "gray.900")
 
   const filteredCards = useMemo(() => {
     return cards?.filter((card) => card.parentId == null) ?? [];
@@ -236,12 +241,14 @@ export default function Column({ column, board, title, index }: ColumnProps) {
               column={column}
             />
             <AddCardContainer onSubmit={submitCard}>
-              <AddCardInput
-                ref={newCardRef}
-                data-testid={`column-input-${index}`}
-                placeholder={inputPlaceholder}
-                onKeyPress={onInputKeyPress}
-              />
+              <Box backgroundColor={containerBackgroundColor}>
+                <AddCardInput
+                  ref={newCardRef}
+                  data-testid={`column-input-${index}`}
+                  placeholder={inputPlaceholder}
+                  onKeyPress={onInputKeyPress}
+                />
+              </Box>
             </AddCardContainer>
           </Container>
         </Wrapper>

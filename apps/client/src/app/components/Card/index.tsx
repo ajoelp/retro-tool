@@ -16,7 +16,7 @@ import {
   useVoteCard,
 } from '../../hooks/cards';
 import { RingShadow } from '../../theme/shadows';
-import { Avatar, Badge, Spinner, Tooltip } from '@chakra-ui/react';
+import { Avatar, Badge, Box, Spinner, Tooltip, useColorModeValue } from '@chakra-ui/react';
 import { CardType } from '@retro-tool/api-interfaces';
 import { primaryColor } from '../../theme/colors';
 import {
@@ -52,13 +52,12 @@ type CardWrapperProps = {
 
 const StackedBoxShadow = `0 1px 1px rgba(0,0,0,0.15), 0 10px 0 -5px #eee, 0 10px 1px -4px rgba(0,0,0,0.15), 0 20px 0 -10px #eee, 0 20px 1px -9px rgba(0,0,0,0.15)`;
 
-export const CardWrapper = styled.div<CardWrapperProps>`
+export const CardWrapper = styled(Box) <CardWrapperProps>`
   ${({ isDragging }) =>
     isDragging &&
     css`
       opacity: 0.8;
     `}
-  background-color: white;
   ${({ isGroupedOver, highlightCard }) =>
     (isGroupedOver || highlightCard) &&
     css`
@@ -67,13 +66,11 @@ export const CardWrapper = styled.div<CardWrapperProps>`
   position: relative;
   width: 100%;
   min-height: 9rem;
-  border: 1px solid #efefef;
   margin-bottom: 1rem;
   display: flex;
   flex-direction: column;
   border-radius: 0.3rem;
   overflow: hidden;
-  background-color: white;
   z-index: 10;
   top: 0;
   left: 0;
@@ -104,6 +101,7 @@ export const CardInput = styled(Textarea)`
   flex: 1;
   resize: none;
   padding: 1rem;
+  background-color: transparent;
   &:focus {
     outline: none;
   }
@@ -183,6 +181,8 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
     const { focusCard, focusCardLoading } = useFocusCard(card.id);
     const [highlightCard, setHighlightCard] = useState(false);
     const { isBoardOwner } = useBoardState();
+    const containerBackgroundColor = useColorModeValue("white", "gray.800")
+    const containerBorderColor = useColorModeValue("gray.200", "gray.700")
 
     useEffect(() => {
       const onFocus = (id: string) => {
@@ -242,6 +242,8 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
               isGroupedOver={Boolean(dragSnapshot.combineTargetFor)}
               hasChildren={hasChildren}
               highlightCard={highlightCard}
+              backgroundColor={containerBackgroundColor}
+              borderColor={containerBorderColor}
             >
               <HoldBar data-testid={`card-${index}-hold`} />
               <InputContainer>

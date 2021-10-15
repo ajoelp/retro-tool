@@ -19,6 +19,7 @@ import {
 } from 'react';
 import '@fontsource/inter';
 import { IgnoredEventsProvider } from './contexts/IgnoredEventsContext';
+import { ThemeProvider } from './contexts/ThemeProvider';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -57,36 +58,38 @@ const Route = (props: AuthenticatedRouteProps) => {
 
 export const App = () => {
   return (
-    <IgnoredEventsProvider>
-      <QueryClientProvider client={queryClient}>
-        <ChakraProvider theme={theme}>
-          <DialogManager>
-            <AuthProvider>
-              <Router>
-                <Switch>
-                  <Route
-                    path="/"
-                    exact={true}
-                    component={lazy(() => import('./pages/Landing'))}
-                  />
-                  <Route
-                    path="/boards/:id"
-                    auth={true}
-                    component={lazy(() => import('./pages/Board'))}
-                  />
-                  <Route
-                    path="/invites/:inviteCode"
-                    auth={true}
-                    component={lazy(() => import('./pages/Invite'))}
-                  />
-                </Switch>
-              </Router>
-            </AuthProvider>
-          </DialogManager>
-        </ChakraProvider>
-        <ReactQueryDevtools />
-      </QueryClientProvider>
-    </IgnoredEventsProvider>
+    <ThemeProvider>
+      <IgnoredEventsProvider>
+        <QueryClientProvider client={queryClient}>
+          <ChakraProvider theme={theme}>
+            <DialogManager>
+              <AuthProvider>
+                <Router>
+                  <Switch>
+                    <Route
+                      path="/"
+                      exact={true}
+                      component={lazy(() => import('./pages/Landing'))}
+                    />
+                    <Route
+                      path="/boards/:id"
+                      auth={true}
+                      component={lazy(() => import('./pages/Board'))}
+                    />
+                    <Route
+                      path="/invites/:inviteCode"
+                      auth={true}
+                      component={lazy(() => import('./pages/Invite'))}
+                    />
+                  </Switch>
+                </Router>
+              </AuthProvider>
+            </DialogManager>
+          </ChakraProvider>
+          <ReactQueryDevtools />
+        </QueryClientProvider>
+      </IgnoredEventsProvider>
+    </ThemeProvider>
   );
 };
 
