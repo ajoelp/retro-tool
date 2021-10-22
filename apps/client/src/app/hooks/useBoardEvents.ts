@@ -147,7 +147,9 @@ export function useBoardEvents(boardId: string) {
 
   useEffect(() => {
     socket.current = io(`${environment.apiUrl}/boards/${boardId}`, {
-      auth: { token: Cookies.get('auth_token') },
+      auth: {
+        token: Cookies.get('impersonate_token') ?? Cookies.get('auth_token'),
+      },
     });
     socket.current?.on('connect', () => {
       console.log('Connected to WS');

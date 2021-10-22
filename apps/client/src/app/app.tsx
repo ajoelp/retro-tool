@@ -1,25 +1,17 @@
 import {
   BrowserRouter as Router,
-  Link,
-  Switch,
-  Route as BaseRoute,
   Redirect,
+  Route as BaseRoute,
+  Switch,
 } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { ChakraProvider, Spinner } from '@chakra-ui/react';
+import { Spinner } from '@chakra-ui/react';
 import { DialogManager } from './dialog-manager';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { AuthProvider, useAuth } from './contexts/AuthProvider';
-import { theme } from './theme';
-import {
-  lazy,
-  LazyExoticComponent,
-  ReactComponentElement,
-  Suspense,
-} from 'react';
-import '@fontsource/inter';
+import { lazy, LazyExoticComponent, Suspense } from 'react';
+import 'typeface-inter';
 import { IgnoredEventsProvider } from './contexts/IgnoredEventsContext';
-import { ThemeProvider } from './contexts/ThemeProvider';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -58,38 +50,34 @@ const Route = (props: AuthenticatedRouteProps) => {
 
 export const App = () => {
   return (
-    <ThemeProvider>
-      <IgnoredEventsProvider>
-        <QueryClientProvider client={queryClient}>
-          <ChakraProvider theme={theme}>
-            <DialogManager>
-              <AuthProvider>
-                <Router>
-                  <Switch>
-                    <Route
-                      path="/"
-                      exact={true}
-                      component={lazy(() => import('./pages/Landing'))}
-                    />
-                    <Route
-                      path="/boards/:id"
-                      auth={true}
-                      component={lazy(() => import('./pages/Board'))}
-                    />
-                    <Route
-                      path="/invites/:inviteCode"
-                      auth={true}
-                      component={lazy(() => import('./pages/Invite'))}
-                    />
-                  </Switch>
-                </Router>
-              </AuthProvider>
-            </DialogManager>
-          </ChakraProvider>
-          <ReactQueryDevtools />
-        </QueryClientProvider>
-      </IgnoredEventsProvider>
-    </ThemeProvider>
+    <IgnoredEventsProvider>
+      <QueryClientProvider client={queryClient}>
+        <DialogManager>
+          <AuthProvider>
+            <Router>
+              <Switch>
+                <Route
+                  path="/"
+                  exact={true}
+                  component={lazy(() => import('./pages/Landing'))}
+                />
+                <Route
+                  path="/boards/:id"
+                  auth={true}
+                  component={lazy(() => import('./pages/Board'))}
+                />
+                <Route
+                  path="/invites/:inviteCode"
+                  auth={true}
+                  component={lazy(() => import('./pages/Invite'))}
+                />
+              </Switch>
+            </Router>
+          </AuthProvider>
+        </DialogManager>
+        <ReactQueryDevtools />
+      </QueryClientProvider>
+    </IgnoredEventsProvider>
   );
 };
 
