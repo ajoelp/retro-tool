@@ -5,7 +5,8 @@ import { Spinner } from './Spinner';
 const Variants = {
   primary:
     'border-transparent text-white bg-indigo-600 hover:bg-indigo-700 text-white bg-indigo-600 hover:bg-indigo-700',
-  white: '',
+  white:
+    'bg-white dark:bg-gray-700 text-gray-600 dark:text-white border border-gray-200 dark:border-gray-800 hover:bg-gray-50 focus:ring dark:hover:bg-gray-600',
 };
 
 const Sizes = {

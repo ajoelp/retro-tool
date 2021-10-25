@@ -20,14 +20,6 @@ import { NavHeight } from '../../theme/sizes';
 import { Helmet } from 'react-helmet';
 import { BoardProvider } from '../../contexts/BoardProvider';
 
-const PageWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  min-width: 100vw;
-  overflow-x: scroll;
-`;
-
 const Wrapper = styled.div`
   flex: 1;
   display: flex;
@@ -136,10 +128,9 @@ const Board = () => {
       return;
     }
   };
-
   return (
     <BoardProvider boardId={data.id}>
-      <PageWrapper>
+      <div className="flex flex-col h-screen min-w-screen overflow-x-scroll bg-white dark:bg-gray-800 text-gray-800 dark:text-white">
         <Helmet>
           <title>Retro - {data.title}</title>
         </Helmet>
@@ -164,7 +155,7 @@ const Board = () => {
             )}
           </Droppable>
         </DragDropContext>
-      </PageWrapper>
+      </div>
     </BoardProvider>
   );
 };

@@ -1,6 +1,5 @@
-import { Avatar, AvatarGroup } from '@chakra-ui/avatar';
 import { AddIcon } from '@chakra-ui/icons';
-import { Button, Tooltip, useColorMode } from '@chakra-ui/react';
+import { Tooltip } from '@chakra-ui/react';
 import { Board } from '@prisma/client';
 import { useEffect } from 'react';
 import styled from 'styled-components';
@@ -9,6 +8,10 @@ import { useDialogs } from '../../dialog-manager';
 import { useAddColumn } from '../../hooks/columns';
 import { useActiveUsers } from '../../hooks/users';
 import { ContainerWidth, NavHeight } from '../../theme/sizes';
+import { Avatar, AvatarGroup } from '../Avatar';
+import { useColorPreferences } from '../../hooks/useDarkMode';
+import { MoonIcon, SunIcon } from '@heroicons/react/solid';
+import { Button } from '../Button';
 
 const NavigationWrapper = styled.div`
   margin: 1rem auto;
@@ -43,7 +46,9 @@ export function Navigation({ board }: NavigationProps) {
   const { openDialog } = useDialogs();
   const activeUsers = useActiveUsers(board.id);
   const { isBoardOwner } = useBoardState();
-  const { colorMode, toggleColorMode } = useColorMode()
+  const { theme, toggleTheme } = useColorPreferences();
+
+  const DarkModeIcon = theme === 'dark' ? SunIcon : MoonIcon;
 
   useEffect(() => {
     if (
@@ -71,30 +76,28 @@ export function Navigation({ board }: NavigationProps) {
         <AvatarGroup max={5}>
           {activeUsers?.map((user) => (
             <Tooltip label={user.githubNickname} key={user.id}>
-              <Avatar size="xs" bor src={user.avatar} />
+              <Avatar size="xs" src={user.avatar} />
             </Tooltip>
           ))}
         </AvatarGroup>
       </AvatarContainer>
-      <Button
-        size="xs"
-        ml="2"
-        onClick={toggleColorMode}
-      >
-        Toggle {colorMode === "light" ? "Dark" : "Light"}
+      <Button size="sm" variant="white" className="ml-2" onClick={toggleTheme}>
+        <DarkModeIcon className="w-4 h-4" />
       </Button>
       {isBoardOwner && (
         <>
           <Button
-            size="xs"
-            ml="2"
+            size="sm"
+            variant="white"
+            className="ml-2"
             onClick={() => openDialog('boardInfo', { board })}
           >
             Invite
           </Button>
           <Button
-            size="xs"
-            ml="2"
+            size="sm"
+            variant="white"
+            className="ml-2"
             onClick={() => openDialog('boardExport', { board })}
           >
             Export

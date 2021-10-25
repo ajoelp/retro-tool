@@ -11,6 +11,7 @@ import { ReactQueryDevtools } from 'react-query/devtools';
 import { AuthProvider, useAuth } from './contexts/AuthProvider';
 import { lazy, LazyExoticComponent, Suspense } from 'react';
 import { IgnoredEventsProvider } from './contexts/IgnoredEventsContext';
+import { ColorPreferencesWrapper } from './hooks/useDarkMode';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -49,34 +50,36 @@ const Route = (props: AuthenticatedRouteProps) => {
 
 export const App = () => {
   return (
-    <IgnoredEventsProvider>
-      <QueryClientProvider client={queryClient}>
-        <DialogManager>
-          <AuthProvider>
-            <Router>
-              <Switch>
-                <Route
-                  path="/"
-                  exact={true}
-                  component={lazy(() => import('./pages/Landing'))}
-                />
-                <Route
-                  path="/boards/:id"
-                  auth={true}
-                  component={lazy(() => import('./pages/Board'))}
-                />
-                <Route
-                  path="/invites/:inviteCode"
-                  auth={true}
-                  component={lazy(() => import('./pages/Invite'))}
-                />
-              </Switch>
-            </Router>
-          </AuthProvider>
-        </DialogManager>
-        <ReactQueryDevtools />
-      </QueryClientProvider>
-    </IgnoredEventsProvider>
+    <ColorPreferencesWrapper>
+      <IgnoredEventsProvider>
+        <QueryClientProvider client={queryClient}>
+          <DialogManager>
+            <AuthProvider>
+              <Router>
+                <Switch>
+                  <Route
+                    path="/"
+                    exact={true}
+                    component={lazy(() => import('./pages/Landing'))}
+                  />
+                  <Route
+                    path="/boards/:id"
+                    auth={true}
+                    component={lazy(() => import('./pages/Board'))}
+                  />
+                  <Route
+                    path="/invites/:inviteCode"
+                    auth={true}
+                    component={lazy(() => import('./pages/Invite'))}
+                  />
+                </Switch>
+              </Router>
+            </AuthProvider>
+          </DialogManager>
+          <ReactQueryDevtools />
+        </QueryClientProvider>
+      </IgnoredEventsProvider>
+    </ColorPreferencesWrapper>
   );
 };
 

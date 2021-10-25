@@ -1,12 +1,5 @@
 import { Column } from '@prisma/client';
-import {
-  ChangeEvent,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  forwardRef,
-} from 'react';
+import { forwardRef, useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useAuth } from '../../contexts/AuthProvider';
 import {
@@ -16,7 +9,7 @@ import {
   useVoteCard,
 } from '../../hooks/cards';
 import { RingShadow } from '../../theme/shadows';
-import { Avatar, Badge, Box, Spinner, Tooltip, useColorModeValue } from '@chakra-ui/react';
+import { Box, Spinner, Tooltip } from '@chakra-ui/react';
 import { CardType } from '@retro-tool/api-interfaces';
 import { primaryColor } from '../../theme/colors';
 import {
@@ -35,6 +28,9 @@ import { DeleteIcon, ViewIcon } from '@chakra-ui/icons';
 import { Textarea } from '../Textarea';
 import { eventEmitter } from '../../utils/EventEmitter';
 import { useBoardState } from '../../contexts/BoardProvider';
+import { Avatar } from '../Avatar';
+import { classNames } from '../../utils/classNames';
+import { AlertBadge } from '../AlertBadge';
 
 type CardProps = {
   column: Column;
@@ -52,7 +48,7 @@ type CardWrapperProps = {
 
 const StackedBoxShadow = `0 1px 1px rgba(0,0,0,0.15), 0 10px 0 -5px #eee, 0 10px 1px -4px rgba(0,0,0,0.15), 0 20px 0 -10px #eee, 0 20px 1px -9px rgba(0,0,0,0.15)`;
 
-export const CardWrapper = styled(Box) <CardWrapperProps>`
+export const CardWrapper = styled(Box)<CardWrapperProps>`
   ${({ isDragging }) =>
     isDragging &&
     css`
@@ -116,7 +112,6 @@ const CardDetails = styled.div`
 
 const CardVotesContainer = styled.div`
   display: flex;
-
   p {
     margin: 0 0.5rem;
   }
@@ -170,6 +165,26 @@ function getStyle(
   };
 }
 
+type ContainerClassOptions = {
+  isDragging: boolean;
+  isGroupedOver: boolean;
+  hasChildren: boolean;
+  highlightCard: boolean;
+};
+
+const containerClasses = ({
+  isDragging,
+  isGroupedOver,
+  hasChildren,
+  highlightCard,
+}: ContainerClassOptions) => {
+  return classNames(
+    'bg-white dark:bg-gray-800 relative w-full min-h-64 mb-2 flex flex-col rounded z-10 top-0 left-0 focus-within:ring overflow-hidden',
+    isDragging && 'opacity-80',
+    (isGroupedOver || highlightCard) && 'ring',
+  );
+};
+
 export const Card = forwardRef<HTMLDivElement, CardProps>(
   ({ card, index }, ref) => {
     const [value, setValue] = useState(card?.content);
@@ -181,8 +196,6 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
     const { focusCard, focusCardLoading } = useFocusCard(card.id);
     const [highlightCard, setHighlightCard] = useState(false);
     const { isBoardOwner } = useBoardState();
-    const containerBackgroundColor = useColorModeValue("white", "gray.800")
-    const containerBorderColor = useColorModeValue("gray.200", "gray.700")
 
     useEffect(() => {
       const onFocus = (id: string) => {
@@ -236,14 +249,15 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
             style={getStyle(dragProvided.draggableProps.style, dragSnapshot)}
           >
             <div ref={ref} />
-            <CardWrapper
+            <AlertBadge count={card.children?.length ?? 0} show={hasChildren} />
+            <div
+              className={containerClasses({
+                isDragging: dragSnapshot.isDragging,
+                isGroupedOver: Boolean(dragSnapshot.combineTargetFor),
+                hasChildren: hasChildren,
+                highlightCard: highlightCard,
+              })}
               key={card.id}
-              isDragging={dragSnapshot.isDragging}
-              isGroupedOver={Boolean(dragSnapshot.combineTargetFor)}
-              hasChildren={hasChildren}
-              highlightCard={highlightCard}
-              backgroundColor={containerBackgroundColor}
-              borderColor={containerBorderColor}
             >
               <HoldBar data-testid={`card-${index}-hold`} />
               <InputContainer>
@@ -290,15 +304,12 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
                       </IconButton>
                     </Tooltip>
                   )}
-                  {hasChildren && (
-                    <Badge mr="2">{card.children?.length ?? 0 + 1}</Badge>
-                  )}
                   <Tooltip label={card.owner.githubNickname}>
                     <Avatar size="xs" src={card.owner.avatar} />
                   </Tooltip>
                 </div>
               </CardDetails>
-            </CardWrapper>
+            </div>
           </DragWrapper>
         )}
       </Draggable>
