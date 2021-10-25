@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom';
 import 'tailwindcss/tailwind.css';
+import 'typeface-inter';
 
 import App from './app/app';
 

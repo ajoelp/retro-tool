@@ -10,7 +10,6 @@ import { DialogManager } from './dialog-manager';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { AuthProvider, useAuth } from './contexts/AuthProvider';
 import { lazy, LazyExoticComponent, Suspense } from 'react';
-import 'typeface-inter';
 import { IgnoredEventsProvider } from './contexts/IgnoredEventsContext';
 
 const queryClient = new QueryClient({
