@@ -4,7 +4,6 @@ import { Logo } from '../components/Logo';
 import { UserActions } from '../components/UserActions';
 import { CreateBoardForm } from '../components/CreateBoardForm';
 import { UserBoards } from '../components/UserBoards';
-import { AdminUsersList } from '../components/AdminUsersList';
 import { useQueryParams } from '../hooks/useQueryParams';
 
 const Landing = () => {
@@ -28,18 +27,32 @@ const Landing = () => {
   }
 
   return (
-    <div className="grid grid-cols-2">
-      <div className="p-4 flex h-screen items-center justify-center sticky top-0">
-        <div className="w-full max-w-md">
-          <Logo className="mb-8 w-full" style={{ maxWidth: 250 }} />
-          <CreateBoardForm />
+    <div
+      className="grid min-h-screen w-full"
+      style={{ gridTemplateRows: '60px minmax(0, 1fr)' }}
+    >
+      <div className="flex items-center mx-8 py-2">
+        <div className="ml-auto">
+          <UserActions />
         </div>
       </div>
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8 relative">
-        <UserActions className="fixed top-0 right-0 mt-4 mr-4" />
-        <div className="w-full max-w-md">
-          <UserBoards />
-          {user.isAdmin && <AdminUsersList />}
+      <div className="grid grid-cols-2">
+        <div
+          className="p-4 flex items-center justify-center sticky top-0"
+          style={{ height: 'calc(100vh - 60px)' }}
+        >
+          <div className="w-full max-w-md">
+            <Logo className="mb-8 w-full" style={{ maxWidth: 250 }} />
+            <CreateBoardForm />
+          </div>
+        </div>
+        <div
+          className="bg-gray-50 flex relative overflow-x-scroll p-8"
+          style={{ height: 'calc(100vh - 60px)' }}
+        >
+          <div className="w-full max-w-md my-auto mx-auto">
+            <UserBoards />
+          </div>
         </div>
       </div>
     </div>

@@ -155,8 +155,13 @@ export default function Column({ column, board, title, index }: ColumnProps) {
     <Draggable draggableId={title} index={index} isDragDisabled={!isBoardOwner}>
       {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
         <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
           className="grid gap-2 overflow-hidden"
-          style={{ gridTemplateRows: `50px minmax(0, 1fr) 200px` }}
+          style={{
+            gridTemplateRows: `50px minmax(0, 1fr) 200px`,
+            ...provided.draggableProps.style,
+          }}
         >
           <div
             className="flex items-center justify-between bg-gray-100 dark:bg-gray-700 rounded p-2 px-4"

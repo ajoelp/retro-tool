@@ -1,5 +1,4 @@
 import { AddIcon } from '@chakra-ui/icons';
-import { Tooltip } from '@chakra-ui/react';
 import { useEffect } from 'react';
 import styled from 'styled-components';
 import { useBoardState } from '../../contexts/BoardProvider';
@@ -11,6 +10,7 @@ import { Avatar, AvatarGroup } from '../Avatar';
 import { useColorPreferences } from '../../hooks/useDarkMode';
 import { MoonIcon, SunIcon } from '@heroicons/react/solid';
 import { Button } from '../Button';
+import { Tooltip } from '../Tooltip';
 
 const NavigationWrapper = styled.div`
   margin: 1rem auto;

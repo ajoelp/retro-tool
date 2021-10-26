@@ -63,6 +63,11 @@ export const App = () => {
                     component={lazy(() => import('./pages/Landing'))}
                   />
                   <Route
+                    path="/admin"
+                    exact={true}
+                    component={lazy(() => import('./pages/Admin'))}
+                  />
+                  <Route
                     path="/boards/:id"
                     auth={true}
                     component={lazy(() => import('./pages/Board'))}
