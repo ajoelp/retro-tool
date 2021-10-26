@@ -264,6 +264,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
                 <HoldIcon />
                 {isCardOwner ? (
                   <CardInput
+                    className="border-none"
                     value={value}
                     onChange={handleChange}
                     disabled={!isCardOwner}

@@ -1,6 +1,5 @@
 import { AddIcon } from '@chakra-ui/icons';
 import { Tooltip } from '@chakra-ui/react';
-import { Board } from '@prisma/client';
 import { useEffect } from 'react';
 import styled from 'styled-components';
 import { useBoardState } from '../../contexts/BoardProvider';
@@ -37,20 +36,19 @@ const AvatarContainer = styled.div`
   margin-left: auto;
 `;
 
-type NavigationProps = {
-  board: Board;
-};
-
-export function Navigation({ board }: NavigationProps) {
-  const { mutateAsync: addColumnAsync } = useAddColumn(board.id);
+export function Navigation() {
+  const { board } = useBoardState();
+  const { mutateAsync: addColumnAsync } = useAddColumn(board!.id);
   const { openDialog } = useDialogs();
-  const activeUsers = useActiveUsers(board.id);
+  const activeUsers = useActiveUsers(board!.id);
   const { isBoardOwner } = useBoardState();
   const { theme, toggleTheme } = useColorPreferences();
 
   const DarkModeIcon = theme === 'dark' ? SunIcon : MoonIcon;
 
   useEffect(() => {
+    if (!board) return;
+
     if (
       window.localStorage.getItem(`board-info-shown-${board.id}`) !== 'true' &&
       isBoardOwner
@@ -66,6 +64,8 @@ export function Navigation({ board }: NavigationProps) {
       },
     });
   };
+
+  if (!board) return null;
 
   return (
     <NavigationWrapper>

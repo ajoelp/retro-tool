@@ -1,5 +1,4 @@
 import { Board, Column as ColumnType } from '@prisma/client';
-import { Heading } from '@chakra-ui/react';
 import {
   Draggable,
   DraggableProvided,
@@ -8,7 +7,6 @@ import {
   DroppableProvided,
   DroppableStateSnapshot,
 } from 'react-beautiful-dnd';
-import { ColumnWidth, GAP } from '../../theme/sizes';
 import { useBoard } from '../../hooks/boards';
 import { useDialogs } from '../../dialog-manager';
 import { useDeleteColumn } from '../../hooks/columns';
@@ -38,10 +36,10 @@ type CardsListProps = {
 
 const containerClasses = (isDragging: boolean) => {
   return classNames(
-    'h-full my-2 rounded flex flex-col p-2 items-start overflow-y-scroll',
+    'h-full rounded flex flex-col p-2 items-start overflow-y-scroll',
     isDragging
       ? 'bg-gray-200 dark:bg-gray-600'
-      : 'bg-gray-100 dark:bg-gray-700',
+      : 'bg-gray-100 dark:bg-gray-700 border dark:border-transparent',
   );
 };
 
@@ -157,29 +155,23 @@ export default function Column({ column, board, title, index }: ColumnProps) {
     <Draggable draggableId={title} index={index} isDragDisabled={!isBoardOwner}>
       {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
         <div
-          className="flex-shrink-0 last:mr-0"
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          style={{
-            width: `${ColumnWidth}px`,
-            marginRight: GAP,
-            ...provided.draggableProps.style,
-          }}
-          data-testid={`column-${index}`}
+          className="grid gap-2 overflow-hidden"
+          style={{ gridTemplateRows: `50px minmax(0, 1fr) 200px` }}
         >
           <div
-            className="flex items-center justify-between"
+            className="flex items-center justify-between bg-gray-100 dark:bg-gray-700 rounded p-2 px-4"
             {...provided.dragHandleProps}
           >
-            <Heading size="md">{column.title}</Heading>
+            <p className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+              {column.title}
+            </p>
             {isBoardOwner && (
               <button onClick={() => deleteColumn(column.id)}>
                 <DeleteIcon />
               </button>
             )}
           </div>
-
-          <div className="h-full flex flex-col">
+          <div>
             <CardList
               name={`card-list-${index}`}
               listType="CARD"
@@ -187,18 +179,17 @@ export default function Column({ column, board, title, index }: ColumnProps) {
               cards={filteredCards}
               column={column}
             />
-            <div
-              className="rounded mt-2 overflow-hidden bg-gray-100 dark:bg-gray-700"
-              onSubmit={submitCard}
-            >
+          </div>
+          <div className="w-full bg-gray-100 dark:bg-gray-700 rounded border dark:border-transparent focus-within:ring">
+            <form onSubmit={submitCard} className="h-full">
               <textarea
-                className="outline-none w-full h-64 rounded bg-transparent border-none"
+                className="outline-none w-full h-full rounded bg-transparent border-none resize-none focus:outline-none"
                 ref={newCardRef}
                 data-testid={`column-input-${index}`}
                 placeholder={inputPlaceholder}
                 onKeyPress={onInputKeyPress}
               />
-            </div>
+            </form>
           </div>
         </div>
       )}
