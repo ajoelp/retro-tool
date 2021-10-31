@@ -1,15 +1,6 @@
 import { DialogProps } from 'dialog-manager-react';
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  Button,
-  Flex,
-} from '@chakra-ui/react';
+import { Button } from '../../components/Button';
+import { BaseDialog } from './BaseDialog';
 
 type ConfirmationDialogProps = {
   title: string;
@@ -30,25 +21,28 @@ export default function ConfirmationDialog(props: ConfirmationDialogProps) {
     closeDialog();
   };
 
-  return (
-    <Modal isOpen={active} onClose={cancelDialog}>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>{title}</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>{message}</ModalBody>
+  const footer = () => {
+    return (
+      <div>
+        <Button variant="white" onClick={cancelDialog} className="mr-3">
+          No
+        </Button>
+        <Button variant="primary" onClick={confirmDialog}>
+          Yes
+        </Button>
+      </div>
+    );
+  };
 
-        <ModalFooter>
-          <Flex alignItems="center" justifyContent="center">
-            <Button colorScheme="blue" mr={3} onClick={confirmDialog}>
-              Yes
-            </Button>
-            <Button variant="ghost" onClick={cancelDialog}>
-              No
-            </Button>
-          </Flex>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+  return (
+    <BaseDialog footer={footer} closeDialog={props.closeDialog}>
+      <h3
+        className="text-lg leading-6 font-medium text-gray-900"
+        id="modal-title"
+      >
+        {title}
+      </h3>
+      <div className="mt-2">{message}</div>
+    </BaseDialog>
   );
 }
