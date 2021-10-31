@@ -1,34 +1,15 @@
-import {
-  Button,
-  Flex,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-} from '@chakra-ui/react';
 import { Board } from '@prisma/client';
 import { DialogProps } from 'dialog-manager-react';
-import { useCopyToClipboard } from 'react-use';
-import styled from 'styled-components';
-import { Textarea } from '../../components/Textarea';
 import { useMemo } from 'react';
-import { BoardToMarkdown } from '../../utils/BoardToMarkdown';
 import { useQueryClient } from 'react-query';
+import { useCopyToClipboard } from 'react-use';
+import { Button } from '../../components/Button';
+import { BoardToMarkdown } from '../../utils/BoardToMarkdown';
+import { BaseDialog } from './BaseDialog';
 
 type BoardExportDialogProps = {
   board: Board;
 } & DialogProps;
-
-const Code = styled(Textarea)`
-  border: 1px solid #efefef;
-  padding: 1rem;
-  white-space: pre;
-  background-color: transparent;
-  border-radius: 0.5rem;
-`;
 
 export default function BoardExportDialog(props: BoardExportDialogProps) {
   const { active, board, closeDialog } = props;
@@ -39,27 +20,34 @@ export default function BoardExportDialog(props: BoardExportDialogProps) {
     return new BoardToMarkdown(queryClient, board.id).build();
   }, [board.id, queryClient]);
 
-  return (
-    <Modal isOpen={active} onClose={closeDialog} size="2xl">
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>{board.title} Export</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <Code value={result} />
-        </ModalBody>
+  const footer = () => {
+    return (
+      <div>
+        <Button variant="white" className="mr-2" onClick={() => copy(result)}>
+          Copy to clipboard
+        </Button>
 
-        <ModalFooter>
-          <Flex alignItems="center" justifyContent="center">
-            <Button colorScheme="blue" mr={3} onClick={() => copy(result)}>
-              Copy to clipboard
-            </Button>
-            <Button colorScheme="blue" mr={3} onClick={closeDialog}>
-              Continue
-            </Button>
-          </Flex>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+        <Button variant="primary" onClick={closeDialog}>
+          Continue
+        </Button>
+      </div>
+    );
+  };
+
+  return (
+    <BaseDialog footer={footer} closeDialog={props.closeDialog}>
+      <h3
+        className="text-lg leading-6 font-medium text-gray-900"
+        id="modal-title"
+      >
+        {board.title} Export
+      </h3>
+      <div className="mt-2">
+        <textarea
+          className="resize border p-1 bg-transparent whitespace-pre rounded"
+          value={result}
+        ></textarea>
+      </div>
+    </BaseDialog>
   );
 }
