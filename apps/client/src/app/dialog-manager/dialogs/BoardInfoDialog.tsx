@@ -21,8 +21,22 @@ export default function BoardInfoDialog(props: BoardInfoDialogProps) {
     closeDialog();
   };
 
+  const footer = () => {
+    return (
+      <div>
+        <Button variant="white" className="mr-2" onClick={closeDialog}>
+          Close
+        </Button>
+
+        <Button variant="primary" onClick={() => confirmDialog()}>
+          Confirm
+        </Button>
+      </div>
+    );
+  };
+
   return (
-    <BaseDialog closeDialog={props.closeDialog}>
+    <BaseDialog closeDialog={props.closeDialog} footer={footer}>
       <h3
         className="text-lg leading-6 font-medium text-gray-900"
         id="modal-title"
