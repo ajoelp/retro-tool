@@ -42,13 +42,12 @@ export function BaseDialog({
               </div>
             </div>
           </div>
+          {Footer && (
+            <div className="flex flex-row-reverse bg-gray-50 px-4 py-3">
+              <Footer />
+            </div>
+          )}
         </div>
-
-        {Footer && (
-          <div>
-            <Footer />
-          </div>
-        )}
       </div>
     </div>
   );

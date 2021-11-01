@@ -17,8 +17,22 @@ export default function ConfirmationDialog(props: ConfirmationDialogProps) {
     closeDialog();
   };
 
+  const footer = () => {
+    return (
+      <div>
+        <Button variant="white" className="mr-2" onClick={closeDialog}>
+          Close
+        </Button>
+
+        <Button variant="primary" onClick={() => confirmDialog(watch())}>
+          Create
+        </Button>
+      </div>
+    );
+  };
+
   return (
-    <BaseDialog footer={() => <p>Hello</p>}>
+    <BaseDialog footer={footer} closeDialog={props.closeDialog}>
       <h3
         className="text-lg leading-6 font-medium text-gray-900"
         id="modal-title"
