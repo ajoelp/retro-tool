@@ -1,11 +1,13 @@
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { classNames } from '../utils/classNames';
 
 type TextareaProps = {
   value: string;
   onChange?: (value: string) => void;
   className?: string;
   disabled?: boolean;
+  readonly?: boolean;
   onFocus?: () => void;
   onBlur?: () => void;
 };
@@ -25,10 +27,17 @@ export function Textarea({
   className,
   disabled,
   onChange,
+  readonly,
 }: TextareaProps) {
   const [value, setValue] = useState(defaultValue);
   const [isFocused, setIsFocused] = useState(false);
   const ref = useRef<HTMLTextAreaElement>(null);
+
+  const classes = classNames(
+    className,
+    'w-full',
+    (disabled || readonly) && 'cursor-text pointer-events-none',
+  );
 
   useEffect(() => {
     if (!isFocused && value !== defaultValue) {
@@ -52,15 +61,14 @@ export function Textarea({
   );
 
   return (
-    <TextAreaWrapper
+    <textarea
       ref={ref}
       disabled={disabled}
       className={className}
       value={value}
-      onFocus={() => setIsFocused(true)}
-      onBlur={() => setIsFocused(false)}
-      // onInput={onInput}
-      $disabled={disabled}
+      readOnly={readonly}
+      onFocus={() => !readonly && setIsFocused(true)}
+      onBlur={() => !readonly && setIsFocused(false)}
       onChange={onValueChange}
     />
   );

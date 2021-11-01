@@ -10,23 +10,15 @@ import {
 } from 'react-beautiful-dnd';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import Column from '../../components/Column';
-import { Navigation } from '../../components/Navigation';
 import { useBoard } from '../../hooks/boards';
 import { useColumns, useReorderColumn } from '../../hooks/columns';
 import { useBoardEvents } from '../../hooks/useBoardEvents';
 import { useUpdateCard } from '../../hooks/cards';
-import { NavHeight } from '../../theme/sizes';
-import { Helmet } from 'react-helmet';
+import { ColumnWidth, NavHeight } from '../../theme/sizes';
 import { BoardProvider } from '../../contexts/BoardProvider';
-
-const PageWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  min-width: 100vw;
-  overflow-x: scroll;
-`;
+import { Helmet } from 'react-helmet';
+import { Navigation } from '../../components/Navigation';
+import Column from '../../components/Column';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -136,37 +128,58 @@ const Board = () => {
       return;
     }
   };
-
   return (
     <BoardProvider boardId={data.id}>
-      <PageWrapper>
-        <Helmet>
-          <title>Retro - {data.title}</title>
-        </Helmet>
-        <Navigation board={data} />
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="board" type="COLUMN" direction="horizontal">
-            {(provided: DroppableProvided) => (
-              <Wrapper ref={provided.innerRef} {...provided.droppableProps}>
-                {columns?.map((column, index) => {
-                  return (
-                    <Column
-                      column={column}
-                      board={data}
-                      key={column.id}
-                      title={column.id}
-                      index={index}
-                    />
-                  );
-                })}
-                {provided.placeholder}
-              </Wrapper>
-            )}
-          </Droppable>
-        </DragDropContext>
-      </PageWrapper>
+      <Helmet>
+        <title>Retro - {data.title}</title>
+      </Helmet>
+      <div
+        className="h-screen w-full grid bg-white text-gray-800 dark:bg-gray-800 dark:text-white gap-2"
+        style={{ gridTemplateRows: `${NavHeight}px 1fr` }}
+      >
+        <Navigation />
+        <div className="overflow-x-scroll flex">
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="board" type="COLUMN" direction="horizontal">
+              {(provided: DroppableProvided) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  className="inline-grid p-2 gap-4 mx-auto h-full"
+                  style={{
+                    gridTemplateColumns: `repeat(auto-fill,minmax(${ColumnWidth}px,1fr))`,
+                    gridAutoFlow: 'column',
+                    gridAutoColumns: `minmax(${ColumnWidth}px, 1fr)`,
+                  }}
+                >
+                  {columns?.map((column, index) => {
+                    return (
+                      <Column
+                        column={column}
+                        board={data}
+                        key={column.id}
+                        title={column.id}
+                        index={index}
+                      />
+                    );
+                  })}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
+        </div>
+      </div>
     </BoardProvider>
   );
+  // return (
+  //   <BoardProvider boardId={data.id}>
+  //     <div className="flex flex-col h-screen min-w-screen overflow-x-scroll bg-white dark:bg-gray-800 text-gray-800 dark:text-white">
+
+  //       <Navigation board={data} />
+  //     </div>
+  //   </BoardProvider>
+  // );
 };
 
 export default Board;

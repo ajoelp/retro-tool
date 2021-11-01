@@ -18,6 +18,7 @@ model User {
   boards         Board[]
   cards          Card[]
   boardAccesses  BoardAccess[]
+  isAdmin        Boolean       @default(false)
 }
 
 model Board {

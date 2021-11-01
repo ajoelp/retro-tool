@@ -1,6 +1,4 @@
 import { Board, Column as ColumnType } from '@prisma/client';
-import styled, { css } from 'styled-components';
-import { Box, Heading, useColorModeValue } from '@chakra-ui/react';
 import {
   Draggable,
   DraggableProvided,
@@ -9,78 +7,17 @@ import {
   DroppableProvided,
   DroppableStateSnapshot,
 } from 'react-beautiful-dnd';
-import { BorderRadius, ColumnWidth, GAP } from '../../theme/sizes';
-import { backgroundColor, backgroundColorDarker } from '../../theme/colors';
 import { useBoard } from '../../hooks/boards';
 import { useDialogs } from '../../dialog-manager';
 import { useDeleteColumn } from '../../hooks/columns';
 import { DeleteIcon } from '@chakra-ui/icons';
 import { useCards, useCreateCard } from '../../hooks/cards';
-import { KeyboardEvent, useMemo, useRef } from 'react';
+import { KeyboardEvent, useEffect, useMemo, useRef } from 'react';
 import { Card } from '../Card';
-import { RingShadow } from '../../theme/shadows';
 import { CardType } from '@retro-tool/api-interfaces';
 import { eventEmitter } from '../../utils/EventEmitter';
-import { useEffect } from 'react';
 import { useBoardState } from '../../contexts/BoardProvider';
-
-const Wrapper = styled.div`
-  width: ${ColumnWidth}px;
-  margin-right: ${GAP}px;
-  padding: 2em 0;
-  flex-shrink: 0;
-  &:last-child {
-    margin-right: 0;
-  }
-`;
-
-type CardsContainerProps = {
-  isDraggingOver: boolean;
-  isDraggingFrom: boolean;
-};
-
-const CardsContainer = styled(Box) <CardsContainerProps>`
-  height: 100%;
-  margin: 20px 0;
-  border-radius: ${BorderRadius}px;
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
-  align-items: flex-start;
-  overflow-y: scroll;
-`;
-
-const Container = styled.div`
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-`;
-const AddCardContainer = styled.form`
-  margin-top: auto;
-  border-radius: ${BorderRadius}px;
-  overflow: hidden;
-`;
-
-const AddCardInput = styled.textarea`
-  width: 100%;
-  height: 200px;
-  resize: none;
-  padding: 10px;
-  display: flex;
-  background-color: transparent;
-  &:focus {
-    outline: none;
-    border: none;
-    box-shadow: ${RingShadow};
-    border-radius: ${BorderRadius}px;
-  }
-`;
-
-const HeadingContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
+import { classNames } from '../../utils/classNames';
 
 type ColumnProps = {
   column: ColumnType;
@@ -97,6 +34,15 @@ type CardsListProps = {
   name: string;
 };
 
+const containerClasses = (isDragging: boolean) => {
+  return classNames(
+    'h-full rounded flex flex-col p-2 items-start overflow-y-scroll',
+    isDragging
+      ? 'bg-gray-200 dark:bg-gray-600'
+      : 'bg-gray-100 dark:bg-gray-700 border dark:border-transparent',
+  );
+};
+
 export function CardList({
   cards,
   column,
@@ -106,9 +52,6 @@ export function CardList({
 }: CardsListProps) {
   const cardsRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const cardsContainerRef = useRef<HTMLDivElement | null>();
-
-  const containerBackgroundColor = useColorModeValue("gray.100", "gray.900")
-  const draggingContainerBackgroundColor = useColorModeValue("gray.200", "gray.700")
 
   useEffect(() => {
     const onFocus = (id: string) => {
@@ -133,15 +76,13 @@ export function CardList({
         dropProvided: DroppableProvided,
         dropSnapshot: DroppableStateSnapshot,
       ) => (
-        <CardsContainer
+        <div
+          className={containerClasses(dropSnapshot.isDraggingOver)}
           ref={(ref: any) => {
             dropProvided.innerRef(ref);
             cardsContainerRef.current = ref;
           }}
-          isDraggingOver={dropSnapshot.isDraggingOver}
-          isDraggingFrom={Boolean(dropSnapshot.draggingFromThisWith)}
           data-testid={name}
-          backgroundColor={dropSnapshot.isDraggingOver ? draggingContainerBackgroundColor : containerBackgroundColor}
           {...dropProvided.droppableProps}
         >
           {cards?.map((card, index) => (
@@ -156,7 +97,7 @@ export function CardList({
             />
           ))}
           {dropProvided.placeholder}
-        </CardsContainer>
+        </div>
       )}
     </Droppable>
   );
@@ -169,8 +110,7 @@ export default function Column({ column, board, title, index }: ColumnProps) {
   const { cards } = useCards(column.id);
   const { createCard } = useCreateCard(column.id);
   const newCardRef = useRef<HTMLTextAreaElement>(null);
-  const { isBoardOwner } = useBoardState()
-  const containerBackgroundColor = useColorModeValue("gray.100", "gray.900")
+  const { isBoardOwner } = useBoardState();
 
   const filteredCards = useMemo(() => {
     return cards?.filter((card) => card.parentId == null) ?? [];
@@ -196,7 +136,7 @@ export default function Column({ column, board, title, index }: ColumnProps) {
         await refetch();
       },
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      onCancel: () => { },
+      onCancel: () => {},
     });
   };
 
@@ -214,19 +154,29 @@ export default function Column({ column, board, title, index }: ColumnProps) {
   return (
     <Draggable draggableId={title} index={index} isDragDisabled={!isBoardOwner}>
       {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
-        <Wrapper
+        <div
           ref={provided.innerRef}
           {...provided.draggableProps}
-          data-testid={`column-${index}`}
+          className="grid gap-2 overflow-hidden"
+          style={{
+            gridTemplateRows: `50px minmax(0, 1fr) 200px`,
+            ...provided.draggableProps.style,
+          }}
         >
-          <HeadingContainer {...provided.dragHandleProps}>
-            <Heading size="md">{column.title}</Heading>
-            {isBoardOwner && <button onClick={() => deleteColumn(column.id)}>
-              <DeleteIcon />
-            </button>}
-          </HeadingContainer>
-
-          <Container>
+          <div
+            className="flex items-center justify-between bg-gray-100 dark:bg-gray-700 rounded p-2 px-4"
+            {...provided.dragHandleProps}
+          >
+            <p className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+              {column.title}
+            </p>
+            {isBoardOwner && (
+              <button onClick={() => deleteColumn(column.id)}>
+                <DeleteIcon />
+              </button>
+            )}
+          </div>
+          <div>
             <CardList
               name={`card-list-${index}`}
               listType="CARD"
@@ -234,18 +184,19 @@ export default function Column({ column, board, title, index }: ColumnProps) {
               cards={filteredCards}
               column={column}
             />
-            <AddCardContainer onSubmit={submitCard}>
-              <Box backgroundColor={containerBackgroundColor}>
-                <AddCardInput
-                  ref={newCardRef}
-                  data-testid={`column-input-${index}`}
-                  placeholder={inputPlaceholder}
-                  onKeyPress={onInputKeyPress}
-                />
-              </Box>
-            </AddCardContainer>
-          </Container>
-        </Wrapper>
+          </div>
+          <div className="w-full bg-gray-100 dark:bg-gray-700 rounded border dark:border-transparent focus-within:ring">
+            <form onSubmit={submitCard} className="h-full">
+              <textarea
+                className="outline-none w-full h-full rounded bg-transparent border-none resize-none focus:outline-none"
+                ref={newCardRef}
+                data-testid={`column-input-${index}`}
+                placeholder={inputPlaceholder}
+                onKeyPress={onInputKeyPress}
+              />
+            </form>
+          </div>
+        </div>
       )}
     </Draggable>
   );

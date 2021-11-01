@@ -13,7 +13,7 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   function (config) {
-    const token = Cookies.get('auth_token');
+    const token = Cookies.get('impersonate_token') ?? Cookies.get('auth_token');
     if (token != null) {
       config.headers.Authorization = token;
     }

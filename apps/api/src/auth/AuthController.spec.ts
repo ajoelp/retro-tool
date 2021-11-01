@@ -1,9 +1,10 @@
-import { TestCase } from './../utils/TestCase';
+import { TestCase } from '../utils/TestCase';
 import { prisma } from '../prismaClient';
 import { ApiRequest } from '../types/ApiRequest';
 import { AuthController } from './AuthController';
 import { Response } from 'express';
 import * as JwtService from '../utils/JwtService';
+import { tokenToUser } from '../utils/JwtService';
 
 class MockResponse {
   cookie() {
@@ -67,6 +68,75 @@ describe('AuthController', () => {
     });
 
     expect(redirectSpy).toHaveBeenCalledWith(301, 'example.com');
+  });
+
+  describe('impersonate', function () {
+    it('will fail if user is not an admin', async () => {
+      const user = await prisma.user.create({
+        data: {
+          email: 'testuser@test.com',
+          githubNickname: 'testUser',
+          avatar: '',
+        },
+      });
+
+      const user2 = await prisma.user.create({
+        data: {
+          email: 'testuser2@test.com',
+          githubNickname: 'testUser2',
+          avatar: '',
+        },
+      });
+
+      const response = await TestCase.make()
+        .actingAs(user)
+        .post(`/auth/impersonate/${user2.id}`);
+
+      expect(response.status).toBe(500);
+    });
+    it('will fail if selected user does not exist', async () => {
+      const user = await prisma.user.create({
+        data: {
+          email: 'testuser@test.com',
+          githubNickname: 'testUser',
+          avatar: '',
+          isAdmin: true,
+        },
+      });
+
+      const response = await TestCase.make()
+        .actingAs(user)
+        .post(`/auth/impersonate/123123`);
+
+      expect(response.status).toBe(500);
+    });
+    it('will return a valid token for a user', async () => {
+      const user = await prisma.user.create({
+        data: {
+          email: 'testuser@test.com',
+          githubNickname: 'testUser',
+          avatar: '',
+          isAdmin: true,
+        },
+      });
+
+      const user2 = await prisma.user.create({
+        data: {
+          email: 'testuser2@test.com',
+          githubNickname: 'testUser2',
+          avatar: '',
+        },
+      });
+
+      const response = await TestCase.make()
+        .actingAs(user)
+        .post(`/auth/impersonate/${user2.id}`);
+
+      expect(response.status).toBe(200);
+      expect(tokenToUser(response.body.token)).toEqual(
+        expect.objectContaining({ id: user2.id }),
+      );
+    });
   });
 
   afterEach(async () => {

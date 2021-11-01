@@ -1,14 +1,9 @@
-import {
-  Button,
-  Flex,
-  Input,
-  InputGroup,
-  InputRightElement, Modal, ModalBody,
-  ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay
-} from '@chakra-ui/react';
 import { Board } from '@prisma/client';
 import { DialogProps } from 'dialog-manager-react';
 import { useCopyToClipboard, useLocation } from 'react-use';
+import { Button } from '../../components/Button';
+import { TextInput } from '../../components/inputs/TextInput';
+import { BaseDialog } from './BaseDialog';
 
 type BoardInfoDialogProps = {
   board: Board;
@@ -26,32 +21,40 @@ export default function BoardInfoDialog(props: BoardInfoDialogProps) {
     closeDialog();
   };
 
-  return (
-    <Modal isOpen={active} onClose={confirmDialog} size="lg">
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>{board.title}</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <p>Invite users to your board using the link below.</p>
-          <InputGroup size="md" mt="2">
-            <Input pr="4.5rem" value={inviteCode} />
-            <InputRightElement width="4.5rem">
-              <Button h="1.75rem" size="sm" onClick={() => copy(inviteCode)}>
-                Copy
-              </Button>
-            </InputRightElement>
-          </InputGroup>
-        </ModalBody>
+  const footer = () => {
+    return (
+      <div>
+        <Button variant="white" className="mr-2" onClick={closeDialog}>
+          Close
+        </Button>
 
-        <ModalFooter>
-          <Flex alignItems="center" justifyContent="center">
-            <Button colorScheme="blue" mr={3} onClick={() => confirmDialog()}>
-              Continue
-            </Button>
-          </Flex>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+        <Button variant="primary" onClick={() => confirmDialog()}>
+          Confirm
+        </Button>
+      </div>
+    );
+  };
+
+  return (
+    <BaseDialog closeDialog={props.closeDialog} footer={footer}>
+      <h3
+        className="text-lg leading-6 font-medium text-gray-900"
+        id="modal-title"
+      >
+        Invite Members
+      </h3>
+      <div className="flex flex-row mt-2">
+        <TextInput
+          type="text"
+          className="pr-2"
+          value={inviteCode}
+          name="invite_code"
+          label="Invite users to this board by sharing the link below."
+        />
+        <div className="flex items-end">
+          <Button onClick={() => copy(inviteCode)}>Copy</Button>
+        </div>
+      </div>
+    </BaseDialog>
   );
 }
