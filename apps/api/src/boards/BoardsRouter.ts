@@ -62,10 +62,16 @@ BoardsRouter.patch(BOARDS_SINGULAR, [
   requiredBoardOwner,
   boardsController.update,
 ]);
+
 BoardsRouter.delete(BOARDS_SINGULAR, [
   authenticatedMiddleware,
   requiredBoardOwner,
   boardsController.destroy,
 ]);
+
+BoardsRouter.post("/boards/:id/timers", [
+  authenticatedMiddleware,
+  boardsController.timers
+])
 
 export { BoardsRouter };
