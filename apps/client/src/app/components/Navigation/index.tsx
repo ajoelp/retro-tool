@@ -10,6 +10,7 @@ import { useColorPreferences } from '../../hooks/useDarkMode';
 import { MoonIcon, SunIcon } from '@heroicons/react/solid';
 import { Button } from '../Button';
 import { Tooltip } from '../Tooltip';
+import { useEffect } from 'react';
 
 const NavigationWrapper = styled.div`
   margin: 1rem auto;
@@ -45,16 +46,17 @@ export function Navigation() {
   const DarkModeIcon = theme === 'dark' ? SunIcon : MoonIcon;
 
   /** TODO: fix this */
-  // useEffect(() => {
-  //   if (!board) return;
-  //
-  //   if (
-  //     window.localStorage.getItem(`board-info-shown-${board.id}`) !== 'true' &&
-  //     isBoardOwner
-  //   ) {
-  //     openDialog('boardInfo', { board });
-  //   }
-  // }, [board, isBoardOwner, openDialog]);
+  useEffect(() => {
+    if (!board) return;
+
+    if (
+      window.localStorage.getItem(`board-info-shown-${board.id}`) !== 'true' &&
+      isBoardOwner
+    ) {
+      openDialog('boardInfo', { board });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [board, isBoardOwner]);
 
   const addColumn = async () => {
     openDialog('addColumn', {
