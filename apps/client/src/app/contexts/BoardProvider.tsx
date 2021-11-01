@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext } from 'react';
+import { createContext, ReactNode, useContext, useMemo } from 'react';
 import { BoardWithColumn } from '../api';
 import { useBoard } from '../hooks/boards';
 import { useAuth } from './AuthProvider';
@@ -22,10 +22,14 @@ export const BoardProvider = ({
 }) => {
   const { data } = useBoard(boardId);
   const { user } = useAuth();
-  const state: BoardProviderState = {
-    board: data,
-    isBoardOwner: data?.ownerId === user?.id,
-  };
+
+  const state = useMemo(
+    () => ({
+      board: data,
+      isBoardOwner: data?.ownerId === user?.id,
+    }),
+    [data, user?.id],
+  );
 
   return (
     <BoardContext.Provider value={state}>{children}</BoardContext.Provider>

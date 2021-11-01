@@ -1,5 +1,4 @@
 import { AddIcon } from '@chakra-ui/icons';
-import { useEffect } from 'react';
 import styled from 'styled-components';
 import { useBoardState } from '../../contexts/BoardProvider';
 import { useDialogs } from '../../dialog-manager';
@@ -37,25 +36,25 @@ const AvatarContainer = styled.div`
 `;
 
 export function Navigation() {
-  const { board } = useBoardState();
+  const { board, isBoardOwner } = useBoardState();
   const { mutateAsync: addColumnAsync } = useAddColumn(board!.id);
   const { openDialog } = useDialogs();
   const activeUsers = useActiveUsers(board!.id);
-  const { isBoardOwner } = useBoardState();
   const { theme, toggleTheme } = useColorPreferences();
 
   const DarkModeIcon = theme === 'dark' ? SunIcon : MoonIcon;
 
-  useEffect(() => {
-    if (!board) return;
-
-    if (
-      window.localStorage.getItem(`board-info-shown-${board.id}`) !== 'true' &&
-      isBoardOwner
-    ) {
-      openDialog('boardInfo', { board });
-    }
-  }, [board, isBoardOwner, openDialog]);
+  /** TODO: fix this */
+  // useEffect(() => {
+  //   if (!board) return;
+  //
+  //   if (
+  //     window.localStorage.getItem(`board-info-shown-${board.id}`) !== 'true' &&
+  //     isBoardOwner
+  //   ) {
+  //     openDialog('boardInfo', { board });
+  //   }
+  // }, [board, isBoardOwner, openDialog]);
 
   const addColumn = async () => {
     openDialog('addColumn', {
