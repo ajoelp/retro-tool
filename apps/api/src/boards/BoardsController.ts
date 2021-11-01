@@ -1,5 +1,5 @@
 import { User } from '@prisma/client';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { prisma } from '../prismaClient';
 import { BOARD_UPDATED_EVENT_NAME } from '@retro-tool/api-interfaces';
 import dependencies from '../dependencies';
@@ -15,7 +15,15 @@ export class BoardsController {
   async index(req: ApiRequest, res: Response) {
     const boards = await prisma.boardAccess.findMany({
       where: { userId: req.user.id },
-      include: { board: true },
+      include: {
+        board: {
+          include: {
+            boardAccesses: {
+              include: { user: true },
+            },
+          },
+        },
+      },
     });
 
     return res.json({ boards: boards.map((board) => board.board) });

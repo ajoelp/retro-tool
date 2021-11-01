@@ -1,4 +1,7 @@
 import { prisma } from '../prismaClient';
+import { ApiRequest } from '../types/ApiRequest';
+import { NextFunction, Response } from 'express';
+import { AuthenticationError } from '../errors/AuthenticationError';
 
 export const isAllowedToRegister = (organizations: string[] = []) => {
   const allowedOrgs = (process.env.ALLOWED_ORGS || '')
@@ -40,4 +43,17 @@ export const githubStrategyCallback = async (
   } catch (e) {
     done(e, null);
   }
+};
+
+export const isAdminMiddleware = (
+  req: ApiRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!req.user || !req.user?.isAdmin) {
+    throw new AuthenticationError(
+      'The user does not have the required permissions.',
+    );
+  }
+  next();
 };

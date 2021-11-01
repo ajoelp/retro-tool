@@ -1,8 +1,9 @@
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { createContext, ReactNode, useContext, useEffect } from 'react';
 import { User } from '@prisma/client';
 import { apiClient } from '../api';
 import { environment } from '../../environments/environment.prod';
+import Cookies from 'js-cookie';
 
 interface LoginParams {
   email: string;
@@ -48,6 +49,24 @@ const useLogin = () => {
   };
 };
 
+type ImpersonateArgs = {
+  userId: User['id'];
+};
+
+export const useImporsonate = () => {
+  const { mutateAsync, isLoading } = useMutation(
+    async (args: ImpersonateArgs) => {
+      const response = await apiClient.post(`auth/impersonate/${args.userId}`);
+      Cookies.set('impersonate_token', `Bearer ${response?.data?.token}`);
+      window.location.reload();
+    },
+  );
+  return {
+    impersonate: mutateAsync,
+    impersonateLoading: isLoading,
+  };
+};
+
 interface AuthProviderProps {
   children: ReactNode;
 }
@@ -71,7 +90,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
     userLoading,
     login,
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    async logout() {},
+    async logout() {
+      if (Cookies.get('impersonate_token')) {
+        Cookies.remove('impersonate_token');
+      } else {
+        Cookies.remove('auth_token');
+      }
+      window.location.reload();
+    },
     logoutLoading: false,
   };
 
