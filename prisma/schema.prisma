@@ -30,6 +30,7 @@ model Board {
   columns       Column[]
   inviteCode    String?
   boardAccesses BoardAccess[]
+  timer         Json?
 }
 
 model BoardAccess {
