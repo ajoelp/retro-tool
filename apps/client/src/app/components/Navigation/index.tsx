@@ -11,6 +11,7 @@ import { MoonIcon, SunIcon } from '@heroicons/react/solid';
 import { Button } from '../Button';
 import { Tooltip } from '../Tooltip';
 import { useEffect } from 'react';
+import { Timer } from '../Timer';
 
 const NavigationWrapper = styled.div`
   margin: 1rem auto;
@@ -44,19 +45,19 @@ export function Navigation() {
   const { theme, toggleTheme } = useColorPreferences();
 
   const DarkModeIcon = theme === 'dark' ? SunIcon : MoonIcon;
-
-  /** TODO: fix this */
-  useEffect(() => {
-    if (!board) return;
-
-    if (
-      window.localStorage.getItem(`board-info-shown-${board.id}`) !== 'true' &&
-      isBoardOwner
-    ) {
-      openDialog('boardInfo', { board });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [board, isBoardOwner]);
+  //
+  // /** TODO: fix this */
+  // useEffect(() => {
+  //   if (!board) return;
+  //
+  //   if (
+  //     window.localStorage.getItem(`board-info-shown-${board.id}`) !== 'true' &&
+  //     isBoardOwner
+  //   ) {
+  //     openDialog('boardInfo', { board });
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [board, isBoardOwner]);
 
   const addColumn = async () => {
     openDialog('addColumn', {
@@ -72,6 +73,9 @@ export function Navigation() {
     <NavigationWrapper>
       <div>
         <BoardTitleInput>{board.title}</BoardTitleInput>
+      </div>
+      <div className="mx-auto">
+        <Timer />
       </div>
       <AvatarContainer>
         <AvatarGroup max={5}>
