@@ -2,9 +2,11 @@ import { Board, Column } from '@prisma/client';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { environment } from '../environments/environment.prod';
+import { PausedState, StartState } from '@retro-tool/api-interfaces';
 
 export type BoardWithColumn = Board & {
   columns: Column[];
+  timer: null | StartState | PausedState;
 };
 
 export const apiClient = axios.create({

@@ -1,13 +1,16 @@
 import { User } from '@prisma/client';
 import { Response } from 'express';
 import { prisma } from '../prismaClient';
-import {BOARD_UPDATED_EVENT_NAME, PausedState, StartState} from '@retro-tool/api-interfaces';
+import {
+  BOARD_UPDATED_EVENT_NAME,
+  PausedState,
+  StartState,
+} from '@retro-tool/api-interfaces';
 import dependencies from '../dependencies';
 import { v4 as uuid } from 'uuid';
 import { BoardRepository } from './BoardRepository';
 import { BoardResource } from './BoardResource';
 import { ApiRequest } from '../types/ApiRequest';
-import {ApiError} from "../errors/ApiError";
 
 const boardRepository = new BoardRepository();
 const boardResource = new BoardResource();
@@ -84,26 +87,16 @@ export class BoardsController {
   }
 
   async timers(req: ApiRequest, res: Response) {
-    const board = await boardRepository.findById(req.params.id)
-    const state = req.body.timer as (StartState | PausedState)
+    const board = await boardRepository.findById(req.params.id);
+    const state = req.body.timer as StartState | PausedState;
 
-    if(board.timer && state.type === 'start') {
-      if((board.timer as any).type === 'start') {
-        throw new ApiError('Timer has already been started.')
+    if (board.timer && state.type === 'start') {
+      if ((board.timer as any).type === 'start') {
+        return res.json({});
       }
     }
 
-    if(state.type === 'paused'){
-      if(!board.timer as any) {
-        throw new ApiError('Timer has not been started.')
-      }
-
-      if((board.timer as any).type === 'paused') {
-        throw new ApiError('Timer has already been paused.')
-      }
-    }
-
-    await boardRepository.updateTimerState(req.params.id, state)
+    await boardRepository.updateTimerState(req.params.id, state);
 
     return res.json({});
   }

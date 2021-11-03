@@ -1,60 +1,176 @@
-import {Button} from "./Button";
-import {useStartTimer} from "../hooks/boards";
-import {useBoardState} from "../contexts/BoardProvider";
-import {useEffect, useState} from "react";
-import {StartState} from "@retro-tool/api-interfaces";
+import { Button } from './Button';
+import { useStartTimer } from '../hooks/boards';
+import { useBoardState } from '../contexts/BoardProvider';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { BoardWithColumn } from '../api';
 
-export function Timer() {
+export const formatTime = (milliseconds: number) => {
+  if (!milliseconds) {
+    return '00:00';
+  }
+  const minutes = Math.floor(milliseconds / 60000);
+  const remainingMilliseconds = milliseconds - minutes * 60000;
+  const seconds = Math.floor(remainingMilliseconds / 1000);
 
-  const {board} = useBoardState();
-  const { setTimerState } = useStartTimer(board!.id)
-  const [timeRemaining, setTimeRemaining] = useState(0);
+  return [minutes, seconds].map((t) => `${t}`.padStart(2, '0')).join(':');
+};
 
-  const numberOfMinutes = 5;
-  const startTime = Date.now();
-  const endTime = Date.now() + (60 * numberOfMinutes * 1000);
+function minutesToMiliseconds(minutes: number) {
+  return 60 * minutes * 1000;
+}
 
-  console.log(board);
+function calculateTimeRemaining(
+  board?: BoardWithColumn | null,
+  defaultTimeRemaining = 1,
+) {
+  if (!board || !board.timer) return minutesToMiliseconds(defaultTimeRemaining);
+  if (board.timer.type === 'start') {
+    const calculated = board.timer.state.endTime - Date.now();
+
+    return calculated > 0 ? board.timer.state.endTime - Date.now() : 0;
+  }
+  return board.timer.state.totalDuration;
+}
+
+enum TimerStates {
+  STARTED = 'started',
+  STOPPED = 'stopped',
+  COMPLETE = 'complete',
+}
+
+type UserBoardTimerState = {
+  state: TimerStates;
+  formattedTime: string;
+  timeRemaining: number;
+  start(): Promise<void>;
+  stop(): Promise<void>;
+  reset(): Promise<void>;
+};
+
+const useAnimationInterval = (callback: any, timeout = 1000) => {
+  const ref = useRef<number>(performance.now());
+
+  const step = useCallback(
+    (timestamp: number) => {
+      if (timestamp - ref.current > timeout) {
+        ref.current = timestamp;
+        callback();
+      }
+      requestAnimationFrame(step);
+    },
+    [callback, timeout],
+  );
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      if(!board) return;
-      const timer = board.timer as StartState
-      console.log('time!', timer.state.endTime - Date.now())
-      setTimeRemaining(
-        timer.state.endTime - Date.now()
-      )
-      return () => {
-        clearInterval(interval)
-      }
-    }, 1000)
-  }, [board!.timer])
+    const animationLoop = requestAnimationFrame(step);
+    return () => {
+      cancelAnimationFrame(animationLoop);
+    };
+  }, [callback, step, timeout]);
+};
 
-  const start = () => {
-    setTimerState({
+function useBoardTimerState(board: BoardWithColumn, defaultMinutes = 5) {
+  const { setTimerState } = useStartTimer(board?.id);
+  const boardRef = useRef(board);
+  boardRef.current = board;
+
+  const [timeRemaining, setTimeRemaining] = useState(
+    calculateTimeRemaining(board, defaultMinutes),
+  );
+
+  const timeRemainingRef = useRef(timeRemaining);
+  timeRemainingRef.current = timeRemaining;
+
+  const state = useMemo(() => {
+    if (timeRemaining <= 0 || !board.timer) return TimerStates.COMPLETE;
+    if (board.timer.type === 'start') return TimerStates.STARTED;
+    return TimerStates.STOPPED;
+  }, [board.timer, timeRemaining]);
+
+  const reset = useCallback(() => {
+    return setTimerState({
       timer: {
-        type: "start",
+        type: 'paused',
         state: {
-          startTime,
-          endTime,
-        }
+          totalDuration: minutesToMiliseconds(1),
+        },
+      },
+    });
+  }, [setTimerState]);
+
+  const start = useCallback(async () => {
+    if (state === TimerStates.COMPLETE) {
+      setTimeRemaining(minutesToMiliseconds(defaultMinutes));
+      await reset();
+    }
+    await setTimerState({
+      timer: {
+        type: 'start',
+        state: {
+          startTime: Date.now(),
+          endTime: Date.now() + timeRemaining,
+        },
+      },
+    });
+  }, [defaultMinutes, reset, setTimerState, state, timeRemaining]);
+
+  const stop = useCallback(() => {
+    return setTimerState({
+      timer: {
+        type: 'paused',
+        state: {
+          totalDuration: timeRemaining,
+        },
+      },
+    });
+  }, [setTimerState, timeRemaining]);
+
+  useAnimationInterval(() => {
+    if (!board) return;
+
+    const calculatedTimeRemaining = calculateTimeRemaining(boardRef.current);
+
+    if (calculatedTimeRemaining <= 0 && board.timer?.type === 'start') {
+      if (calculatedTimeRemaining !== 0) {
+        setTimeRemaining(0);
       }
-    })
-  }
+    } else {
+      setTimeRemaining(calculateTimeRemaining(boardRef.current));
+    }
+  }, 1000);
 
-  const stop = () => {
-    return ''
-  }
+  return {
+    state,
+    timeRemaining,
+    start,
+    stop,
+    reset,
+  };
+}
 
-  return(
+export function Timer() {
+  const { board } = useBoardState();
+  const { timeRemaining, state, start, stop, reset } = useBoardTimerState(
+    board as BoardWithColumn,
+  );
+
+  return (
     <div className="flex items-center">
-      <p className="mr-2">{timeRemaining}</p>
-      <Button onClick={() => start()} className="mr-2">
-        Start
-      </Button>
-      <Button onClick={() => stop()}>
-        Stop
-      </Button>
+      <p>{state}</p>
+      <p className="mr-2">{formatTime(timeRemaining)}</p>
+      {[TimerStates.STOPPED, TimerStates.COMPLETE].includes(state) && (
+        <>
+          <Button onClick={() => start()} className="mr-2">
+            Start
+          </Button>
+          <Button onClick={() => reset()} className="mr-2">
+            Reset
+          </Button>
+        </>
+      )}
+      {TimerStates.STARTED === state && (
+        <Button onClick={() => stop()}>Stop</Button>
+      )}
     </div>
-  )
+  );
 }
