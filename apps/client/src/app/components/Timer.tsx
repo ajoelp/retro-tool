@@ -1,14 +1,17 @@
 import {Button} from "./Button";
 import {useStartTimer} from "../hooks/boards";
 import {useBoardState} from "../contexts/BoardProvider";
-import {useEffect, useState} from "react";
-import {StartState} from "@retro-tool/api-interfaces";
+import {useEffect, useRef, useState} from "react";
+import {PausedState, StartState} from "@retro-tool/api-interfaces";
 
 export function Timer() {
 
   const {board} = useBoardState();
   const { setTimerState } = useStartTimer(board!.id)
   const [timeRemaining, setTimeRemaining] = useState(0);
+
+  const boardRef = useRef<typeof board>(board)
+  boardRef.current = board
 
   const numberOfMinutes = 5;
   const startTime = Date.now();
@@ -17,18 +20,26 @@ export function Timer() {
   console.log(board);
 
   useEffect(() => {
+    console.log('board:',boardRef.current);
     const interval = setInterval(() => {
-      if(!board) return;
-      const timer = board.timer as StartState
+      if(!boardRef.current || !boardRef.current.timer) return;
+      const timer = boardRef.current.timer as StartState
       console.log('time!', timer.state.endTime - Date.now())
       setTimeRemaining(
-        timer.state.endTime - Date.now()
+        calculateTimeRemaining(timer)
       )
       return () => {
         clearInterval(interval)
       }
     }, 1000)
-  }, [board!.timer])
+  }, [])
+
+  const calculateTimeRemaining = (timer: StartState | PausedState) => {
+    if (timer.type === 'start') {
+      return timer.state.endTime - Date.now()
+    }
+    return timer.state.totalDuration
+  }
 
   const start = () => {
     setTimerState({
@@ -43,7 +54,15 @@ export function Timer() {
   }
 
   const stop = () => {
-    return ''
+    setTimerState({
+      timer: {
+        type: "paused",
+        state: {
+          totalDuration: timeRemaining
+        }
+      }
+
+    })
   }
 
   return(
