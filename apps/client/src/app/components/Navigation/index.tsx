@@ -10,7 +10,8 @@ import { useColorPreferences } from '../../hooks/useDarkMode';
 import { MoonIcon, SunIcon } from '@heroicons/react/solid';
 import { Button } from '../Button';
 import { Tooltip } from '../Tooltip';
-import { useEffect } from 'react';
+import { Timer } from '../Timer';
+
 
 const NavigationWrapper = styled.div`
   margin: 1rem auto;
@@ -20,12 +21,6 @@ const NavigationWrapper = styled.div`
   display: flex;
   align-items: center;
   flex: 0 auto;
-`;
-
-const BoardTitleInput = styled.p`
-  height: ${NavHeight}px;
-  font-size: 2rem;
-  font-weight: bold;
 `;
 
 const AddColumnButton = styled.button`
@@ -45,19 +40,6 @@ export function Navigation() {
 
   const DarkModeIcon = theme === 'dark' ? SunIcon : MoonIcon;
 
-  /** TODO: fix this */
-  useEffect(() => {
-    if (!board) return;
-
-    if (
-      window.localStorage.getItem(`board-info-shown-${board.id}`) !== 'true' &&
-      isBoardOwner
-    ) {
-      openDialog('boardInfo', { board });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [board, isBoardOwner]);
-
   const addColumn = async () => {
     openDialog('addColumn', {
       onSuccess: async (title) => {
@@ -70,8 +52,8 @@ export function Navigation() {
 
   return (
     <NavigationWrapper>
-      <div>
-        <BoardTitleInput>{board.title}</BoardTitleInput>
+      <div className="flex-1">
+        <p className="text-2xl font-bold">{board.title}</p>
       </div>
       <AvatarContainer>
         <AvatarGroup max={5}>
@@ -82,6 +64,9 @@ export function Navigation() {
           ))}
         </AvatarGroup>
       </AvatarContainer>
+      <div className="ml-2">
+        <Timer />
+      </div>
       <Button size="sm" variant="white" className="ml-2" onClick={toggleTheme}>
         <DarkModeIcon className="w-4 h-4" />
       </Button>

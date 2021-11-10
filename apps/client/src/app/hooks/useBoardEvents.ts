@@ -4,6 +4,7 @@ import { io, Socket } from 'socket.io-client';
 import { useCallback, useEffect, useRef } from 'react';
 import {
   BOARD_UPDATED_EVENT_NAME,
+  BOARD_USERS_EVENT_NAME,
   CARD_CREATED_EVENT_NAME,
   CARD_DELETED_EVENT_NAME,
   CARD_FOCUS_EVENT_NAME,
@@ -131,18 +132,17 @@ export function useBoardEvents(boardId: string) {
             event.payload,
           );
           return;
+        case BOARD_USERS_EVENT_NAME:
+          queryClient.setQueryData(
+            ['activeUsers', { boardId }],
+            () => event.payload,
+          );
+          return;
         default:
           return;
       }
     },
     [boardId, ignoredEvents, queryClient],
-  );
-
-  const setUsers = useCallback(
-    (users) => {
-      queryClient.setQueryData(['activeUsers', { boardId }], () => users);
-    },
-    [boardId, queryClient],
   );
 
   useEffect(() => {
@@ -156,8 +156,6 @@ export function useBoardEvents(boardId: string) {
     });
 
     socket.current?.on('event', processEvent);
-
-    socket.current?.on('users', setUsers);
 
     socket.current?.on('disconnect', (e) => {
       console.log('Disconnected from WS', e);
