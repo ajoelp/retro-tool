@@ -10,7 +10,6 @@ import { useColorPreferences } from '../../hooks/useDarkMode';
 import { MoonIcon, SunIcon } from '@heroicons/react/solid';
 import { Button } from '../Button';
 import { Tooltip } from '../Tooltip';
-import { useEffect } from 'react';
 import { Timer } from '../Timer';
 
 const NavigationWrapper = styled.div`
@@ -74,9 +73,6 @@ export function Navigation() {
       <div>
         <BoardTitleInput>{board.title}</BoardTitleInput>
       </div>
-      <div className="mx-auto">
-        <Timer />
-      </div>
       <AvatarContainer>
         <AvatarGroup max={5}>
           {activeUsers?.map((user) => (
@@ -86,6 +82,9 @@ export function Navigation() {
           ))}
         </AvatarGroup>
       </AvatarContainer>
+      <div className="ml-2">
+        <Timer />
+      </div>
       <Button size="sm" variant="white" className="ml-2" onClick={toggleTheme}>
         <DarkModeIcon className="w-4 h-4" />
       </Button>

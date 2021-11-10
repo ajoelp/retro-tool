@@ -1,5 +1,8 @@
 import { User } from '.prisma/client';
-import { SocketEvents } from '@retro-tool/api-interfaces';
+import {
+  BOARD_USERS_EVENT_NAME,
+  SocketEvents,
+} from '@retro-tool/api-interfaces';
 import { Namespace, Server, Socket } from 'socket.io';
 import { v4 as uuid } from 'uuid';
 import { tokenToUser } from '../utils/JwtService';
@@ -79,8 +82,10 @@ export class NamespaceService {
       },
       [],
     );
-
-    this.namespace.emit('users', boardUsers);
+    this.sendEventToBoard(boardId, {
+      type: BOARD_USERS_EVENT_NAME,
+      payload: boardUsers,
+    });
   }
 
   sendEventToBoard(

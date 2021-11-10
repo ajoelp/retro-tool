@@ -1,4 +1,4 @@
-import { Card, Column, Board } from '@prisma/client';
+import { Board, Card, Column, User } from '@prisma/client';
 
 export const CARD_CREATED_EVENT_NAME = 'events/CARD_CREATED' as const;
 export const CARD_UPDATED_EVENT_NAME = 'events/CARD_UPDATED' as const;
@@ -10,6 +10,7 @@ export const COLUMN_UPDATED_EVENT_NAME = 'events/COLUMN_UPDATED' as const;
 export const COLUMN_DELETED_EVENT_NAME = 'events/COLUMN_DELETED' as const;
 
 export const BOARD_UPDATED_EVENT_NAME = 'events/BOARD_UPDATED' as const;
+export const BOARD_USERS_EVENT_NAME = 'events/BOARDS_USERS' as const;
 
 export type CARD_CREATED_EVENT = {
   type: typeof CARD_CREATED_EVENT_NAME;
@@ -51,6 +52,11 @@ export type BOARD_UPDATED_EVENT = {
   payload: Board;
 };
 
+export type BOARD_USERS_EVENT = {
+  type: typeof BOARD_USERS_EVENT_NAME;
+  payload: User[];
+};
+
 export type SocketEvents =
   | CARD_CREATED_EVENT
   | CARD_UPDATED_EVENT
@@ -59,4 +65,5 @@ export type SocketEvents =
   | COLUMN_CREATED_EVENT
   | COLUMN_UPDATED_EVENT
   | COLUMN_DELETED_EVENT
-  | BOARD_UPDATED_EVENT;
+  | BOARD_UPDATED_EVENT
+  | BOARD_USERS_EVENT;
