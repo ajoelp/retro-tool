@@ -93,16 +93,6 @@ export class BoardsController {
       }
     }
 
-    if(state.type === 'paused'){
-      if(!board.timer as any) {
-        throw new ApiError('Timer has not been started.')
-      }
-
-      if((board.timer as any).type === 'paused') {
-        throw new ApiError('Timer has already been paused.')
-      }
-    }
-
     await boardRepository.updateTimerState(req.params.id, state)
 
     return res.json({});
