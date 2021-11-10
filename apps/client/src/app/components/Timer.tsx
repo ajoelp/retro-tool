@@ -1,8 +1,17 @@
-import {Button} from "./Button";
 import {useStartTimer} from "../hooks/boards";
 import {useBoardState} from "../contexts/BoardProvider";
 import {useEffect, useRef, useState} from "react";
 import {PausedState, StartState} from "@retro-tool/api-interfaces";
+import {PauseIcon, PlayIcon, XCircleIcon} from "@heroicons/react/solid";
+
+function formatTime (time: number) {
+  const minutes = Math.floor(time / 60000)
+  const timeRemaining = time - minutes * 60000
+  const seconds = Math.floor(timeRemaining / 1000)
+  return [minutes, seconds]
+    .map(number => number.toString().padStart(2, '0'))
+    .join(':')
+}
 
 export function Timer() {
 
@@ -15,23 +24,20 @@ export function Timer() {
 
   const numberOfMinutes = 5;
   const startTime = Date.now();
-  const endTime = Date.now() + (60 * numberOfMinutes * 1000);
-
-  console.log(board);
+  const defaultDuration = 60 * numberOfMinutes * 1000;
+  const endTime = Date.now() + defaultDuration;
 
   useEffect(() => {
-    console.log('board:',boardRef.current);
     const interval = setInterval(() => {
       if(!boardRef.current || !boardRef.current.timer) return;
       const timer = boardRef.current.timer as StartState
-      console.log('time!', timer.state.endTime - Date.now())
       setTimeRemaining(
         calculateTimeRemaining(timer)
       )
       return () => {
         clearInterval(interval)
       }
-    }, 1000)
+    }, 50)
   }, [])
 
   const calculateTimeRemaining = (timer: StartState | PausedState) => {
@@ -61,19 +67,29 @@ export function Timer() {
           totalDuration: timeRemaining
         }
       }
-
     })
   }
 
+  const reset = () => {
+    setTimerState({
+      timer: {
+        type: "paused",
+        state: {
+          totalDuration: defaultDuration
+        }
+      }
+    })
+  }
+
+  const timer = board?.timer as StartState | PausedState | null;
   return(
     <div className="flex items-center">
-      <p className="mr-2">{timeRemaining}</p>
-      <Button onClick={() => start()} className="mr-2">
-        Start
-      </Button>
-      <Button onClick={() => stop()}>
-        Stop
-      </Button>
+      <p className="mr-2">{formatTime(timeRemaining)}</p>
+      {
+        timer?.type === 'paused'
+            ? (<PlayIcon className='w-8 h-8 text-purple-600' onClick={start}/>) :(<PauseIcon className='w-8 h-8 text-purple-600' onClick={() => stop()}/>)
+      }
+      <XCircleIcon onClick={() => reset()} className="w-8 h-8 ml-2 text-purple-600"/>
     </div>
   )
 }
