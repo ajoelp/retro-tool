@@ -22,12 +22,6 @@ const NavigationWrapper = styled.div`
   flex: 0 auto;
 `;
 
-const BoardTitleInput = styled.p`
-  height: ${NavHeight}px;
-  font-size: 2rem;
-  font-weight: bold;
-`;
-
 const AddColumnButton = styled.button`
   padding: 10px 20px;
 `;
@@ -70,8 +64,8 @@ export function Navigation() {
 
   return (
     <NavigationWrapper>
-      <div>
-        <BoardTitleInput>{board.title}</BoardTitleInput>
+      <div className="flex-1">
+        <p className="text-2xl font-bold">{board.title}</p>
       </div>
       <AvatarContainer>
         <AvatarGroup max={5}>

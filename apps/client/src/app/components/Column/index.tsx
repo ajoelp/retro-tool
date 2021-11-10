@@ -36,7 +36,7 @@ type CardsListProps = {
 
 const containerClasses = (isDragging: boolean) => {
   return classNames(
-    'h-full rounded flex flex-col p-2 items-start overflow-y-scroll',
+    'h-full rounded flex flex-col p-2 items-start overflow-y-scroll scrollbar scrollbar-thin scrollbar-thumb-gray-900',
     isDragging
       ? 'bg-gray-200 dark:bg-gray-600'
       : 'bg-gray-100 dark:bg-gray-700 border dark:border-transparent',

@@ -138,7 +138,7 @@ const Board = () => {
         style={{ gridTemplateRows: `${NavHeight}px 1fr` }}
       >
         <Navigation />
-        <div className="overflow-x-scroll flex">
+        <div className="overflow-x-scroll scrollbar scrollbar-thin scrollbar-thumb-gray-900 flex">
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="board" type="COLUMN" direction="horizontal">
               {(provided: DroppableProvided) => (

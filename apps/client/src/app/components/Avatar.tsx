@@ -1,4 +1,10 @@
-import { ReactNode } from 'react';
+import { Children, isValidElement, ReactElement, ReactNode } from 'react';
+
+export function getValidChildren(children: React.ReactNode) {
+  return Children.toArray(children).filter((child) =>
+    isValidElement(child),
+  ) as ReactElement[];
+}
 
 const Sizes = {
   xs: 'h-6 w-6',
@@ -30,6 +36,8 @@ type AvatarGroupProps = {
   max?: number;
 };
 
-export function AvatarGroup({ children }: AvatarGroupProps) {
-  return <div className="flex -space-x-1 overflow-hidden">{children}</div>;
+export function AvatarGroup({ children, max }: AvatarGroupProps) {
+  const validChildren = getValidChildren(children);
+  const maxChildren = max ? validChildren.slice(0, max) : validChildren;
+  return <div className="flex -space-x-1 overflow-hidden">{maxChildren}</div>;
 }
