@@ -2,7 +2,7 @@ import { useStartTimer } from '../hooks/boards';
 import { useBoardState } from '../contexts/BoardProvider';
 import { useMemo, useRef, useState } from 'react';
 import { PausedState, StartState } from '@retro-tool/api-interfaces';
-import { useRequestAnimationInterval } from '../hooks/useRequestAnimationInterval';
+import { useInterval } from '../hooks/useInterval';
 import { useDialogs } from '../dialog-manager';
 
 function formatTime(time: number) {
@@ -76,7 +76,7 @@ export function Timer() {
 
   const defaultDuration = 60 * defaultMinutes * 1000;
 
-  useRequestAnimationInterval(() => {
+  useInterval(() => {
     if (!boardRef.current || !boardRef.current.timer) return;
     const timer = boardRef.current.timer as StartState;
     const newTimeRemaining = calculateTimeRemaining(timer);
@@ -99,7 +99,7 @@ export function Timer() {
       }
       return newTimeRemaining;
     });
-  }, 1000);
+  }, 500);
 
   const calculateTimeRemaining = (timer: StartState | PausedState | null) => {
     if (timer === null) return defaultDuration;
@@ -157,7 +157,6 @@ export function Timer() {
   const iconClasses = 'w-4 h-4 text-gray-900 dark:text-white';
 
   const timer = board?.timer as StartState | PausedState | null;
-  console.log(timer);
   return (
     <div className="flex items-center rounded text-xs bg-white dark:bg-gray-700 shadow-sm focus-within:ring-2 focus-within:ring-offset-2 border overflow-hidden dark:border-gray-800">
       <button
@@ -167,7 +166,6 @@ export function Timer() {
             currentTime: defaultMinutes,
             onSuccess(time) {
               setDefaultMinutes(time);
-              console.log(time);
               reset(60 * time * 1000);
             },
           })

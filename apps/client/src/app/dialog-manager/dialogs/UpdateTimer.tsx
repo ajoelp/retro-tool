@@ -18,8 +18,6 @@ export default function UpdateTimerDialog(props: UpdateTimerDialogProps) {
     closeDialog();
   };
 
-  console.log(watch());
-
   const footer = () => {
     return (
       <div>

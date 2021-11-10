@@ -1,22 +1,17 @@
-import { ReactNode } from 'react'
-import { extendTheme, ChakraProvider } from "@chakra-ui/react"
+import { ReactNode } from 'react';
+import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 
 export type DefaultTheme = {
   typography: {
-    primary: 'black',
-  },
+    primary: 'black';
+  };
   backgrounds: {
-    primary: 'white',
-  },
-}
+    primary: 'white';
+  };
+};
 
-export const chakraTheme = extendTheme({})
+export const chakraTheme = extendTheme({});
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  console.log(chakraTheme)
-  return (
-    <ChakraProvider theme={chakraTheme}>
-      {children}
-    </ChakraProvider>
-  )
+  return <ChakraProvider theme={chakraTheme}>{children}</ChakraProvider>;
 }

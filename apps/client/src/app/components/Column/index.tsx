@@ -57,7 +57,6 @@ export function CardList({
     const onFocus = (id: string) => {
       const htmlElement = cardsRefs.current[id];
       const containerElement = cardsContainerRef.current;
-      console.log({ htmlElement, containerElement });
       htmlElement?.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
