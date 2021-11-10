@@ -6,13 +6,20 @@ import { ColumnsRouter } from './columns/ColumnsRouter';
 import { CardsRouter } from './cards/CardsRouter';
 import { Server } from 'socket.io';
 import http from 'http';
-import globalErrorMiddleware from './middleware/globalErrorMiddleware';
+import globalErrorMiddleware, {buildError} from './middleware/globalErrorMiddleware';
 import { AuthRouter } from './auth/AuthRouter';
 import passport from 'passport';
 import helmet from 'helmet';
 import dependencies from './dependencies';
 import { InvitesRouter } from './invites/InvitesRouter';
 import { UsersRouter } from './users/UsersRouter';
+import rateLimit from 'express-rate-limit';
+
+const limiter = rateLimit({
+  windowMs: 1000,
+  max: 60,
+  message: buildError('too-many-requests', new Error('rate limit'))
+});
 
 const expressApp = express();
 
@@ -25,6 +32,7 @@ const applyMiddleware = (app: Express) => {
   app.use(passport.session());
   app.use(express.json());
   app.use(helmet());
+  app.use(limiter);
 };
 
 applyMiddleware(expressApp);
