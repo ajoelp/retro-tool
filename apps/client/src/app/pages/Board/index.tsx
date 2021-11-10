@@ -172,14 +172,6 @@ const Board = () => {
       </div>
     </BoardProvider>
   );
-  // return (
-  //   <BoardProvider boardId={data.id}>
-  //     <div className="flex flex-col h-screen min-w-screen overflow-x-scroll bg-white dark:bg-gray-800 text-gray-800 dark:text-white">
-
-  //       <Navigation board={data} />
-  //     </div>
-  //   </BoardProvider>
-  // );
 };
 
 export default Board;

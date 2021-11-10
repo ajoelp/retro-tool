@@ -3,6 +3,7 @@ import { useBoardState } from '../contexts/BoardProvider';
 import { useMemo, useRef, useState } from 'react';
 import { PausedState, StartState } from '@retro-tool/api-interfaces';
 import { useRequestAnimationInterval } from '../hooks/useRequestAnimationInterval';
+import { useDialogs } from '../dialog-manager';
 
 function formatTime(time: number) {
   const minutes = Math.floor(time / 60000);
@@ -60,7 +61,9 @@ export function Timer() {
   const { board } = useBoardState();
   const { setTimerState } = useStartTimer(board!.id);
   const [timeRemaining, setTimeRemaining] = useState(0);
+  const [defaultMinutes, setDefaultMinutes] = useState(5);
   const defaultTitle = useRef<string>();
+  const { openDialog } = useDialogs();
 
   const sound = useMemo(() => {
     const audio = new Audio('/assets/notification.mp3');
@@ -71,8 +74,7 @@ export function Timer() {
   const boardRef = useRef<typeof board>(board);
   boardRef.current = board;
 
-  const numberOfMinutes = 1;
-  const defaultDuration = 60 * numberOfMinutes * 1000;
+  const defaultDuration = 60 * defaultMinutes * 1000;
 
   useRequestAnimationInterval(() => {
     if (!boardRef.current || !boardRef.current.timer) return;
@@ -132,7 +134,7 @@ export function Timer() {
     });
   };
 
-  const reset = async () => {
+  const reset = async (time = defaultDuration) => {
     await setTimerState({
       timer: {
         type: 'paused',
@@ -146,18 +148,33 @@ export function Timer() {
         type: 'start',
         state: {
           startTime: Date.now(),
-          endTime: Date.now() + defaultDuration,
+          endTime: Date.now() + time,
         },
       },
     });
   };
 
-  const iconClasses = 'w-4 h-4 text-white';
+  const iconClasses = 'w-4 h-4 text-gray-900 dark:text-white';
 
   const timer = board?.timer as StartState | PausedState | null;
+  console.log(timer);
   return (
     <div className="flex items-center rounded text-xs bg-white dark:bg-gray-700 shadow-sm focus-within:ring-2 focus-within:ring-offset-2 border overflow-hidden dark:border-gray-800">
-      <p className="px-2.5 py-1.5 font-mono">{formatTime(timeRemaining)}</p>
+      <button
+        className="px-2.5 py-1.5 font-mono"
+        onClick={() =>
+          openDialog('updateTimer', {
+            currentTime: defaultMinutes,
+            onSuccess(time) {
+              setDefaultMinutes(time);
+              console.log(time);
+              reset(60 * time * 1000);
+            },
+          })
+        }
+      >
+        {formatTime(timeRemaining)}
+      </button>
       {timeRemaining !== 0 && (
         <>
           {timer == null || timer?.type === 'paused' ? (

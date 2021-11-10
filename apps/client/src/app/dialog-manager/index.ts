@@ -6,6 +6,7 @@ const Dialogs = {
   addColumn: lazy(() => import('./dialogs/AddColumnDialog')),
   boardInfo: lazy(() => import('./dialogs/BoardInfoDialog')),
   boardExport: lazy(() => import('./dialogs/BoardExportDialog')),
+  updateTimer: lazy(() => import('./dialogs/UpdateTimer')),
 };
 
 const { DialogManager, useDialogs } = createDialogWrapper(Dialogs);

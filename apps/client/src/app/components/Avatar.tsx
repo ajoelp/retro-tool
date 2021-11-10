@@ -25,7 +25,7 @@ export function Avatar({ size = 'md', src, className, alt = '' }: AvatarProps) {
   return (
     <img
       src={src}
-      className={`inline-block rounded-full ${Sizes[size]} ${className} ring-1 ring-white`}
+      className={`inline-block rounded-full ${Sizes[size]} ${className} border border-white`}
       alt={alt}
     />
   );
