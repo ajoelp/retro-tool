@@ -26,9 +26,20 @@ services:
     networks:
       - retro-tool
 
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+    volumes:
+      - redisdata:/data
+    networks:
+      - retro-tool
+
 networks:
   retro-tool:
 volumes:
+  redisdata:
+    driver: local
   postgres_data:
     driver: local
   postgres_test_data:

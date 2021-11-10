@@ -14,8 +14,10 @@ import dependencies from './dependencies';
 import { InvitesRouter } from './invites/InvitesRouter';
 import { UsersRouter } from './users/UsersRouter';
 import rateLimit from 'express-rate-limit';
+import RedisStore from 'rate-limit-redis';
 
 const limiter = rateLimit({
+  store: new RedisStore({ url: process.env.REDIS_CONNECTION_STRING }),
   windowMs: 1000,
   max: 60,
   message: buildError('too-many-requests', new Error('rate limit'))
