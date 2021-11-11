@@ -5,11 +5,15 @@ import { useMutation, useQuery } from 'react-query';
 import { v4 as uuid } from 'uuid';
 import { Column } from '@prisma/client';
 
-export const useColumns = (boardId: string) => {
-  const { data, isLoading } = useQuery(['columns', boardId], async () => {
-    const { data } = await apiClient.get(`/boards/${boardId}/columns`);
-    return data.columns as Column[];
-  });
+export const useColumns = (boardId?: string) => {
+  const { data, isLoading } = useQuery(
+    ['columns', boardId],
+    async () => {
+      const { data } = await apiClient.get(`/boards/${boardId}/columns`);
+      return data.columns as Column[];
+    },
+    { enabled: Boolean(boardId) },
+  );
   return {
     columns: data,
     columnsLoading: isLoading,
@@ -31,7 +35,7 @@ type DeleteColumnParams = {
 };
 
 export const useDeleteColumn = () => {
-  const { board } = useBoardState()
+  const { board } = useBoardState();
   return useMutation(({ columnId }: DeleteColumnParams) =>
     apiClient.delete(`/boards/${board?.id}/columns/${columnId}`),
   );

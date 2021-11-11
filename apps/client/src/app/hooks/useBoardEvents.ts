@@ -23,7 +23,7 @@ import { eventEmitter } from '../utils/EventEmitter';
 
 type EventType = SocketEvents & { eventTrackingId?: string };
 
-export function useBoardEvents(boardId: string) {
+export function useBoardEvents(boardId?: string) {
   const queryClient = useQueryClient();
   const { ignoredEvents } = useIgnoredEvents();
   const socket = useRef<Socket>();

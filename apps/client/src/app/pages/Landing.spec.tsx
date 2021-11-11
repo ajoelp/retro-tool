@@ -1,11 +1,10 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import Landing from './Landing';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { Router } from 'react-router-dom';
+import { MemoryRouter, Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthProvider';
 import { useQueryParams } from '../hooks/useQueryParams';
-import { createMemoryHistory } from 'history';
 
 jest.mock('../api');
 jest.mock('../contexts/AuthProvider');
@@ -24,18 +23,22 @@ jest.mock('../components/AdminUsersList', () => ({
 
 const queryClient = new QueryClient();
 
-const renderComponent = () => {
-  const history = createMemoryHistory();
+jest.mock('react-router-dom', () => {
+  const initial = jest.requireActual('react-router-dom');
+  return {
+    ...initial,
+    Navigate: jest.fn(() => <div />),
+  };
+});
 
-  render(
+const renderComponent = (route = '/') => {
+  return render(
     <QueryClientProvider client={queryClient}>
-      <Router history={history}>
+      <MemoryRouter initialEntries={[route]}>
         <Landing />
-      </Router>
+      </MemoryRouter>
     </QueryClientProvider>,
   );
-
-  return { history };
 };
 
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
@@ -80,9 +83,8 @@ describe('Landing Page', () => {
   });
 
   describe('Logged in', () => {
-    it('will redirect if query param is provided', () => {
+    it('will redirect if query param is provided', async () => {
       const redirect = '/hello/world';
-      mockUseQueryParams.mockReturnValueOnce({ redirect });
       mockUseAuth.mockReturnValueOnce({
         logoutLoading: false,
         user: {
@@ -98,9 +100,12 @@ describe('Landing Page', () => {
         userLoading: false,
       });
 
-      const { history } = renderComponent();
+      act(() => {
+        renderComponent(`/home?redirect=${redirect}`);
+      });
 
-      expect(history.location.pathname).toBe(redirect);
+      expect(Navigate).toHaveBeenCalledTimes(1);
+      expect(Navigate).toHaveBeenCalledWith({ to: redirect }, {});
     });
 
     it.each([

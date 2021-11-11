@@ -2,9 +2,9 @@ import { Board } from '.prisma/client';
 import { useMutation, useQuery } from 'react-query';
 import { apiClient, BoardWithColumn } from '../api';
 import { User } from '@prisma/client';
-import {PausedState, StartState} from "@retro-tool/api-interfaces";
+import { PausedState, StartState } from '@retro-tool/api-interfaces';
 
-export const useBoard = (id: string) => {
+export const useBoard = (id?: string) => {
   return useQuery(
     ['board', id],
     async () => {
@@ -47,7 +47,7 @@ export const useBoards = () => {
 };
 
 type startTimerArgs = {
-  timer: StartState | PausedState
+  timer: StartState | PausedState;
 };
 
 export const useStartTimer = (boardId: string) => {

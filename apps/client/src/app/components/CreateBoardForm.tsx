@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { useCreateBoard } from '../hooks/boards';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { TextInput } from './inputs/TextInput';
 import { Button } from './Button';
 import { useAuth, useMe } from '../contexts/AuthProvider';
@@ -17,8 +17,7 @@ export const CreateBoardForm = () => {
   const { createBoard, createBoardLoading } = useCreateBoard();
   const { refetch: getMe } = useMe();
   const { user } = useAuth();
-  const history = useHistory();
-
+  const navigate = useNavigate();
   const defaultColumns = useMemo(() => {
     return user?.defaultColumns ?? DEFAULT_COLUMNS;
   }, [user]);
@@ -43,7 +42,7 @@ export const CreateBoardForm = () => {
         .map((value) => value.trim()) as string[],
     });
     await getMe();
-    history.push(`/boards/${board.id}`);
+    navigate(`/boards/${board.id}`);
   };
 
   return (

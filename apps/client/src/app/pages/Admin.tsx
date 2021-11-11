@@ -1,11 +1,11 @@
 import { AdminUsersList } from '../components/AdminUsersList';
 import { useAuth } from '../contexts/AuthProvider';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
 export default function AdminPage() {
   const { user } = useAuth();
 
-  if (!user || !user.isAdmin) return <Redirect to="/" />;
+  if (!user || !user.isAdmin) return <Navigate to="/" />;
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col p-8">

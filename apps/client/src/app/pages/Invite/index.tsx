@@ -1,22 +1,17 @@
 import { Spinner } from '@chakra-ui/spinner';
 import { Alert, AlertIcon, AlertTitle } from '@chakra-ui/alert';
-import { Redirect, useParams } from 'react-router';
+import { Navigate, useParams } from 'react-router-dom';
 import { useInvite } from '../../hooks/invites';
-import { CloseButton } from '@chakra-ui/close-button';
-
-type InviteParamsType = {
-  inviteCode: string;
-};
 
 const Invite = () => {
-  const { inviteCode } = useParams<InviteParamsType>();
+  const { inviteCode } = useParams();
 
   const { isLoading, isSuccess, data } = useInvite(inviteCode);
 
   if (isLoading) return <Spinner />;
 
   if (isSuccess) {
-    return <Redirect to={`/boards/${data?.id}`} />;
+    return <Navigate to={`/boards/${data?.id}`} />;
   }
 
   return (

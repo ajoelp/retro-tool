@@ -1,10 +1,9 @@
-import { Redirect } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthProvider';
 import { Logo } from '../components/Logo';
 import { UserActions } from '../components/UserActions';
 import { CreateBoardForm } from '../components/CreateBoardForm';
 import { UserBoards } from '../components/UserBoards';
-import { useQueryParams } from '../hooks/useQueryParams';
+import { Navigate, useLocation, useSearchParams } from 'react-router-dom';
 
 const GithubSvg = ({ className }: { className?: string }) => {
   return (
@@ -25,7 +24,8 @@ const GithubSvg = ({ className }: { className?: string }) => {
 
 const Landing = () => {
   const { user, login, userLoading } = useAuth();
-  const { redirect } = useQueryParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { search, pathname } = useLocation();
 
   if (userLoading) {
     return null;
@@ -40,7 +40,7 @@ const Landing = () => {
               <li className="p-0">
                 <button
                   className="m-0 px-4 py-4 sm:px-6 bg-gray-800 flex items-center justify-center text-white w-full hover:bg-gray-700 cursor-pointer"
-                  onClick={() => login(redirect as string)}
+                  onClick={() => login(searchParams.get('redirect') as string)}
                   data-testid="login-button"
                 >
                   Login with <GithubSvg className="ml-3" />
@@ -53,8 +53,8 @@ const Landing = () => {
     );
   }
 
-  if (redirect) {
-    return <Redirect to={redirect as string} />;
+  if (searchParams.get('redirect')) {
+    return <Navigate to={searchParams.get('redirect') as string} />;
   }
 
   return (

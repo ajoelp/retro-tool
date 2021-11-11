@@ -44,7 +44,7 @@ const reorder = (
 };
 
 const Board = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams();
   const { data, isLoading, isError } = useBoard(id);
   const { columns: apiColumns, columnsLoading } = useColumns(id);
   const { mutateAsync: reorderColumnAsync } = useReorderColumn(data?.id);
