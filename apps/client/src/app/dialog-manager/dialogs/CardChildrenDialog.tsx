@@ -23,7 +23,7 @@ export default function CardChildrenDialog(props: CardChildrenDialogProps) {
           <div className="w-full max-w-2xl m-auto relative z-50 grid grid-cols-2 gap-2 ">
             {card.children?.map((child, index) => (
               <CardWrapper
-                card={card}
+                card={child}
                 index={index}
                 hasChildren={false}
                 isGroupedOver={false}
