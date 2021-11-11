@@ -20,7 +20,7 @@ export default function CardChildrenDialog(props: CardChildrenDialogProps) {
             exit={{ opacity: 0 }}
             onClick={closeDialog}
           />
-          <div className="w-full max-w-2xl m-auto relative z-50 grid grid-cols-2 gap-2 ">
+          <div className="w-full max-w-2xl m-auto relative z-50 grid grid-cols-2 gap-2 bg-white dark:bg-gray-900 shadow-xl p-2 rounded">
             {card.children?.map((child, index) => (
               <CardWrapper
                 card={child}
