@@ -136,10 +136,13 @@ describe('BoardsController', () => {
     const response = await TestCase.make()
       .actingAs(user)
       .delete(generatePath(BOARDS_SINGULAR, { id: board.id }));
+
     expect(response.status).toEqual(200);
-    expect(
-      await prisma.board.findFirst({ where: { id: board.id } }),
-    ).toBeFalsy();
+    const updatedBoard = await prisma.board.findFirst({
+      where: { id: board.id },
+    });
+    expect(updatedBoard).toBeTruthy();
+    expect(updatedBoard.deleted).toBeTruthy();
   });
 
   it('starts a boards timer', async () => {

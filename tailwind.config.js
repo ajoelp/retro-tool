@@ -11,7 +11,10 @@ module.exports = {
     },
   },
   variants: {
-    extend: {},
+    extend: {
+      visibility: ['hover', 'focus', 'group-hover'],
+      display: ['hover', 'focus', 'group-hover'],
+    },
   },
   plugins: [require('@tailwindcss/forms'), require('tailwind-scrollbar')],
 };

@@ -59,3 +59,16 @@ export const useStartTimer = (boardId: string) => {
     createBoardLoading: isLoading,
   };
 };
+
+type DeleteBoardArgs = {
+  boardId: string;
+};
+export const useDeleteBoard = () => {
+  const { mutateAsync, isLoading } = useMutation((params: DeleteBoardArgs) => {
+    return apiClient.delete(`/boards/${params.boardId}`);
+  });
+  return {
+    deleteBoard: mutateAsync,
+    deleteBoardLoading: isLoading,
+  };
+};

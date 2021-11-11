@@ -21,7 +21,12 @@ const userRepository = new UserRepository();
 export class BoardsController {
   async index(req: ApiRequest, res: Response) {
     const boards = await prisma.boardAccess.findMany({
-      where: { userId: req.user.id },
+      where: {
+        userId: req.user.id,
+        board: {
+          deleted: null,
+        },
+      },
       include: {
         board: {
           include: {
@@ -87,8 +92,9 @@ export class BoardsController {
   }
 
   async destroy(req: ApiRequest, res: Response) {
-    await prisma.board.delete({
+    await prisma.board.update({
       where: { id: req.params.id },
+      data: { deleted: new Date() },
     });
     return res.json({});
   }
