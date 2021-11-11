@@ -26,22 +26,24 @@
       }
     ]
   },
-  "projects": {
-    "api": {
-      "tags": []
-    },
-    "api-interfaces": {
-      "tags": []
-    },
-    "client": {
-      "tags": []
-    },
-    "client-e2e": {
-      "tags": [],
-      "implicitDependencies": ["client"]
-    },
-    "scripts": {
-      "tags": []
+  "cli": {
+    "defaultCollection": "@nrwl/react"
+  },
+  "generators": {
+    "@nrwl/react": {
+      "application": {
+        "style": "css",
+        "linter": "eslint",
+        "babel": true
+      },
+      "component": {
+        "style": "css"
+      },
+      "library": {
+        "style": "css",
+        "linter": "eslint"
+      }
     }
-  }
+  },
+  "defaultProject": "client"
 }
