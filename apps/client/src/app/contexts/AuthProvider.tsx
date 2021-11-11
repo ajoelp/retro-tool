@@ -28,7 +28,7 @@ export const AuthContext = createContext<AuthProviderState>({
   logoutLoading: false,
 });
 
-const useMe = () => {
+export const useMe = () => {
   return useQuery<User>(
     ['currentUser'],
     async () => {

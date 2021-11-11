@@ -1,16 +1,22 @@
 import { User } from '@prisma/client';
 import { Response } from 'express';
 import { prisma } from '../prismaClient';
-import {BOARD_UPDATED_EVENT_NAME, PausedState, StartState} from '@retro-tool/api-interfaces';
+import {
+  BOARD_UPDATED_EVENT_NAME,
+  PausedState,
+  StartState,
+} from '@retro-tool/api-interfaces';
 import dependencies from '../dependencies';
 import { v4 as uuid } from 'uuid';
 import { BoardRepository } from './BoardRepository';
 import { BoardResource } from './BoardResource';
 import { ApiRequest } from '../types/ApiRequest';
-import {ApiError} from "../errors/ApiError";
+import { ApiError } from '../errors/ApiError';
+import { UserRepository } from '../users/UserRepository';
 
 const boardRepository = new BoardRepository();
 const boardResource = new BoardResource();
+const userRepository = new UserRepository();
 
 export class BoardsController {
   async index(req: ApiRequest, res: Response) {
@@ -59,6 +65,10 @@ export class BoardsController {
       include: { columns: true },
     });
 
+    await userRepository.updateById(req.user.id, {
+      defaultColumns: columns.join(','),
+    });
+
     return res.json({ board });
   }
 
@@ -84,16 +94,16 @@ export class BoardsController {
   }
 
   async timers(req: ApiRequest, res: Response) {
-    const board = await boardRepository.findById(req.params.id)
-    const state = req.body.timer as (StartState | PausedState)
+    const board = await boardRepository.findById(req.params.id);
+    const state = req.body.timer as StartState | PausedState;
 
-    if(board.timer && state.type === 'start') {
-      if((board.timer as any).type === 'start') {
-        throw new ApiError('Timer has already been started.')
+    if (board.timer && state.type === 'start') {
+      if ((board.timer as any).type === 'start') {
+        throw new ApiError('Timer has already been started.');
       }
     }
 
-    await boardRepository.updateTimerState(req.params.id, state)
+    await boardRepository.updateTimerState(req.params.id, state);
 
     return res.json({});
   }

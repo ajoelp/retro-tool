@@ -3,6 +3,8 @@ import { useCreateBoard } from '../hooks/boards';
 import { useHistory } from 'react-router-dom';
 import { TextInput } from './inputs/TextInput';
 import { Button } from './Button';
+import { useAuth, useMe } from '../contexts/AuthProvider';
+import { useMemo } from 'react';
 
 const DEFAULT_COLUMNS = 'Mad, Glad, Sad';
 
@@ -12,17 +14,24 @@ type FormData = {
 };
 
 export const CreateBoardForm = () => {
+  const { createBoard, createBoardLoading } = useCreateBoard();
+  const { refetch: getMe } = useMe();
+  const { user } = useAuth();
+  const history = useHistory();
+
+  const defaultColumns = useMemo(() => {
+    return user?.defaultColumns ?? DEFAULT_COLUMNS;
+  }, [user]);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      columns: DEFAULT_COLUMNS,
+      columns: defaultColumns,
     },
   });
-  const { createBoard, createBoardLoading } = useCreateBoard();
-  const history = useHistory();
 
   const submit = async (data: FormData) => {
     const {
@@ -33,6 +42,7 @@ export const CreateBoardForm = () => {
         ?.split(',')
         .map((value) => value.trim()) as string[],
     });
+    await getMe();
     history.push(`/boards/${board.id}`);
   };
 
@@ -51,7 +61,7 @@ export const CreateBoardForm = () => {
         className="mt-2"
         label="Columns"
         hint="Comma separated"
-        placeholder={DEFAULT_COLUMNS}
+        placeholder={defaultColumns}
         errors={errors.columns?.message}
         {...register('columns', { required: 'Columns are required.' })}
       />

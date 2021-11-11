@@ -19,6 +19,7 @@ model User {
   cards          Card[]
   boardAccesses  BoardAccess[]
   isAdmin        Boolean       @default(false)
+  defaultColumns String?
 }
 
 model Board {
