@@ -47,7 +47,8 @@ export default function BoardInfoDialog(props: BoardInfoDialogProps) {
         <TextInput
           type="text"
           className="pr-2"
-          value={inviteCode}
+          defaultValue={inviteCode}
+          readOnly={true}
           name="invite_code"
           label="Invite users to this board by sharing the link below."
         />

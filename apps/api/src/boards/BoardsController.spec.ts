@@ -1,7 +1,11 @@
 import { BOARDS_ROOT, BOARDS_SINGULAR } from './BoardsRouter';
 import { prisma } from '../prismaClient';
 import generatePath from '../utils/generatePath';
-import {BOARD_UPDATED_EVENT_NAME, PausedState, StartState} from '@retro-tool/api-interfaces';
+import {
+  BOARD_UPDATED_EVENT_NAME,
+  PausedState,
+  StartState,
+} from '@retro-tool/api-interfaces';
 import { TestCase } from '../utils/TestCase';
 import { User } from '@prisma/client';
 import dependencies from '../dependencies';
@@ -138,7 +142,7 @@ describe('BoardsController', () => {
     ).toBeFalsy();
   });
 
-  it('starts a boards timer', async  () => {
+  it('starts a boards timer', async () => {
     const board = await prisma.board.create({
       data: {
         title: 'testTitle',
@@ -149,15 +153,15 @@ describe('BoardsController', () => {
       },
     });
 
-    expect(board.timer).toBeNull()
+    expect(board.timer).toBeNull();
 
     const timer: StartState = {
-      type: "start",
+      type: 'start',
       state: {
         startTime: 0,
-        endTime: 100
-      }
-    }
+        endTime: 100,
+      },
+    };
 
     const response = await TestCase.make()
       .actingAs(user)
@@ -167,13 +171,14 @@ describe('BoardsController', () => {
     expect(response.status).toEqual(200);
     expect(mockSendEventToBoard).toHaveBeenCalledWith(board.id, {
       type: BOARD_UPDATED_EVENT_NAME,
-      payload: expect.objectContaining({timer: timer}),
+      payload: expect.objectContaining({ timer: timer }),
     });
-    expect((await prisma.board.findFirst({ where: { id: board.id }})).timer).toEqual(timer)
-  })
+    expect(
+      (await prisma.board.findFirst({ where: { id: board.id } })).timer,
+    ).toEqual(timer);
+  });
 
-
-  it('pauses a boards timer', async  () => {
+  it('pauses a boards timer', async () => {
     const board = await prisma.board.create({
       data: {
         title: 'testTitle',
@@ -182,21 +187,21 @@ describe('BoardsController', () => {
           create: { userId: user.id },
         },
         timer: {
-          type: "start",
+          type: 'start',
           state: {
             startTime: 0,
-            endTime: 100
-          }
-        }
+            endTime: 100,
+          },
+        },
       },
     });
 
     const pausedTimer: PausedState = {
-      type: "paused",
+      type: 'paused',
       state: {
-        totalDuration: 50
-      }
-    }
+        totalDuration: 50,
+      },
+    };
 
     const response = await TestCase.make()
       .actingAs(user)
@@ -206,10 +211,12 @@ describe('BoardsController', () => {
     expect(response.status).toEqual(200);
     expect(mockSendEventToBoard).toHaveBeenCalledWith(board.id, {
       type: BOARD_UPDATED_EVENT_NAME,
-      payload: expect.objectContaining({timer: pausedTimer}),
+      payload: expect.objectContaining({ timer: pausedTimer }),
     });
-    expect((await prisma.board.findFirst({ where: { id: board.id }})).timer).toEqual(pausedTimer)
-  })
+    expect(
+      (await prisma.board.findFirst({ where: { id: board.id } })).timer,
+    ).toEqual(pausedTimer);
+  });
 
   it('returns an error if you start a timer after it has already started', async () => {
     const board = await prisma.board.create({
@@ -220,23 +227,23 @@ describe('BoardsController', () => {
           create: { userId: user.id },
         },
         timer: {
-          type: "start",
+          type: 'start',
           state: {
             startTime: 0,
-            endTime: 100
-          }
-        }
+            endTime: 100,
+          },
+        },
       },
     });
-    expect(board.timer).not.toBeNull()
+    expect(board.timer).not.toBeNull();
 
     const startTimer: StartState = {
-      type: "start",
+      type: 'start',
       state: {
         startTime: 0,
-        endTime: 100
-      }
-    }
+        endTime: 100,
+      },
+    };
 
     const response = await TestCase.make()
       .actingAs(user)
@@ -244,65 +251,7 @@ describe('BoardsController', () => {
       .send({ timer: startTimer });
 
     expect(response.status).toEqual(400);
-  })
-
-  it('returns an error if you pause a timer after it has already paused', async () => {
-    const board = await prisma.board.create({
-      data: {
-        title: 'testTitle',
-        ownerId: user.id,
-        boardAccesses: {
-          create: { userId: user.id },
-        },
-        timer: {
-          type: "paused",
-          state: {}
-        }
-      },
-    });
-    expect(board.timer).not.toBeNull()
-
-    const pausedTimer: PausedState = {
-      type: "paused",
-      state: {
-        totalDuration: 100
-      }
-    }
-
-    const response = await TestCase.make()
-      .actingAs(user)
-      .post(`/boards/${board.id}/timers`)
-      .send({ timer: pausedTimer });
-
-    expect(response.status).toEqual(400);
-  })
-
-  it('returns an error if you pause a timer that has not been started', async () => {
-    const board = await prisma.board.create({
-      data: {
-        title: 'testTitle',
-        ownerId: user.id,
-        boardAccesses: {
-          create: { userId: user.id },
-        },
-        timer: undefined
-      },
-    });
-
-    const startTimer: PausedState = {
-      type: "paused",
-      state: {
-        totalDuration: 100
-      }
-    }
-
-    const response = await TestCase.make()
-      .actingAs(user)
-      .post(`/boards/${board.id}/timers`)
-      .send({ timer: startTimer });
-
-    expect(response.status).toEqual(400);
-  })
+  });
 
   afterEach(async () => {
     await prisma.column.deleteMany();

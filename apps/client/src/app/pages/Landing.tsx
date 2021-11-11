@@ -41,6 +41,7 @@ const Landing = () => {
                 <button
                   className="m-0 px-4 py-4 sm:px-6 bg-gray-800 flex items-center justify-center text-white w-full hover:bg-gray-700 cursor-pointer"
                   onClick={() => login(redirect as string)}
+                  data-testid="login-button"
                 >
                   Login with <GithubSvg className="ml-3" />
                 </button>

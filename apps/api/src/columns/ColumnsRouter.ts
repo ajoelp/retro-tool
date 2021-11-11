@@ -11,7 +11,11 @@ import { User } from '@prisma/client';
 const ColumnsRouter = Router();
 const columnsController = new ColumnsController();
 
-const canViewBoard = async (req: ApiRequest, res: Response, next: NextFunction) => {
+const canViewBoard = async (
+  req: ApiRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   const { boardId } = req.params;
   const { id: userId } = req.user as User;
 
@@ -24,21 +28,26 @@ const canViewBoard = async (req: ApiRequest, res: Response, next: NextFunction) 
   }
 
   next();
-}
+};
 
-const canUpdateBoard = async (req: ApiRequest, res: Response, next: NextFunction) => {
+export const canUpdateBoard = async (
+  req: ApiRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   const { boardId } = req.params;
 
   if (!boardId) throw new Error('boardId not supplied to route');
 
-  const board = await prisma.board.findFirst({ where: { id: boardId } })
+  const board = await prisma.board.findFirst({ where: { id: boardId } });
 
-  if (!board) throw new NotFoundError(`Board ${boardId} not found.`)
+  if (!board) throw new NotFoundError(`Board ${boardId} not found.`);
 
-  if (board.ownerId !== req.user.id) throw new AuthenticationError('Unauthorized')
+  if (board.ownerId !== req.user.id)
+    throw new AuthenticationError('Unauthorized');
 
   next();
-}
+};
 
 export const COLUMNS_ROOT = '/boards/:boardId/columns';
 export const COLUMNS_SINGULAR = '/boards/:boardId/columns/:id';

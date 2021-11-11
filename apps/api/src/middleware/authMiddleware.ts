@@ -1,5 +1,5 @@
 import { User } from '@prisma/client';
-import { Response, NextFunction } from 'express';
+import { NextFunction, Response } from 'express';
 import { AuthenticationError } from '../errors/AuthenticationError';
 import { ApiRequest } from '../types/ApiRequest';
 import { tokenToUser } from '../utils/JwtService';

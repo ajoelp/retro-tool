@@ -45,7 +45,8 @@ export default function BoardExportDialog(props: BoardExportDialogProps) {
       <div className="mt-2">
         <textarea
           className="resize border p-1 bg-transparent whitespace-pre rounded"
-          value={result}
+          defaultValue={result}
+          readOnly={true}
         ></textarea>
       </div>
     </BaseDialog>

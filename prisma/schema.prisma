@@ -32,6 +32,7 @@ model Board {
   inviteCode    String?
   boardAccesses BoardAccess[]
   timer         Json?
+  deleted       DateTime?
 }
 
 model BoardAccess {

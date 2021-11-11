@@ -40,9 +40,9 @@ describe('AuthController', () => {
     process.env.COOKIE_DOMAIN = 'localhost';
     process.env.SPA_URL = 'example.com';
 
-    jest
+    const spy = jest
       .spyOn(JwtService, 'generateJwtSecret')
-      .mockImplementation(() => 'testToken');
+      .mockImplementationOnce(() => 'testToken');
 
     const user = await prisma.user.create({
       data: {
@@ -68,6 +68,7 @@ describe('AuthController', () => {
     });
 
     expect(redirectSpy).toHaveBeenCalledWith(301, 'example.com');
+    spy.mockRestore();
   });
 
   describe('impersonate', function () {
@@ -110,6 +111,7 @@ describe('AuthController', () => {
 
       expect(response.status).toBe(500);
     });
+
     it('will return a valid token for a user', async () => {
       const user = await prisma.user.create({
         data: {
@@ -133,7 +135,7 @@ describe('AuthController', () => {
         .post(`/auth/impersonate/${user2.id}`);
 
       expect(response.status).toBe(200);
-      expect(tokenToUser(response.body.token)).toEqual(
+      expect(await tokenToUser(response.body.token)).toEqual(
         expect.objectContaining({ id: user2.id }),
       );
     });

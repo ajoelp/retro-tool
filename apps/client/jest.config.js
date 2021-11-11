@@ -8,13 +8,5 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageReporters: ['text-summary', ['lcov', { projectRoot: '../../' }]],
   coverageDirectory: '../../coverage/apps/client',
-  coverageThreshold: {
-    global: {
-      branches: 90,
-      functions: 100,
-      lines: 100,
-      statements: 100,
-    },
-  },
   setupFilesAfterEnv: ['<rootDir>/jest-setup.ts'],
 };

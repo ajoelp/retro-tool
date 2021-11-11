@@ -4,7 +4,8 @@ import { Server } from 'socket.io';
 import { Board, User } from '.prisma/client';
 import { prisma } from '../prismaClient';
 import { generateJwtSecret } from '../utils/JwtService';
-import flushPromises from 'flush-promises';
+import { BOARD_USERS_EVENT_NAME } from '@retro-tool/api-interfaces';
+
 class MockIO extends EventEmitter {
   of() {
     return this;
@@ -150,19 +151,28 @@ describe('NamespaceService', () => {
     const boardId = 'sampleBoardId';
 
     const emit = jest.fn();
+    const notCalledEmit = jest.fn();
     service.namespace = { emit } as any;
 
-    service.clients.set('id-1', { boardId, user: { id: '1' } } as any);
-    service.clients.set('id-2', { boardId, user: { id: '1' } } as any);
-    service.clients.set('id-3', { boardId, user: { id: '2' } } as any);
+    service.clients.set('id-1', { boardId, user: { id: '1' }, emit } as any);
+    service.clients.set('id-2', { boardId, user: { id: '1' }, emit } as any);
+    service.clients.set('id-3', { boardId, user: { id: '2' }, emit } as any);
     service.clients.set('id-4', {
       boardId: 'different-board-id',
       user: { id: '3' },
+      emit: notCalledEmit,
     } as any);
 
     await service.emitUserRoom(boardId);
 
-    expect(emit).toHaveBeenCalledTimes(1);
-    expect(emit).toHaveBeenCalledWith('users', [{ id: '1' }, { id: '2' }]);
+    expect(emit).toHaveBeenCalledTimes(3);
+    expect(emit).toHaveBeenCalledWith(
+      'event',
+      expect.objectContaining({
+        payload: [{ id: '1' }, { id: '2' }],
+        type: BOARD_USERS_EVENT_NAME,
+      }),
+    );
+    expect(notCalledEmit).not.toHaveBeenCalled();
   });
 });
