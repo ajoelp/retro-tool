@@ -4,7 +4,7 @@ import { ApiRequest } from '../types/ApiRequest';
 import {ApiError} from "../errors/ApiError";
 
 
-const buildError = (type: string, error: Error) => {
+export const buildError = (type: string, error: Error) => {
   const response: any = {
     error: type,
     message: error.message
