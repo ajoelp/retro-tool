@@ -28,7 +28,7 @@ const Board = lazy(() => import('./pages/Board'));
 const Invite = lazy(() => import('./pages/Invite'));
 const NoMatch = lazy(() => import('./pages/NoMatch'));
 
-let routes: RouteObject[] = [
+const routes: RouteObject[] = [
   {
     path: '/',
     element: <Landing />,

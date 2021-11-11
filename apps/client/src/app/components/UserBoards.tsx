@@ -3,6 +3,7 @@ import { Spinner } from './Spinner';
 import { Link } from 'react-router-dom';
 import { dateAgo } from '../utils/dates';
 import { ChevronRightIcon } from '@heroicons/react/solid';
+import { Avatar, AvatarGroup } from './Avatar';
 
 export const UserBoards = () => {
   const { data, isLoading } = useBoards();
@@ -48,16 +49,16 @@ export const UserBoards = () => {
                       </div>
                     </div>
                     <div className="mt-4 flex-shrink-0 sm:mt-0 sm:ml-5">
-                      <div className="flex overflow-hidden -space-x-1">
+                      <AvatarGroup max={5}>
                         {board.boardAccesses.map((applicant) => (
-                          <img
+                          <Avatar
+                            size="xs"
                             key={applicant.user.email}
-                            className="inline-block h-6 w-6 rounded-full ring-2 ring-white"
                             src={applicant.user.avatar}
                             alt={applicant.user.githubNickname}
                           />
                         ))}
-                      </div>
+                      </AvatarGroup>
                     </div>
                   </div>
                   <div className="ml-5 flex-shrink-0">
