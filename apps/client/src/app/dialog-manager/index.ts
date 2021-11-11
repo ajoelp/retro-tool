@@ -7,6 +7,7 @@ const Dialogs = {
   boardInfo: lazy(() => import('./dialogs/BoardInfoDialog')),
   boardExport: lazy(() => import('./dialogs/BoardExportDialog')),
   updateTimer: lazy(() => import('./dialogs/UpdateTimer')),
+  cardChildren: lazy(() => import('./dialogs/CardChildrenDialog')),
 };
 
 const { DialogManager, useDialogs } = createDialogWrapper(Dialogs);
