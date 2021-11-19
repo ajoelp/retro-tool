@@ -44,7 +44,9 @@ export const useMe = () => {
 
 const useLogin = () => {
   return (redirect = '/') => {
-    window.localStorage.setItem('redirect', redirect);
+    if (redirect != null) {
+      window.localStorage.setItem('redirect', redirect);
+    }
     window.location.href = `${environment.apiUrl}/auth/github`;
   };
 };
