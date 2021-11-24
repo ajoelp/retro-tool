@@ -12,7 +12,6 @@ import { Button } from '../Button';
 import { Tooltip } from '../Tooltip';
 import { Timer } from '../Timer';
 
-
 const NavigationWrapper = styled.div`
   margin: 1rem auto;
   width: 100%;
@@ -90,7 +89,7 @@ export function Navigation() {
           </Button>
         </>
       )}
-      <AddColumnButton onClick={addColumn}>
+      <AddColumnButton onClick={addColumn} data-testid="add_column_button">
         <AddIcon />
       </AddColumnButton>
     </NavigationWrapper>

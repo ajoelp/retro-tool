@@ -204,11 +204,17 @@ export const CardWrapper = ({
       </InputContainer>
       <CardDetails>
         <CardVotesContainer>
-          <CardVotesButton onClick={() => voteCard({ increment: true })}>
+          <CardVotesButton
+            onClick={() => voteCard({ increment: true })}
+            data-testid={`upvote-button-${index}`}
+          >
             <ArrowUpIcon className="w-6 h-6" />
           </CardVotesButton>
-          <p>{card.votes}</p>
-          <CardVotesButton onClick={() => voteCard({ increment: false })}>
+          <p data-testid={`vote-count-${index}`}>{card.votes}</p>
+          <CardVotesButton
+            onClick={() => voteCard({ increment: false })}
+            data-testid={`downvote-button-${index}`}
+          >
             <ArrowDownIcon className="w-6 h-6" />
           </CardVotesButton>
         </CardVotesContainer>
