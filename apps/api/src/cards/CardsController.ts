@@ -21,7 +21,14 @@ export class CardsController {
       where: {
         columnId: columnId as string,
         parent: parentId ? { id: parentId as string } : null,
-        draft: false,
+        OR: [
+          {
+            ownerId: req.user.id,
+          },
+          {
+            draft: false,
+          }
+        ],
       },
       orderBy: { createdAt: 'asc' },
       include: {

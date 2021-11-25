@@ -171,6 +171,43 @@ describe('CardsController', () => {
         expect.arrayContaining([expect.objectContaining(draftCard)]),
       );
     });
+    it('will list all the draft owned cards for a column', async () => {
+      const card1 = {
+        ownerId: user.id,
+        columnId: column.id,
+        content: 'random-content',
+        order: 1,
+      };
+      const card2 = {
+        ownerId: user.id,
+        columnId: column.id,
+        content: 'random-content2',
+        order: 2,
+      };
+      const draftCard = {
+        ownerId: user.id,
+        columnId: column.id,
+        content: 'random-content',
+        order: 3,
+        draft: true
+      };
+
+      await prisma.card.createMany({
+        data: [card1, card2, draftCard],
+      });
+
+      const response = await TestCase.make()
+        .actingAs(user)
+        .get(`/cards?columnId=${column.id}`);
+      expect(response.status).toEqual(200);
+      expect(response.body.cards).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining(card1),
+          expect.objectContaining(card2),
+          expect.objectContaining(draftCard),
+        ]),
+      );
+    });
   });
   describe('create', () => {
     it('will create a card', async () => {
@@ -247,6 +284,44 @@ describe('CardsController', () => {
       expect(await prisma.card.findFirst({ where: { id: card.id } })).toEqual(
         expect.objectContaining(payload),
       );
+    });
+
+    it('will update a draft card', async () => {
+
+      const sendEventToBoardSpy = jest
+        .spyOn(dependencies.namespaceService, 'sendEventToBoard')
+        .mockImplementation(jest.fn());
+      const sendEventToUserSpy = jest
+        .spyOn(dependencies.namespaceService, 'sendEventToUser')
+        .mockImplementation(jest.fn());
+
+
+      const card = await prisma.card.create({
+        data: {
+          ownerId: user.id,
+          columnId: column.id,
+          content: 'random-content2',
+          order: 2,
+          draft: true,
+        },
+      });
+
+      const payload = { content: 'updated-content' };
+
+      const response = await TestCase.make()
+        .actingAs(user)
+        .post(`/cards/${card.id}`)
+        .send({ payload });
+
+      expect(response.status).toEqual(200);
+
+      expect(response.status).toEqual(200);
+      expect(await prisma.card.findFirst({ where: { id: card.id } })).toEqual(
+        expect.objectContaining(payload),
+      );
+      expect(sendEventToUserSpy).toHaveBeenCalled()
+      expect(sendEventToBoardSpy).not.toHaveBeenCalled()
+
     });
   });
   describe('vote', () => {
