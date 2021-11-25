@@ -147,6 +147,34 @@ describe('NamespaceService', () => {
     });
   });
 
+  it('will emit an event to a specific client', () => {
+    const boardId = 'sampleBoardId';
+    const client = {
+      user: { id: '1' },
+      boardId: boardId,
+      emit: jest.fn(),
+    };
+    const notOurClient = {
+      user: { id: '2' },
+      boardId: boardId,
+      emit: jest.fn(),
+    };
+
+    service.clients.set('random-id', client as any);
+    service.clients.set('random-id2', notOurClient as any);
+    const payload = { test: true } as unknown as Board;
+    service.sendEventToUser(client.user.id, boardId, {
+      type: 'events/BOARD_UPDATED',
+      payload,
+    });
+
+    expect(client.emit).toHaveBeenCalledWith('event', {
+      type: 'events/BOARD_UPDATED',
+      payload,
+    });
+    expect(notOurClient.emit).not.toHaveBeenCalled();
+  });
+
   it('will emit all users in a room', async () => {
     const boardId = 'sampleBoardId';
 

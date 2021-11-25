@@ -121,6 +121,7 @@ export default function Column({ column, board, title, index }: ColumnProps) {
 
     await createCard({
       content: newCardRef.current.value ?? '',
+      draft: true,
     });
 
     newCardRef.current.value = '';
