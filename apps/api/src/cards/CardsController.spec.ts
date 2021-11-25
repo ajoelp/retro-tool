@@ -8,12 +8,20 @@ describe('CardsController', () => {
   let board: Board;
   let column: Column;
   let user: User;
+  let anotherUser: User;
   beforeAll(async () => {
     user = await prisma.user.create({
       data: {
         email: 'test@email.com',
         githubNickname: 'testUser',
         avatar: 'test-avatar',
+      },
+    });
+    anotherUser = await prisma.user.create({
+      data: {
+        email: 'another-user@email.com',
+        githubNickname: 'anoutherUser',
+        avatar: 'another-test-avatar',
       },
     });
     board = await prisma.board.create({
@@ -118,6 +126,49 @@ describe('CardsController', () => {
             id: card1.id,
           }),
         ]),
+      );
+    });
+
+    it('will list all the published cards for a column', async () => {
+      const otherColumn = await prisma.column.create({
+        data: { title: 'other column', boardId: board.id, order: 1 },
+      });
+      const card1 = {
+        ownerId: user.id,
+        columnId: column.id,
+        content: 'random-content',
+        order: 1,
+      };
+      const card2 = {
+        ownerId: user.id,
+        columnId: column.id,
+        content: 'random-content2',
+        order: 2,
+      };
+      const draftCard = {
+        ownerId: anotherUser.id,
+        columnId: column.id,
+        content: 'random-content',
+        order: 3,
+        draft: true
+      };
+
+      await prisma.card.createMany({
+        data: [card1, card2, draftCard],
+      });
+
+      const response = await TestCase.make()
+        .actingAs(user)
+        .get(`/cards?columnId=${column.id}`);
+      expect(response.status).toEqual(200);
+      expect(response.body.cards).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining(card1),
+          expect.objectContaining(card2),
+        ]),
+      );
+      expect(response.body.cards).not.toEqual(
+        expect.arrayContaining([expect.objectContaining(draftCard)]),
       );
     });
   });
