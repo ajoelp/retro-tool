@@ -1,16 +1,13 @@
 import { apiClient } from './../api';
 import { useMutation, useQuery } from 'react-query';
-import { Card } from '@prisma/client';
+import { Card, Column } from '@prisma/client';
 import { CardType } from '@retro-tool/api-interfaces';
 
 export function useCards(columnId: string) {
-  const { data, isLoading, refetch } = useQuery(
-    ['cards', columnId],
-    async () => {
-      const { data } = await apiClient.get('/cards', { params: { columnId } });
-      return data.cards as CardType[];
-    },
-  );
+  const { data, isLoading, refetch } = useQuery(['cards', columnId], async () => {
+    const { data } = await apiClient.get('/cards', { params: { columnId } });
+    return data.cards as CardType[];
+  });
   return {
     cards: data,
     cardsLoading: isLoading,
@@ -24,12 +21,10 @@ type CreateCardArgs = {
 };
 
 export function useCreateCard(columnId: string) {
-  const { mutateAsync, isLoading } = useMutation(
-    async ({ content, draft }: CreateCardArgs) => {
-      const { data } = await apiClient.post('/cards', { columnId, content, draft });
-      return data.card as CardType;
-    },
-  );
+  const { mutateAsync, isLoading } = useMutation(async ({ content, draft }: CreateCardArgs) => {
+    const { data } = await apiClient.post('/cards', { columnId, content, draft });
+    return data.card as CardType;
+  });
   return { createCard: mutateAsync, createCardLoading: isLoading };
 }
 
@@ -39,14 +34,12 @@ export type UpdateCardArgs = {
 };
 
 export function useUpdateCard() {
-  const { mutateAsync, isLoading } = useMutation(
-    async ({ cardId, payload }: UpdateCardArgs) => {
-      const { data } = await apiClient.post(`/cards/${cardId}`, {
-        payload,
-      });
-      return data.card;
-    },
-  );
+  const { mutateAsync, isLoading } = useMutation(async ({ cardId, payload }: UpdateCardArgs) => {
+    const { data } = await apiClient.post(`/cards/${cardId}`, {
+      payload,
+    });
+    return data.card;
+  });
   return {
     updateCard: mutateAsync,
     updateCardLoading: isLoading,
@@ -57,9 +50,8 @@ export type VoteCardArgs = {
   increment: boolean;
 };
 export function useVoteCard(cardId: string) {
-  const { mutateAsync, isLoading } = useMutation(
-    ({ increment }: VoteCardArgs) =>
-      apiClient.post(`/cards/${cardId}/vote`, { increment }),
+  const { mutateAsync, isLoading } = useMutation(({ increment }: VoteCardArgs) =>
+    apiClient.post(`/cards/${cardId}/vote`, { increment }),
   );
   return {
     voteCard: mutateAsync,
@@ -68,9 +60,7 @@ export function useVoteCard(cardId: string) {
 }
 
 export function useDeleteCard(cardId: string) {
-  const { mutateAsync, isLoading } = useMutation(() =>
-    apiClient.delete(`/cards/${cardId}`),
-  );
+  const { mutateAsync, isLoading } = useMutation(() => apiClient.delete(`/cards/${cardId}`));
   return {
     deleteCard: mutateAsync,
     deleteCardLoading: isLoading,
@@ -78,11 +68,16 @@ export function useDeleteCard(cardId: string) {
 }
 
 export function useFocusCard(cardId: string) {
-  const { mutateAsync, isLoading } = useMutation(() =>
-    apiClient.post(`/cards/${cardId}/focusCard`),
-  );
+  const { mutateAsync, isLoading } = useMutation(() => apiClient.post(`/cards/${cardId}/focusCard`));
   return {
     focusCard: mutateAsync,
     focusCardLoading: isLoading,
   };
+}
+
+export function usePublishCards(columnId: Column['id']) {
+  const { mutateAsync, isLoading } = useMutation(() => {
+    return apiClient.post('/bulk/cards/publish', { columnId });
+  });
+  return { publishCards: mutateAsync, publishCardsLoading: isLoading };
 }

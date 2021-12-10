@@ -1,9 +1,6 @@
 import { Response } from 'express';
 import { prisma } from '../prismaClient';
-import {
-  CARD_CREATED_EVENT_NAME,
-  CARD_FOCUS_EVENT_NAME,
-} from '@retro-tool/api-interfaces';
+import { CARD_CREATED_EVENT_NAME, CARD_FOCUS_EVENT_NAME, CARD_UPDATED_EVENT_NAME } from '@retro-tool/api-interfaces';
 import { User } from '@prisma/client';
 import dependencies from '../dependencies';
 import { CardRepository } from './CardRepository';
@@ -27,7 +24,7 @@ export class CardsController {
           },
           {
             draft: false,
-          }
+          },
         ],
       },
       orderBy: { createdAt: 'asc' },
@@ -65,7 +62,7 @@ export class CardsController {
       dependencies.namespaceService.sendEventToUser(card.ownerId, card.column.boardId, {
         type: CARD_CREATED_EVENT_NAME,
         payload: card,
-      })
+      });
     } else {
       dependencies.namespaceService.sendEventToBoard(card.column.boardId, {
         type: CARD_CREATED_EVENT_NAME,
@@ -121,34 +118,36 @@ export class CardsController {
   }
 
   async publish(req: ApiRequest, res: Response) {
-    const { boardId } = req.params;
+    const { columnId } = req.body;
 
     const query = {
-      draft: true,
       ownerId: req.user.id,
       column: {
-        boardId: boardId
-      }
-    }
+        id: columnId,
+      },
+    };
+
+    await prisma.card.updateMany({
+      where: {
+        draft: true,
+        ...query,
+      },
+      data: {
+        draft: false,
+      },
+    });
 
     const cards = await prisma.card.findMany({
       where: query,
-      include: { column: true }
+      include: { column: true, owner: true },
     });
 
-    await prisma.card.updateMany({
-      where: query,
-      data: {
-        draft: false
-      }
-    });
-
-    cards.forEach(card => {
+    cards.forEach((card) => {
       dependencies.namespaceService.sendEventToBoard(card.column.boardId, {
-        type: CARD_FOCUS_EVENT_NAME,
+        type: CARD_UPDATED_EVENT_NAME,
         payload: card,
       });
-    })
+    });
 
     return res.send();
   }

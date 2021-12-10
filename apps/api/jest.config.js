@@ -4,6 +4,7 @@ module.exports = {
   displayName: 'api',
   preset: '../../jest.preset.js',
   verbose: true,
+  clearMocks: true,
   globals: {
     'ts-jest': {
       tsconfig: '<rootDir>/tsconfig.spec.json',

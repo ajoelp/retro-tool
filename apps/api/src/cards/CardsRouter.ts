@@ -19,43 +19,20 @@ CardsRouter.post('/cards', [
   cardsController.create,
 ]);
 
-CardsRouter.post('/cards/:cardId', [
-  authenticatedMiddleware,
-  canEditCard,
-  hasAccessToBoard,
-  cardsController.update,
-]);
+CardsRouter.post('/cards/:cardId', [authenticatedMiddleware, canEditCard, hasAccessToBoard, cardsController.update]);
 
-CardsRouter.delete('/cards/:cardId', [
-  authenticatedMiddleware,
-  canEditCard,
-  hasAccessToBoard,
-  cardsController.delete,
-]);
+CardsRouter.delete('/cards/:cardId', [authenticatedMiddleware, canEditCard, hasAccessToBoard, cardsController.delete]);
 
-CardsRouter.get('/cards', [
-  authenticatedMiddleware,
-  hasAccessToBoard,
-  query('columnId'),
-  cardsController.list,
-]);
+CardsRouter.get('/cards', [authenticatedMiddleware, hasAccessToBoard, query('columnId'), cardsController.list]);
 
-CardsRouter.post('/cards/:cardId/vote', [
-  authenticatedMiddleware,
-  hasAccessToBoard,
-  cardsController.vote,
-]);
+CardsRouter.post('/cards/:cardId/vote', [authenticatedMiddleware, hasAccessToBoard, cardsController.vote]);
 
-CardsRouter.post('/cards/:cardId/focusCard', [
-  authenticatedMiddleware,
-  hasAccessToBoard,
-  cardsController.focus,
-]);
+CardsRouter.post('/cards/:cardId/focusCard', [authenticatedMiddleware, hasAccessToBoard, cardsController.focus]);
 
-CardsRouter.post('/bulk-cards/publish', [
+CardsRouter.post('/bulk/cards/publish', [
   authenticatedMiddleware,
   hasAccessToBoard,
-  query('boardId'),
+  body('cardId'),
   cardsController.publish,
 ]);
 

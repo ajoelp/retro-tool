@@ -104,12 +104,11 @@ export class NamespaceService {
     event: SocketEvents,
     eventTrackingId?: string,
   ) {
-    // this.getUserInBoard(boardId).forEach((client) => {
-    //   client.emit('event', { ...event, eventTrackingId });
-    // });
-    this.getUserInBoard(boardId).filter((client) => client.user.id === userId).forEach((client) => {
-      client.emit('event', { ...event, eventTrackingId });
-    })
+    this.getUserInBoard(boardId)
+      .filter((client) => client.user.id === userId)
+      .forEach((client) => {
+        client.emit('event', { ...event, eventTrackingId });
+      });
   }
 
   start() {
