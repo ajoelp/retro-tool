@@ -121,6 +121,7 @@ export default function Column({ column, board, title, index }: ColumnProps) {
 
     await createCard({
       content: newCardRef.current.value ?? '',
+      draft: true,
     });
 
     newCardRef.current.value = '';
@@ -170,7 +171,10 @@ export default function Column({ column, board, title, index }: ColumnProps) {
               {column.title}
             </p>
             {isBoardOwner && (
-              <button onClick={() => deleteColumn(column.id)}>
+              <button
+                data-testid={`delete-column-${index}-button`}
+                onClick={() => deleteColumn(column.id)}
+              >
                 <DeleteIcon />
               </button>
             )}

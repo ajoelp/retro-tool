@@ -20,12 +20,13 @@ export function useCards(columnId: string) {
 
 type CreateCardArgs = {
   content: string;
+  draft: boolean;
 };
 
 export function useCreateCard(columnId: string) {
   const { mutateAsync, isLoading } = useMutation(
-    async ({ content }: CreateCardArgs) => {
-      const { data } = await apiClient.post('/cards', { columnId, content });
+    async ({ content, draft }: CreateCardArgs) => {
+      const { data } = await apiClient.post('/cards', { columnId, content, draft });
       return data.card as CardType;
     },
   );

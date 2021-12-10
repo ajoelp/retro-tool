@@ -98,6 +98,20 @@ export class NamespaceService {
     });
   }
 
+  sendEventToUser(
+    userId: string,
+    boardId: string,
+    event: SocketEvents,
+    eventTrackingId?: string,
+  ) {
+    // this.getUserInBoard(boardId).forEach((client) => {
+    //   client.emit('event', { ...event, eventTrackingId });
+    // });
+    this.getUserInBoard(boardId).filter((client) => client.user.id === userId).forEach((client) => {
+      client.emit('event', { ...event, eventTrackingId });
+    })
+  }
+
   start() {
     this.namespace.on('connection', this.onConnection.bind(this));
   }

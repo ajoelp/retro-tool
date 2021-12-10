@@ -86,19 +86,33 @@ export class CardRepository {
       },
     });
 
-    dependencies.namespaceService.sendEventToBoard(card.column.boardId, {
-      type: CARD_UPDATED_EVENT_NAME,
-      payload: card,
-    });
+    if (card.draft) {
+      dependencies.namespaceService.sendEventToUser(card.ownerId, card.column.boardId, {
+        type: CARD_UPDATED_EVENT_NAME,
+        payload: card,
+      })
+    } else {
+      dependencies.namespaceService.sendEventToBoard(card.column.boardId, {
+        type: CARD_UPDATED_EVENT_NAME,
+        payload: card,
+      });
+    }
 
     // If the cards are grouped
     if (payload.parentId != null) {
       const parentCard = await this.getCardById(payload.parentId);
 
-      dependencies.namespaceService.sendEventToBoard(card.column.boardId, {
-        type: CARD_UPDATED_EVENT_NAME,
-        payload: parentCard,
-      });
+      if (card.draft) {
+        dependencies.namespaceService.sendEventToUser(card.ownerId, card.column.boardId, {
+          type: CARD_UPDATED_EVENT_NAME,
+          payload: parentCard,
+        })
+      } else {
+        dependencies.namespaceService.sendEventToBoard(card.column.boardId, {
+          type: CARD_UPDATED_EVENT_NAME,
+          payload: parentCard,
+        });
+      }
 
       if (card.children && card.children.length) {
         for (const childCard of card.children) {

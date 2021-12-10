@@ -21,6 +21,14 @@ export class CardsController {
       where: {
         columnId: columnId as string,
         parent: parentId ? { id: parentId as string } : null,
+        OR: [
+          {
+            ownerId: req.user.id,
+          },
+          {
+            draft: false,
+          }
+        ],
       },
       orderBy: { createdAt: 'asc' },
       include: {
@@ -35,10 +43,11 @@ export class CardsController {
   }
 
   async create(req: ApiRequest, res: Response) {
-    const { columnId, content } = req.body;
+    const { columnId, content, draft = false } = req.body;
     const card = await prisma.card.create({
       data: {
         content,
+        draft,
         ownerId: (req.user as User).id,
         columnId,
         order: await cardRepository.getNextOrderValue(columnId),
@@ -52,10 +61,17 @@ export class CardsController {
       },
     });
 
-    dependencies.namespaceService.sendEventToBoard(card.column.boardId, {
-      type: CARD_CREATED_EVENT_NAME,
-      payload: card,
-    });
+    if (card.draft) {
+      dependencies.namespaceService.sendEventToUser(card.ownerId, card.column.boardId, {
+        type: CARD_CREATED_EVENT_NAME,
+        payload: card,
+      })
+    } else {
+      dependencies.namespaceService.sendEventToBoard(card.column.boardId, {
+        type: CARD_CREATED_EVENT_NAME,
+        payload: card,
+      });
+    }
 
     return res.json({ card });
   }
@@ -100,6 +116,39 @@ export class CardsController {
       type: CARD_FOCUS_EVENT_NAME,
       payload: card,
     });
+
+    return res.send();
+  }
+
+  async publish(req: ApiRequest, res: Response) {
+    const { boardId } = req.params;
+
+    const query = {
+      draft: true,
+      ownerId: req.user.id,
+      column: {
+        boardId: boardId
+      }
+    }
+
+    const cards = await prisma.card.findMany({
+      where: query,
+      include: { column: true }
+    });
+
+    await prisma.card.updateMany({
+      where: query,
+      data: {
+        draft: false
+      }
+    });
+
+    cards.forEach(card => {
+      dependencies.namespaceService.sendEventToBoard(card.column.boardId, {
+        type: CARD_FOCUS_EVENT_NAME,
+        payload: card,
+      });
+    })
 
     return res.send();
   }

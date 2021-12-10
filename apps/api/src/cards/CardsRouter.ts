@@ -14,6 +14,7 @@ CardsRouter.post('/cards', [
   body('columnId'),
   body('ownerId'),
   body('content'),
+  body('draft'),
   validateRequestParams,
   cardsController.create,
 ]);
@@ -49,6 +50,13 @@ CardsRouter.post('/cards/:cardId/focusCard', [
   authenticatedMiddleware,
   hasAccessToBoard,
   cardsController.focus,
+]);
+
+CardsRouter.post('/bulk-cards/publish', [
+  authenticatedMiddleware,
+  hasAccessToBoard,
+  query('boardId'),
+  cardsController.publish,
 ]);
 
 export { CardsRouter };

@@ -18,7 +18,7 @@ import {
   DraggingStyle,
   NotDraggingStyle,
 } from 'react-beautiful-dnd';
-import { MenuIcon } from '@heroicons/react/outline';
+import {MenuIcon, PencilAltIcon} from '@heroicons/react/outline';
 import { eventEmitter } from '../../utils/EventEmitter';
 import { useBoardState } from '../../contexts/BoardProvider';
 import { Avatar } from '../Avatar';
@@ -184,7 +184,7 @@ export const CardWrapper = ({
         highlightCard,
       })}
       initial={{ opacity: 0, scale: 0 }}
-      animate={{ opacity: 1, scale: 1 }}
+      animate={{ opacity: card.draft ? .5 : 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0 }}
       transition={{ delay: index * 0.1 }}
       key={card.id}
@@ -204,15 +204,26 @@ export const CardWrapper = ({
       </InputContainer>
       <CardDetails>
         <CardVotesContainer>
-          <CardVotesButton onClick={() => voteCard({ increment: true })}>
+          <CardVotesButton
+            onClick={() => voteCard({ increment: true })}
+            data-testid={`upvote-button-${index}`}
+          >
             <ArrowUpIcon className="w-6 h-6" />
           </CardVotesButton>
-          <p>{card.votes}</p>
-          <CardVotesButton onClick={() => voteCard({ increment: false })}>
+          <p data-testid={`vote-count-${index}`}>{card.votes}</p>
+          <CardVotesButton
+            onClick={() => voteCard({ increment: false })}
+            data-testid={`downvote-button-${index}`}
+          >
             <ArrowDownIcon className="w-6 h-6" />
           </CardVotesButton>
         </CardVotesContainer>
         <div className="flex items-center">
+          {card.draft && (
+            <Tooltip label="Draft card">
+              <PencilAltIcon className="w-4 h-4 mr-1"/>
+            </Tooltip>
+          )}
           {hasChildren && (
             <Tooltip label="View Cards">
               <button
