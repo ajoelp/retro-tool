@@ -55,6 +55,7 @@ export const CreateBoardForm = () => {
         label="Board Name"
         errors={errors.boardName?.message}
         {...register('boardName', { required: 'Board name is required.' })}
+        data-testid="board_title"
       />
       <TextInput
         className="mt-2"
@@ -63,8 +64,14 @@ export const CreateBoardForm = () => {
         placeholder={defaultColumns}
         errors={errors.columns?.message}
         {...register('columns', { required: 'Columns are required.' })}
+        data-testid="column_names"
       />
-      <Button type="submit" className="mt-4" isLoading={createBoardLoading}>
+      <Button
+        type="submit"
+        className="mt-4"
+        isLoading={createBoardLoading}
+        data-testid="create_board_button"
+      >
         Create
       </Button>
     </form>

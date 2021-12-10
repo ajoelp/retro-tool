@@ -27,7 +27,11 @@ export default function ConfirmationDialog(props: ConfirmationDialogProps) {
         <Button variant="white" onClick={cancelDialog} className="mr-3">
           No
         </Button>
-        <Button variant="primary" onClick={confirmDialog}>
+        <Button
+          variant="primary"
+          onClick={confirmDialog}
+          data-testid="confirm_yes"
+        >
           Yes
         </Button>
       </div>

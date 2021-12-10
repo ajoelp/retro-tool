@@ -24,7 +24,11 @@ export default function ConfirmationDialog(props: ConfirmationDialogProps) {
           Close
         </Button>
 
-        <Button variant="primary" onClick={() => confirmDialog(watch())}>
+        <Button
+          variant="primary"
+          onClick={() => confirmDialog(watch())}
+          data-testid="save_column"
+        >
           Create
         </Button>
       </div>
@@ -45,6 +49,7 @@ export default function ConfirmationDialog(props: ConfirmationDialogProps) {
             label="What should the column be named?"
             type="text"
             required
+            data-testid="column_name_field"
             {...register('name', { required: true })}
           />
           <input />
