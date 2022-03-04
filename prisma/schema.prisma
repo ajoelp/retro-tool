@@ -12,7 +12,7 @@ generator client {
 
 model User {
   id             String        @id @default(uuid())
-  githubNickname String        @unique
+  githubNickname String
   email          String        @unique
   avatar         String
   boards         Board[]

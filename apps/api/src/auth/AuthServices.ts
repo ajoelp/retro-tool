@@ -20,7 +20,7 @@ export const githubStrategyCallback = async (_accessToken, _refreshToken, profil
 
   try {
     const user = await prisma.user.upsert({
-      where: { githubNickname: profile.githubNickname },
+      where: { email: profile.email },
       create: {
         email: profile.email,
         githubNickname: profile.githubNickname,
