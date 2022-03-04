@@ -4,9 +4,7 @@ import { NextFunction, Response } from 'express';
 import { AuthenticationError } from '../errors/AuthenticationError';
 
 export const isAllowedToRegister = (organizations: string[] = []) => {
-  const allowedOrgs = (process.env.ALLOWED_ORGS || '')
-    .split(',')
-    .filter((org) => org !== '');
+  const allowedOrgs = (process.env.ALLOWED_ORGS || '').split(',').filter((org) => org !== '');
 
   if (allowedOrgs.length <= 0) return true;
   return !!organizations.find((organization) => {
@@ -14,12 +12,7 @@ export const isAllowedToRegister = (organizations: string[] = []) => {
   });
 };
 
-export const githubStrategyCallback = async (
-  _accessToken,
-  _refreshToken,
-  profile,
-  done,
-) => {
+export const githubStrategyCallback = async (_accessToken, _refreshToken, profile, done) => {
   if (!isAllowedToRegister(profile.organizations)) {
     done(new Error('Invalid organization'), null);
     return;
@@ -27,7 +20,7 @@ export const githubStrategyCallback = async (
 
   try {
     const user = await prisma.user.upsert({
-      where: { email: profile.email },
+      where: { githubNickname: profile.githubNickname },
       create: {
         email: profile.email,
         githubNickname: profile.githubNickname,
@@ -45,15 +38,9 @@ export const githubStrategyCallback = async (
   }
 };
 
-export const isAdminMiddleware = (
-  req: ApiRequest,
-  res: Response,
-  next: NextFunction,
-) => {
+export const isAdminMiddleware = (req: ApiRequest, res: Response, next: NextFunction) => {
   if (!req.user || !req.user?.isAdmin) {
-    throw new AuthenticationError(
-      'The user does not have the required permissions.',
-    );
+    throw new AuthenticationError('The user does not have the required permissions.');
   }
   next();
 };
