@@ -19,6 +19,7 @@ const boardResource = new BoardResource();
 const userRepository = new UserRepository();
 
 export class BoardsController {
+
   async index(req: ApiRequest, res: Response) {
     const boards = await prisma.boardAccess.findMany({
       where: {
@@ -26,6 +27,11 @@ export class BoardsController {
         board: {
           deleted: null,
         },
+      },
+      orderBy: {
+        board: {
+          createdAt: 'desc'
+        }
       },
       include: {
         board: {
