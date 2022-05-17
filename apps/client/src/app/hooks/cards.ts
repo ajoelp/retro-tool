@@ -2,6 +2,7 @@ import { apiClient } from './../api';
 import { useMutation, useQuery } from 'react-query';
 import { Card, Column } from '@prisma/client';
 import { CardType } from '@retro-tool/api-interfaces';
+import { useCallback, useRef, useState } from 'react';
 
 export function useCards(columnId: string) {
   const { data, isLoading, refetch } = useQuery(['cards', columnId], async () => {
@@ -48,13 +49,47 @@ export function useUpdateCard() {
 
 export type VoteCardArgs = {
   increment: boolean;
+  times: number;
 };
-export function useVoteCard(cardId: string) {
-  const { mutateAsync, isLoading } = useMutation(({ increment }: VoteCardArgs) =>
-    apiClient.post(`/cards/${cardId}/vote`, { increment }),
+
+type GenericFunction = (...args: any[]) => any;
+function useDebounceWithCalls<T extends GenericFunction>(fn: T, timeout = 300) {
+  const timer = useRef<NodeJS.Timer>();
+  const [calls, setCalls] = useState(1);
+
+  const method = useCallback(
+    (...args: Parameters<T>) => {
+      if (timer.current) {
+        clearTimeout(timer.current);
+      }
+      setCalls((c) => c + 1);
+      timer.current = setTimeout(async () => {
+        setCalls(0);
+        fn(...args);
+      }, 300);
+    },
+    [fn],
   );
+
+  return [method, calls] as [T, number];
+}
+
+export function useVoteCard(cardId: string) {
+  const { mutateAsync, isLoading } = useMutation(({ increment, times = 0 }: VoteCardArgs) =>
+    apiClient.post(`/cards/${cardId}/vote`, { increment, times }),
+  );
+
+  const [debouncedMutate, calls] = useDebounceWithCalls(mutateAsync);
+
+  const voteCard = useCallback(
+    ({ increment }: Omit<VoteCardArgs, 'times'>) => {
+      return debouncedMutate({ increment, times: calls });
+    },
+    [calls, debouncedMutate],
+  );
+
   return {
-    voteCard: mutateAsync,
+    voteCard,
     voteLoading: isLoading,
   };
 }

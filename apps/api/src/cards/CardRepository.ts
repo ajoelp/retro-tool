@@ -1,8 +1,5 @@
 import { prisma } from '../prismaClient';
-import {
-  CARD_DELETED_EVENT_NAME,
-  CARD_UPDATED_EVENT_NAME,
-} from '@retro-tool/api-interfaces';
+import { CARD_DELETED_EVENT_NAME, CARD_UPDATED_EVENT_NAME } from '@retro-tool/api-interfaces';
 import dependencies from '../dependencies';
 
 export class CardRepository {
@@ -46,7 +43,7 @@ export class CardRepository {
     });
   }
 
-  async vote(id: string, increment: boolean) {
+  async vote(id: string, increment: boolean, times = 1) {
     const method = increment ? 'increment' : 'decrement';
 
     const card = await prisma.card.update({
@@ -54,7 +51,7 @@ export class CardRepository {
         id,
       },
       data: {
-        votes: { [method]: 1 },
+        votes: { [method]: times },
       },
       include: {
         children: {
@@ -90,7 +87,7 @@ export class CardRepository {
       dependencies.namespaceService.sendEventToUser(card.ownerId, card.column.boardId, {
         type: CARD_UPDATED_EVENT_NAME,
         payload: card,
-      })
+      });
     } else {
       dependencies.namespaceService.sendEventToBoard(card.column.boardId, {
         type: CARD_UPDATED_EVENT_NAME,
@@ -106,7 +103,7 @@ export class CardRepository {
         dependencies.namespaceService.sendEventToUser(card.ownerId, card.column.boardId, {
           type: CARD_UPDATED_EVENT_NAME,
           payload: parentCard,
-        })
+        });
       } else {
         dependencies.namespaceService.sendEventToBoard(card.column.boardId, {
           type: CARD_UPDATED_EVENT_NAME,

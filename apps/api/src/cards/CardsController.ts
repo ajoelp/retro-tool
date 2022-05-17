@@ -84,8 +84,8 @@ export class CardsController {
 
   async vote(req: ApiRequest, res: Response) {
     const { cardId } = req.params;
-    const { increment = true } = req.body;
-    const card = await cardRepository.vote(cardId, increment);
+    const { increment = true, times = 1 } = req.body;
+    const card = await cardRepository.vote(cardId, increment, times);
     return res.json({ card });
   }
 
