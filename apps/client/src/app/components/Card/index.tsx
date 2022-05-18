@@ -1,13 +1,8 @@
 import { Column } from '@prisma/client';
-import { forwardRef, useEffect, useMemo, useState } from 'react';
+import { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useAuth } from '../../contexts/AuthProvider';
-import {
-  useDeleteCard,
-  useFocusCard,
-  useUpdateCard,
-  useVoteCard,
-} from '../../hooks/cards';
+import { useDeleteCard, useFocusCard, useUpdateCard, useVoteCard } from '../../hooks/cards';
 import { Spinner } from '@chakra-ui/react';
 import { CardType } from '@retro-tool/api-interfaces';
 import { primaryColor } from '../../theme/colors';
@@ -18,7 +13,7 @@ import {
   DraggingStyle,
   NotDraggingStyle,
 } from 'react-beautiful-dnd';
-import {MenuIcon, PencilAltIcon} from '@heroicons/react/outline';
+import { MenuIcon, PencilAltIcon } from '@heroicons/react/outline';
 import { eventEmitter } from '../../utils/EventEmitter';
 import { useBoardState } from '../../contexts/BoardProvider';
 import { Avatar } from '../Avatar';
@@ -26,15 +21,10 @@ import { classNames } from '../../utils/classNames';
 import { AlertBadge } from '../AlertBadge';
 import { Tooltip } from '../Tooltip';
 import { Textarea } from '../Textarea';
-import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-  EyeIcon,
-  TrashIcon,
-  ViewGridIcon,
-} from '@heroicons/react/solid';
-import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowDownIcon, ArrowUpIcon, EyeIcon, TrashIcon, ViewGridIcon } from '@heroicons/react/solid';
+import { animate, AnimatePresence, motion } from 'framer-motion';
 import { useDialogs } from '../../dialog-manager';
+import { usePrevious } from 'react-use';
 
 type CardProps = {
   column?: Column;
@@ -93,10 +83,7 @@ const IconButton = styled.button`
   margin: 0 0.5rem;
 `;
 
-function getStyle(
-  style: DraggingStyle | NotDraggingStyle | undefined,
-  snapshot: DraggableStateSnapshot,
-) {
+function getStyle(style: DraggingStyle | NotDraggingStyle | undefined, snapshot: DraggableStateSnapshot) {
   if (!snapshot.isDragging) return {};
   if (!snapshot.isDropAnimating) return style;
   return {
@@ -111,17 +98,38 @@ type ContainerClassOptions = {
   highlightCard: boolean;
 };
 
-const containerClasses = ({
-  isDragging,
-  isGroupedOver,
-  highlightCard,
-}: ContainerClassOptions) => {
+const containerClasses = ({ isDragging, isGroupedOver, highlightCard }: ContainerClassOptions) => {
   return classNames(
     'bg-white dark:text-white dark:bg-gray-800 relative w-full min-h-64 mb-2 flex flex-col rounded z-10 top-0 left-0 focus-within:ring overflow-hidden',
     isDragging && 'opacity-80',
     (isGroupedOver || highlightCard) && 'ring',
   );
 };
+
+type CounterProps = { value: number };
+function Counter({ value }: CounterProps) {
+  const [current, setCurrent] = useState(value ?? 0);
+  const nodeRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    const node = nodeRef.current;
+    if (!node) return;
+    const controls = animate(current, value, {
+      duration: 2,
+      onUpdate(newValue) {
+        console.log(newValue);
+        node.textContent = newValue.toFixed(0) ?? '0';
+      },
+      onComplete() {
+        setCurrent(value);
+      },
+    });
+
+    return () => controls.stop();
+  }, [current, value]);
+
+  return <p ref={nodeRef} />;
+}
 
 type CardWrapperProps = {
   card: CardType;
@@ -130,13 +138,7 @@ type CardWrapperProps = {
   hasChildren: boolean;
   index: number;
 };
-export const CardWrapper = ({
-  card,
-  isDragging,
-  isGroupedOver,
-  hasChildren,
-  index,
-}: CardWrapperProps) => {
+export const CardWrapper = ({ card, isDragging, isGroupedOver, hasChildren, index }: CardWrapperProps) => {
   const { user } = useAuth();
   const { voteCard } = useVoteCard(card.id);
   const { deleteCard, deleteCardLoading } = useDeleteCard(card.id);
@@ -184,7 +186,7 @@ export const CardWrapper = ({
         highlightCard,
       })}
       initial={{ opacity: 0, scale: 0 }}
-      animate={{ opacity: card.draft ? .5 : 1, scale: 1 }}
+      animate={{ opacity: card.draft ? 0.5 : 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0 }}
       transition={{ delay: index * 0.1 }}
       key={card.id}
@@ -204,24 +206,18 @@ export const CardWrapper = ({
       </InputContainer>
       <CardDetails>
         <CardVotesContainer>
-          <CardVotesButton
-            onClick={() => voteCard({ increment: true })}
-            data-testid={`upvote-button-${index}`}
-          >
+          <CardVotesButton onClick={() => voteCard({ increment: true })} data-testid={`upvote-button-${index}`}>
             <ArrowUpIcon className="w-6 h-6" />
           </CardVotesButton>
-          <p data-testid={`vote-count-${index}`}>{card.votes}</p>
-          <CardVotesButton
-            onClick={() => voteCard({ increment: false })}
-            data-testid={`downvote-button-${index}`}
-          >
+          <Counter value={card.votes} />
+          <CardVotesButton onClick={() => voteCard({ increment: false })} data-testid={`downvote-button-${index}`}>
             <ArrowDownIcon className="w-6 h-6" />
           </CardVotesButton>
         </CardVotesContainer>
         <div className="flex items-center">
           {card.draft && (
             <Tooltip label="Draft card">
-              <PencilAltIcon className="w-4 h-4 mr-1"/>
+              <PencilAltIcon className="w-4 h-4 mr-1" />
             </Tooltip>
           )}
           {hasChildren && (
@@ -241,19 +237,13 @@ export const CardWrapper = ({
             (isBoardOwner && (
               <Tooltip label="Delete card">
                 <IconButton onClick={() => deleteCard()}>
-                  {deleteCardLoading ? (
-                    <Spinner />
-                  ) : (
-                    <TrashIcon className="w-4 h-4" />
-                  )}
+                  {deleteCardLoading ? <Spinner /> : <TrashIcon className="w-4 h-4" />}
                 </IconButton>
               </Tooltip>
             ))}
           {isBoardOwner && (
             <Tooltip label="Focus card">
-              <IconButton onClick={() => focusCard()}>
-                {<EyeIcon className="w-4 h-4" />}
-              </IconButton>
+              <IconButton onClick={() => focusCard()}>{<EyeIcon className="w-4 h-4" />}</IconButton>
             </Tooltip>
           )}
           <Tooltip label={card.owner.githubNickname}>
@@ -265,52 +255,39 @@ export const CardWrapper = ({
   );
 };
 
-export const Card = forwardRef<HTMLDivElement, CardProps>(
-  ({ card, index }, ref) => {
-    const { user } = useAuth();
-    const hasChildren = useMemo(() => {
-      if (!card.children) return false;
-      return card.children.length > 0;
-    }, [card]);
+export const Card = forwardRef<HTMLDivElement, CardProps>(({ card, index }, ref) => {
+  const { user } = useAuth();
+  const hasChildren = useMemo(() => {
+    if (!card.children) return false;
+    return card.children.length > 0;
+  }, [card]);
 
-    const isCardOwner = user?.id === card.ownerId;
+  const isCardOwner = user?.id === card.ownerId;
 
-    return (
-      <Draggable
-        key={card.id}
-        draggableId={card.id}
-        index={index}
-        isDragDisabled={!isCardOwner}
-      >
-        {(
-          dragProvided: DraggableProvided,
-          dragSnapshot: DraggableStateSnapshot,
-        ) => (
-          <AnimatePresence>
-            <div
-              className="relative w-full"
-              {...dragProvided.draggableProps}
-              {...dragProvided.dragHandleProps}
-              data-testid={`card-${index}`}
-              ref={dragProvided.innerRef}
-              style={getStyle(dragProvided.draggableProps.style, dragSnapshot)}
-            >
-              <div ref={ref} />
-              <AlertBadge
-                count={card.children?.length ?? 0}
-                show={hasChildren}
-              />
-              <CardWrapper
-                card={card}
-                isDragging={dragSnapshot.isDragging}
-                isGroupedOver={Boolean(dragSnapshot.combineTargetFor)}
-                hasChildren={hasChildren}
-                index={index}
-              />
-            </div>
-          </AnimatePresence>
-        )}
-      </Draggable>
-    );
-  },
-);
+  return (
+    <Draggable key={card.id} draggableId={card.id} index={index} isDragDisabled={!isCardOwner}>
+      {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
+        <AnimatePresence>
+          <div
+            className="relative w-full"
+            {...dragProvided.draggableProps}
+            {...dragProvided.dragHandleProps}
+            data-testid={`card-${index}`}
+            ref={dragProvided.innerRef}
+            style={getStyle(dragProvided.draggableProps.style, dragSnapshot)}
+          >
+            <div ref={ref} />
+            <AlertBadge count={card.children?.length ?? 0} show={hasChildren} />
+            <CardWrapper
+              card={card}
+              isDragging={dragSnapshot.isDragging}
+              isGroupedOver={Boolean(dragSnapshot.combineTargetFor)}
+              hasChildren={hasChildren}
+              index={index}
+            />
+          </div>
+        </AnimatePresence>
+      )}
+    </Draggable>
+  );
+});
