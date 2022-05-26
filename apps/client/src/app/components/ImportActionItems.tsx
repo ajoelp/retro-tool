@@ -71,9 +71,6 @@ export default function InportActionItems({ boardId }: ImportActionItemsProps) {
                             <span className={classNames(selected ? 'font-semibold' : 'font-normal', 'truncate')}>
                               {board.title}
                             </span>
-                            <span className={classNames(active ? 'text-indigo-200' : 'text-gray-500', 'ml-2 truncate')}>
-                              {board.createdAt}
-                            </span>
                           </div>
 
                           {selected ? (
