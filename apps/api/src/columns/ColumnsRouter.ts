@@ -11,11 +11,7 @@ import { User } from '@prisma/client';
 const ColumnsRouter = Router();
 const columnsController = new ColumnsController();
 
-const canViewBoard = async (
-  req: ApiRequest,
-  res: Response,
-  next: NextFunction,
-) => {
+export const canViewBoard = async (req: ApiRequest, res: Response, next: NextFunction) => {
   const { boardId } = req.params;
   const { id: userId } = req.user as User;
 
@@ -30,11 +26,7 @@ const canViewBoard = async (
   next();
 };
 
-export const canUpdateBoard = async (
-  req: ApiRequest,
-  res: Response,
-  next: NextFunction,
-) => {
+export const canUpdateBoard = async (req: ApiRequest, res: Response, next: NextFunction) => {
   const { boardId } = req.params;
 
   if (!boardId) throw new Error('boardId not supplied to route');
@@ -43,8 +35,7 @@ export const canUpdateBoard = async (
 
   if (!board) throw new NotFoundError(`Board ${boardId} not found.`);
 
-  if (board.ownerId !== req.user.id)
-    throw new AuthenticationError('Unauthorized');
+  if (board.ownerId !== req.user.id) throw new AuthenticationError('Unauthorized');
 
   next();
 };
@@ -60,28 +51,12 @@ ColumnsRouter.get(COLUMNS_ROOT, [
   columnsController.index,
 ]);
 
-ColumnsRouter.post(COLUMNS_ROOT, [
-  authenticatedMiddleware,
-  canUpdateBoard,
-  columnsController.create,
-]);
+ColumnsRouter.post(COLUMNS_ROOT, [authenticatedMiddleware, canUpdateBoard, columnsController.create]);
 
-ColumnsRouter.patch(COLUMNS_SINGULAR, [
-  authenticatedMiddleware,
-  canUpdateBoard,
-  columnsController.update,
-]);
+ColumnsRouter.patch(COLUMNS_SINGULAR, [authenticatedMiddleware, canUpdateBoard, columnsController.update]);
 
-ColumnsRouter.delete(COLUMNS_SINGULAR, [
-  authenticatedMiddleware,
-  canUpdateBoard,
-  columnsController.destroy,
-]);
+ColumnsRouter.delete(COLUMNS_SINGULAR, [authenticatedMiddleware, canUpdateBoard, columnsController.destroy]);
 
-ColumnsRouter.post(COLUMNS_REORDER, [
-  authenticatedMiddleware,
-  canUpdateBoard,
-  columnsController.updateOrder,
-]);
+ColumnsRouter.post(COLUMNS_REORDER, [authenticatedMiddleware, canUpdateBoard, columnsController.updateOrder]);
 
 export { ColumnsRouter };

@@ -33,6 +33,17 @@ model Board {
   boardAccesses BoardAccess[]
   timer         Json?
   deleted       DateTime?
+  actionItems    ActionItem[]
+}
+
+model ActionItem {
+  id        String   @id @default(uuid())
+  value     String
+  complete  Boolean
+  createdAt DateTime @default(now())
+
+  boardId String
+  board   Board  @relation(fields: [boardId], references: [id])
 }
 
 model BoardAccess {

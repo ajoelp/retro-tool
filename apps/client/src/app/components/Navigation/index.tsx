@@ -11,6 +11,7 @@ import { MoonIcon, SunIcon } from '@heroicons/react/solid';
 import { Button } from '../Button';
 import { Tooltip } from '../Tooltip';
 import { Timer } from '../Timer';
+import { useActionItems } from '../../hooks/action-items';
 
 const NavigationWrapper = styled.div`
   margin: 1rem auto;
@@ -36,6 +37,7 @@ export function Navigation() {
   const { openDialog } = useDialogs();
   const activeUsers = useActiveUsers(board!.id);
   const { theme, toggleTheme } = useColorPreferences();
+  const { data: actionItems } = useActionItems(board?.id);
 
   const DarkModeIcon = theme === 'dark' ? SunIcon : MoonIcon;
 
@@ -69,22 +71,20 @@ export function Navigation() {
       <Button size="sm" variant="white" className="ml-2" onClick={toggleTheme}>
         <DarkModeIcon className="w-4 h-4" />
       </Button>
+      <Button
+        size="sm"
+        variant="white"
+        className="ml-2"
+        onClick={() => openDialog('actionitems', { boardId: board.id })}
+      >
+        Action Items {actionItems?.length ? `(${actionItems.length})` : ''}
+      </Button>
       {isBoardOwner && (
         <>
-          <Button
-            size="sm"
-            variant="white"
-            className="ml-2"
-            onClick={() => openDialog('boardInfo', { board })}
-          >
+          <Button size="sm" variant="white" className="ml-2" onClick={() => openDialog('boardInfo', { board })}>
             Invite
           </Button>
-          <Button
-            size="sm"
-            variant="white"
-            className="ml-2"
-            onClick={() => openDialog('boardExport', { board })}
-          >
+          <Button size="sm" variant="white" className="ml-2" onClick={() => openDialog('boardExport', { board })}>
             Export
           </Button>
         </>

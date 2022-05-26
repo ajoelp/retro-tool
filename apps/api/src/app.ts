@@ -6,9 +6,7 @@ import { ColumnsRouter } from './columns/ColumnsRouter';
 import { CardsRouter } from './cards/CardsRouter';
 import { Server } from 'socket.io';
 import http from 'http';
-import globalErrorMiddleware, {
-  buildError,
-} from './middleware/globalErrorMiddleware';
+import globalErrorMiddleware, { buildError } from './middleware/globalErrorMiddleware';
 import { AuthRouter } from './auth/AuthRouter';
 import passport from 'passport';
 import helmet from 'helmet';
@@ -16,6 +14,7 @@ import dependencies from './dependencies';
 import { InvitesRouter } from './invites/InvitesRouter';
 import { UsersRouter } from './users/UsersRouter';
 import expressSession from 'express-session';
+import { ActionItemRouter } from './action-items/ActionItemRouter';
 
 const expressApp = express();
 
@@ -49,6 +48,7 @@ expressApp.use(CardsRouter);
 expressApp.use(AuthRouter);
 expressApp.use(InvitesRouter);
 expressApp.use(UsersRouter);
+expressApp.use(ActionItemRouter);
 
 expressApp.use(globalErrorMiddleware);
 

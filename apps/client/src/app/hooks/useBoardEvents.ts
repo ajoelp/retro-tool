@@ -3,6 +3,9 @@ import { useIgnoredEvents } from '../contexts/IgnoredEventsContext';
 import { io, Socket } from 'socket.io-client';
 import { useCallback, useEffect, useRef } from 'react';
 import {
+  ACTION_ITEM_CREATED_EVENT_NAME,
+  ACTION_ITEM_DELETED_EVENT_NAME,
+  ACTION_ITEM_UPDATED_EVENT_NAME,
   BOARD_UPDATED_EVENT_NAME,
   BOARD_USERS_EVENT_NAME,
   CARD_CREATED_EVENT_NAME,
@@ -15,11 +18,12 @@ import {
   SocketEvents,
 } from '@retro-tool/api-interfaces';
 import { useQueryClient } from 'react-query';
-import { Board, Card, Column } from '@prisma/client';
+import { ActionItem, Board, Card, Column } from '@prisma/client';
 import Cookies from 'js-cookie';
 import { environment } from '../../environments/environment.prod';
 import update from 'immutability-helper';
 import { eventEmitter } from '../utils/EventEmitter';
+import { lowerFirst } from 'lodash';
 
 type EventType = SocketEvents & { eventTrackingId?: string };
 
@@ -32,6 +36,31 @@ export function useBoardEvents(boardId?: string) {
     (event: EventType) => {
       if (event.eventTrackingId && ignoredEvents.includes(event.eventTrackingId)) return;
       switch (event.type) {
+        case ACTION_ITEM_CREATED_EVENT_NAME:
+          queryClient.setQueryData<ActionItem[]>(['actionItems', { boardId: event.payload.boardId }], (oldData) =>
+            update(oldData ?? [], { $push: [event.payload] }),
+          );
+          return;
+        case ACTION_ITEM_UPDATED_EVENT_NAME:
+          queryClient.setQueryData<ActionItem[]>(
+            ['actionItems', { boardId: event.payload.boardId }],
+            (oldData = []) => {
+              const index = oldData.findIndex((column) => column.id === event.payload.id);
+              return update(oldData, {
+                [index]: { $set: event.payload },
+              });
+            },
+          );
+          return;
+        case ACTION_ITEM_DELETED_EVENT_NAME:
+          queryClient.setQueryData<ActionItem[]>(
+            ['actionItems', { boardId: event.payload.boardId }],
+            (oldData = []) => {
+              const index = oldData.findIndex((actionItem) => actionItem.id === event.payload.id);
+              return update(oldData, { $splice: [[index, 1]] });
+            },
+          );
+          return;
         case CARD_CREATED_EVENT_NAME:
           queryClient.setQueryData<Card[]>(['cards', event.payload.columnId], (oldData) =>
             update(oldData ?? [], { $push: [event.payload] }),
