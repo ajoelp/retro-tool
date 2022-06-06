@@ -15,7 +15,7 @@ type BaseDialogProps = {
   size?: keyof typeof Sizes;
 };
 
-export function BaseDialog({ children, closeDialog, footer: Footer, active, size = 'sm' }: BaseDialogProps) {
+export function BaseDialog({ children, closeDialog, footer: Footer, active = true, size = 'sm' }: BaseDialogProps) {
   return (
     <AnimatePresence>
       <div className="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
