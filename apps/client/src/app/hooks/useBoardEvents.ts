@@ -17,7 +17,7 @@ import {
   COLUMN_UPDATED_EVENT_NAME,
   SocketEvents,
 } from '@retro-tool/api-interfaces';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { ActionItem, Board, Card, Column } from '@prisma/client';
 import Cookies from 'js-cookie';
 import { environment } from '../../environments/environment.prod';

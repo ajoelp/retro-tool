@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { createContext, ReactNode, useContext, useEffect } from 'react';
 import { User } from '@prisma/client';
 import { apiClient } from '../api';

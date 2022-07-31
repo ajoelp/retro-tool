@@ -23,10 +23,15 @@ export async function canEditCard(
   if (!cardId) throw new Error(CardAccessError);
 
   const user = req.user as User;
-  const card = await prisma.card.findFirst({ where: { id: cardId } });
+  const card = await prisma.card.findFirst({ where: { id: cardId }, include: { column: { include: { board: { select: { ownerId: true  }}}}}});
 
-  if (!card || !user || user.id !== card.ownerId)
+  if (!card || !user) {
     throw new Error(CardAccessError);
+  }
+
+  if(user.id !== card.ownerId && user.id !== card.column.board.ownerId) {
+    throw new Error(CardAccessError);
+  }
 
   next();
 }

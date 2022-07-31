@@ -1,5 +1,5 @@
 import { Board } from '.prisma/client';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../api';
 
 export const useInvite = (inviteCode?: string) => {

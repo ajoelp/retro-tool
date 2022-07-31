@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { ReactNode } from 'hoist-non-react-statics/node_modules/@types/react';
+import {ReactNode} from "react";
 
 const Sizes = {
   sm: 'sm:max-w-lg sm:w-full',
