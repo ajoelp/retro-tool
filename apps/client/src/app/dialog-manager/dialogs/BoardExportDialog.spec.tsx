@@ -2,7 +2,7 @@ import { Board } from '@prisma/client';
 import { render } from '@testing-library/react';
 import BoardExportDialog from './BoardExportDialog';
 
-jest.mock('react-query', () => ({
+jest.mock('@tanstack/react-query', () => ({
   useQueryClient: jest.fn().mockReturnValue({
     getQueryData: jest.fn().mockReturnValue(null),
   }),

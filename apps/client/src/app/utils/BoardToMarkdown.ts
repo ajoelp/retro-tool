@@ -1,5 +1,5 @@
 import { Board, Card, Column, User } from '@prisma/client';
-import { QueryClient } from 'react-query';
+import { QueryClient } from '@tanstack/react-query';
 
 const NL = '\n';
 

@@ -1,7 +1,3 @@
-import {
-  CustomDomComponent,
-  CustomMotionComponentConfig,
-} from 'framer-motion/types/render/dom/motion-proxy';
 import * as React from 'react';
 
 const actual = jest.requireActual('framer-motion');
@@ -9,8 +5,8 @@ const actual = jest.requireActual('framer-motion');
 // https://github.com/framer/motion/blob/main/src/render/dom/motion.ts
 function custom<Props>(
   Component: string | React.ComponentType<Props>,
-  _customMotionComponentConfig: CustomMotionComponentConfig = {},
-): CustomDomComponent<Props> {
+  _customMotionComponentConfig: any = {},
+): any {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   return React.forwardRef((props, ref) => {

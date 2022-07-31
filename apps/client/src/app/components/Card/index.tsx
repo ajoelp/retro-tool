@@ -24,7 +24,6 @@ import { Textarea } from '../Textarea';
 import { ArrowDownIcon, ArrowUpIcon, EyeIcon, TrashIcon, ViewGridIcon } from '@heroicons/react/solid';
 import { animate, AnimatePresence, motion } from 'framer-motion';
 import { useDialogs } from '../../dialog-manager';
-import { usePrevious } from 'react-use';
 
 type CardProps = {
   column?: Column;
@@ -233,14 +232,13 @@ export const CardWrapper = ({ card, isDragging, isGroupedOver, hasChildren, inde
               </button>
             </Tooltip>
           )}
-          {isCardOwner ||
-            (isBoardOwner && (
+          {(isCardOwner || isBoardOwner) && (
               <Tooltip label="Delete card">
                 <IconButton onClick={() => deleteCard()}>
                   {deleteCardLoading ? <Spinner /> : <TrashIcon className="w-4 h-4" />}
                 </IconButton>
               </Tooltip>
-            ))}
+            )}
           {isBoardOwner && (
             <Tooltip label="Focus card">
               <IconButton onClick={() => focusCard()}>{<EyeIcon className="w-4 h-4" />}</IconButton>

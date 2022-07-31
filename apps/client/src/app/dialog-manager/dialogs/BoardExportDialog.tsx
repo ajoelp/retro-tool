@@ -1,7 +1,7 @@
 import { Board } from '@prisma/client';
 import { DialogProps } from 'dialog-manager-react';
 import { useMemo } from 'react';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useCopyToClipboard } from 'react-use';
 import { Button } from '../../components/Button';
 import { BoardToMarkdown } from '../../utils/BoardToMarkdown';

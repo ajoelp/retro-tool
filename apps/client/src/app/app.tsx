@@ -5,9 +5,9 @@ import {
   useLocation,
   useRoutes,
 } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DialogManager } from './dialog-manager';
-import { ReactQueryDevtools } from 'react-query/devtools';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AuthProvider, useAuth } from './contexts/AuthProvider';
 import { lazy, Suspense } from 'react';
 import { IgnoredEventsProvider } from './contexts/IgnoredEventsContext';
@@ -73,7 +73,7 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 
 export const Navigation = () => {
   const element = useRoutes(routes);
-  return <Suspense fallback={<Spinner />}>{element}</Suspense>;
+  return <Suspense fallback={<Spinner className="w-8 h-8" />}>{element}</Suspense>;
 };
 
 export const App = () => {

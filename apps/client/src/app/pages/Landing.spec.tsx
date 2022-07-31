@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import Landing from './Landing';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthProvider';
 import { useQueryParams } from '../hooks/useQueryParams';

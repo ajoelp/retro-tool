@@ -1,5 +1,5 @@
 import { Board } from '.prisma/client';
-import { useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient, BoardWithColumn } from '../api';
 import { User } from '@prisma/client';
 import { PausedState, StartState } from '@retro-tool/api-interfaces';

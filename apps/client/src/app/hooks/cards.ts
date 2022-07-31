@@ -1,5 +1,5 @@
 import { apiClient } from './../api';
-import { useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Card, Column } from '@prisma/client';
 import { CardType } from '@retro-tool/api-interfaces';
 import { useCallback, useRef, useState } from 'react';

@@ -1,7 +1,7 @@
 import { useBoardState } from './../contexts/BoardProvider';
 import { useIgnoredEvents } from '../contexts/IgnoredEventsContext';
 import { apiClient } from '../api';
-import { useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { v4 as uuid } from 'uuid';
 import { Column } from '@prisma/client';
 
