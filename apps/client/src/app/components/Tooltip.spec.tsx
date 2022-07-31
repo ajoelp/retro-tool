@@ -10,6 +10,7 @@ describe('Tooltip', () => {
     let element: HTMLParagraphElement | null = null;
 
     await act(async () => {
+
       render(
         <Tooltip label={tooltipValue}>
           <p
@@ -21,6 +22,8 @@ describe('Tooltip', () => {
           </p>
         </Tooltip>,
       );
+    });
+
       expect(element).toBeDefined();
       fireEvent.mouseOver(element!);
       jest.advanceTimersByTime(5000);
@@ -28,6 +31,5 @@ describe('Tooltip', () => {
       fireEvent.mouseLeave(element!);
       jest.advanceTimersByTime(5000);
       expect(screen.queryByText(tooltipValue)).not.toBeInTheDocument();
-    });
   });
 });

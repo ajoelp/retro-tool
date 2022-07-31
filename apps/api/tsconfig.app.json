@@ -5,6 +5,6 @@
     "module": "commonjs",
     "types": ["node", "express"]
   },
-  "exclude": ["**/*.spec.ts", "jest.setup.ts"],
+  "exclude": ["**/*.spec.ts", "jest.setup.ts", "jest.config.ts"],
   "include": ["src/**/*", "prisma-test-environment.ts"]
 }

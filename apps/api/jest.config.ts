@@ -1,6 +1,7 @@
+/* eslint-disable */
 const path = require('path');
 
-module.exports = {
+export default {
   displayName: 'api',
   preset: '../../jest.preset.js',
   verbose: true,
