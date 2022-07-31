@@ -6,13 +6,13 @@ import {
   useRoutes,
 } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { Spinner } from '@chakra-ui/react';
 import { DialogManager } from './dialog-manager';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { AuthProvider, useAuth } from './contexts/AuthProvider';
 import { lazy, Suspense } from 'react';
 import { IgnoredEventsProvider } from './contexts/IgnoredEventsContext';
 import { ColorPreferencesWrapper } from './hooks/useDarkMode';
+import { Spinner } from './components/Spinner';
 
 const queryClient = new QueryClient({
   defaultOptions: {

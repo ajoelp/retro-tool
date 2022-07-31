@@ -2,7 +2,7 @@ import { prisma } from '../prismaClient';
 import { Board, Column, User } from '@prisma/client';
 import { TestCase } from '../utils/TestCase';
 import dependencies from '../dependencies';
-import { CARD_FOCUS_EVENT_NAME } from '@retro-tool/api-interfaces';
+import {CARD_FOCUS_EVENT_NAME, CARD_UPDATED_EVENT_NAME} from '@retro-tool/api-interfaces';
 
 jest.mock('../dependencies', () => ({
   namespaceService: {
@@ -378,12 +378,12 @@ describe('CardsController', () => {
         },
       });
 
-      const response = await TestCase.make().actingAs(user).post('/bulk-cards/publish');
+      const response = await TestCase.make().actingAs(user).post('/bulk/cards/publish');
 
       expect(response.status).toEqual(200);
       expect((await prisma.card.findFirst({ where: { id: card2.id } })).draft).toEqual(false);
       expect(sendEventToBoardSpy).toHaveBeenCalledWith(board.id, {
-        type: CARD_FOCUS_EVENT_NAME,
+        type: CARD_UPDATED_EVENT_NAME,
         payload: expect.objectContaining({ id: card2.id }),
       });
     });

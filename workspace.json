@@ -2,12 +2,13 @@
   "version": 2,
   "projects": {
     "api": {
+      "$schema": "../../node_modules/nx/schemas/project-schema.json",
       "root": "apps/api",
       "sourceRoot": "apps/api/src",
       "projectType": "application",
       "targets": {
         "build": {
-          "executor": "@nrwl/node:build",
+          "executor": "@nrwl/node:webpack",
           "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/apps/api",
@@ -31,7 +32,7 @@
           "generatePackageJson": true
         },
         "serve": {
-          "executor": "@nrwl/node:execute",
+          "executor": "@nrwl/node:node",
           "options": {
             "buildTarget": "api:build"
           }
@@ -47,7 +48,7 @@
           "executor": "@nrwl/jest:jest",
           "outputs": ["coverage/apps/api"],
           "options": {
-            "jestConfig": "apps/api/jest.config.js",
+            "jestConfig": "apps/api/jest.config.ts",
             "passWithNoTests": true
           }
         }
@@ -55,6 +56,7 @@
       "tags": []
     },
     "api-interfaces": {
+      "$schema": "../../node_modules/nx/schemas/project-schema.json",
       "root": "libs/api-interfaces",
       "sourceRoot": "libs/api-interfaces/src",
       "projectType": "library",
@@ -70,12 +72,13 @@
       "tags": []
     },
     "client": {
+      "$schema": "../../node_modules/nx/schemas/project-schema.json",
       "root": "apps/client",
       "sourceRoot": "apps/client/src",
       "projectType": "application",
       "targets": {
         "build": {
-          "executor": "@nrwl/web:build",
+          "executor": "@nrwl/web:webpack",
           "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/apps/client",
@@ -111,8 +114,15 @@
                   "maximumError": "1mb"
                 }
               ]
+            },
+            "development": {
+              "extractLicenses": false,
+              "optimization": false,
+              "sourceMap": true,
+              "vendorChunk": true
             }
-          }
+          },
+          "defaultConfiguration": "production"
         },
         "serve": {
           "executor": "@nrwl/web:dev-server",
@@ -125,8 +135,12 @@
             "production": {
               "buildTarget": "client:build:production",
               "hmr": false
+            },
+            "development": {
+              "buildTarget": "client:build:development"
             }
-          }
+          },
+          "defaultConfiguration": "development"
         },
         "lint": {
           "executor": "@nrwl/linter:eslint",
@@ -139,7 +153,7 @@
           "executor": "@nrwl/jest:jest",
           "outputs": ["coverage/apps/client"],
           "options": {
-            "jestConfig": "apps/client/jest.config.js",
+            "jestConfig": "apps/client/jest.config.ts",
             "passWithNoTests": true
           }
         }
@@ -147,6 +161,7 @@
       "tags": []
     },
     "client-e2e": {
+      "$schema": "../../node_modules/nx/schemas/project-schema.json",
       "root": "apps/client-e2e",
       "sourceRoot": "apps/client-e2e/src",
       "projectType": "application",
@@ -175,12 +190,13 @@
       "implicitDependencies": ["client"]
     },
     "scripts": {
+      "$schema": "../../node_modules/nx/schemas/project-schema.json",
       "root": "apps/scripts",
       "sourceRoot": "apps/scripts/src",
       "projectType": "application",
       "targets": {
         "build": {
-          "executor": "@nrwl/node:build",
+          "executor": "@nrwl/node:webpack",
           "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/apps/scripts",
@@ -196,7 +212,7 @@
           }
         },
         "serve": {
-          "executor": "@nrwl/node:execute",
+          "executor": "@nrwl/node:node",
           "options": {
             "buildTarget": "scripts:build"
           }
@@ -212,12 +228,13 @@
           "executor": "@nrwl/jest:jest",
           "outputs": ["coverage/apps/scripts"],
           "options": {
-            "jestConfig": "apps/scripts/jest.config.js",
+            "jestConfig": "apps/scripts/jest.config.ts",
             "passWithNoTests": true
           }
         }
       },
       "tags": []
     }
-  }
+  },
+  "$schema": "./node_modules/nx/schemas/workspace-schema.json"
 }
