@@ -9,7 +9,7 @@ import {
 } from 'react-beautiful-dnd';
 import { useBoard } from '../../hooks/boards';
 import { useDialogs } from '../../dialog-manager';
-import { useDeleteColumn } from '../../hooks/columns';
+import { useDeleteColumn, useSortByVotes } from '../../hooks/columns';
 import { useCards, useCreateCard, usePublishCards } from '../../hooks/cards';
 import { KeyboardEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { Card } from '../Card';
@@ -100,6 +100,7 @@ export function CardList({ cards, column, listType, listId, name }: CardsListPro
 
 export default function Column({ column, board, title, index }: ColumnProps) {
   const { mutateAsync: deleteColumnAsync } = useDeleteColumn();
+  const { mutateAsync: sortColumnByVotesAsync } = useSortByVotes();
   const { openDialog } = useDialogs();
   const { refetch } = useBoard(board.id);
   const { cards } = useCards(column.id);
@@ -138,6 +139,19 @@ export default function Column({ column, board, title, index }: ColumnProps) {
     });
   };
 
+  const sortColumnByVotes = async (columnId: string) => {
+    openDialog('confirmation', {
+      title: 'Are you sure?',
+      message: 'Are you sure you want to sort the column by votes?',
+      onSuccess: async () => {
+        await sortColumnByVotesAsync({ columnId });
+        await refetch();
+      },
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      onCancel: () => {},
+    });
+  };
+
   const onInputKeyPress = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (!e.shiftKey && e.code === 'Enter') {
       e.preventDefault();
@@ -148,6 +162,10 @@ export default function Column({ column, board, title, index }: ColumnProps) {
 
   const ActionItems = useMemo<ActionMenuItem[]>(() => {
     return [
+      {
+        title: 'Sort Column By Votes',
+        action: () => sortColumnByVotes(column.id),
+      },
       isBoardOwner
         ? {
             title: 'Delete Column',
@@ -155,7 +173,7 @@ export default function Column({ column, board, title, index }: ColumnProps) {
           }
         : null,
     ].filter((a) => a != null) as ActionMenuItem[];
-  }, [column.id, deleteColumn, isBoardOwner]);
+  }, [column.id, deleteColumn, isBoardOwner, sortColumnByVotes]);
 
   const hasDraftCards = cards?.find((card) => card.draft === true) != null;
 

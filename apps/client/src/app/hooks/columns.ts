@@ -57,3 +57,16 @@ export const useReorderColumn = (boardId?: string) => {
     });
   });
 };
+
+export type SortByVotesArgs = {
+  columnId: string;
+};
+
+export const useSortByVotes = () => {
+  const { board } = useBoardState();
+
+  return useMutation((args: SortByVotesArgs) => {
+    const columnId = args.columnId;
+    return apiClient.delete(`/boards/${board?.id}/columns/${columnId}/sortbyvotes`);
+  });
+};
