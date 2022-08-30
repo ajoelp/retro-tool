@@ -64,7 +64,7 @@ function useDebounceWithCalls<T extends GenericFunction>(fn: T, timeout = 300) {
       }
       setCalls((c) => c + 1);
       timer.current = setTimeout(async () => {
-        setCalls(0);
+        setCalls(1);
         fn(...args);
       }, 300);
     },

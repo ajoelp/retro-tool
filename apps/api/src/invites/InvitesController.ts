@@ -1,4 +1,4 @@
-import { ApiRequest } from './../types/ApiRequest.d';
+import { ApiRequest } from '../types/ApiRequest';
 import { User } from '@prisma/client';
 import { Response } from 'express';
 import { NotFoundError } from '../errors/NotFoundError';

@@ -7,11 +7,15 @@ import { useActiveUsers } from '../../hooks/users';
 import { ContainerWidth, NavHeight } from '../../theme/sizes';
 import { Avatar, AvatarGroup } from '../Avatar';
 import { useColorPreferences } from '../../hooks/useDarkMode';
-import { MoonIcon, SunIcon } from '@heroicons/react/solid';
+import {FilterIcon, MoonIcon, SunIcon} from '@heroicons/react/solid';
 import { Button } from '../Button';
 import { Tooltip } from '../Tooltip';
 import { Timer } from '../Timer';
 import { useActionItems } from '../../hooks/action-items';
+import {TextInput} from "../inputs/TextInput";
+import {useCopyToClipboard, useLocation} from "react-use";
+import ActionMenu from "../ActionMenu";
+import {useUpdateBoard} from "../../hooks/boards";
 
 const NavigationWrapper = styled.div`
   margin: 1rem auto;
@@ -38,6 +42,11 @@ export function Navigation() {
   const activeUsers = useActiveUsers(board!.id);
   const { theme, toggleTheme } = useColorPreferences();
   const { data: actionItems } = useActionItems(board?.id);
+  const [, copy] = useCopyToClipboard();
+  const location = useLocation()
+  const {updateBoard} = useUpdateBoard(board?.id)
+
+  const inviteCode = `${location.origin}/invites/${board?.inviteCode}`;
 
   const DarkModeIcon = theme === 'dark' ? SunIcon : MoonIcon;
 
@@ -52,9 +61,12 @@ export function Navigation() {
   if (!board) return null;
 
   return (
-    <NavigationWrapper>
-      <div className="flex-1">
+    <div className="flex items-center flex-shrink px-4">
+      <div className="flex-1 flex items-center gap-4">
         <p className="text-2xl font-bold">{board.title}</p>
+        <div className="inline-flex items-center text-xs gap-2 rounded bg-gray-200 border border-gray-300">
+          <button className="p-1 border-l border-gray-300" onClick={() => copy(inviteCode)}>Copy Invite Code</button>
+        </div>
       </div>
       <AvatarContainer>
         <AvatarGroup max={5}>
@@ -79,19 +91,34 @@ export function Navigation() {
       >
         Action Items {actionItems?.length ? `(${actionItems.length})` : ''}
       </Button>
-      {isBoardOwner && (
-        <>
-          <Button size="sm" variant="white" className="ml-2" onClick={() => openDialog('boardInfo', { board })}>
-            Invite
+      <ActionMenu items={[
+        {
+          title: 'Sort by Most Recent',
+          active: (board?.settings as any)?.sortBy === 'createdAt',
+          action: () => { updateBoard({ settings: { sortBy: 'createdAt' }})},
+        },
+        {
+          title: 'Sort by Votes',
+          active: (board?.settings as any)?.sortBy === 'votes',
+          action: () => { updateBoard({ settings: { sortBy: 'votes' }})},
+        }
+      ]}>
+          <Button
+            size="sm"
+            variant="white"
+            className="ml-2 flex items-center gap-2"
+          >
+            <p>Sort By</p>
           </Button>
-          <Button size="sm" variant="white" className="ml-2" onClick={() => openDialog('boardExport', { board })}>
+      </ActionMenu>
+      {isBoardOwner && (
+        <Button size="sm" variant="white" className="ml-2" onClick={() => openDialog('boardExport', { board })}>
             Export
           </Button>
-        </>
       )}
       <AddColumnButton onClick={addColumn} data-testid="add_column_button">
         <AddIcon />
       </AddColumnButton>
-    </NavigationWrapper>
+    </div>
   );
 }

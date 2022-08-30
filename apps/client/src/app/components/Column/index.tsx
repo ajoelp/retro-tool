@@ -22,8 +22,6 @@ import orderBy from 'lodash/orderBy';
 import { Switch } from '@headlessui/react';
 import { Tooltip } from '../Tooltip';
 
-console.log(Switch);
-
 type ColumnProps = {
   column: ColumnType;
   board: Board;
@@ -49,11 +47,11 @@ const containerClasses = (isDragging: boolean) => {
 export function CardList({ cards, column, listType, listId, name }: CardsListProps) {
   const cardsRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const cardsContainerRef = useRef<HTMLDivElement | null>();
+  const { board } = useBoardState()
 
   useEffect(() => {
     const onFocus = (id: string) => {
       const htmlElement = cardsRefs.current[id];
-      const containerElement = cardsContainerRef.current;
       htmlElement?.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
@@ -66,7 +64,12 @@ export function CardList({ cards, column, listType, listId, name }: CardsListPro
     };
   }, []);
 
-  const sortedCards = orderBy(cards, 'createdAt');
+  const sort = useMemo<[string, 'asc' | 'desc']>(() => {
+    const value = (board?.settings as Record<string, any>)?.sortBy ?? 'createdAt'
+    return [value, value === 'createdAt' ? 'asc' as const : 'desc' as const]
+  }, [board?.settings])
+
+  const sortedCards = orderBy(cards, ...sort);
 
   return (
     <Droppable droppableId={listId} type={listType} isCombineEnabled={true}>

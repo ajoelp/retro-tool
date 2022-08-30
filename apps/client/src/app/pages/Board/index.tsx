@@ -19,6 +19,8 @@ import { BoardProvider } from '../../contexts/BoardProvider';
 import { Helmet } from 'react-helmet';
 import { Navigation } from '../../components/Navigation';
 import Column from '../../components/Column';
+import {Logo} from "../../components/Logo";
+import {Button} from "../../components/Button";
 
 const Wrapper = styled.div`
   flex: 1;
@@ -59,10 +61,11 @@ const Board = () => {
 
   if (isError) {
     return (
-      <Alert status="error">
-        <AlertIcon />
-        <AlertTitle mr={2}>Unauthorized.</AlertTitle>
-      </Alert>
+      <div className="w-screen h-screen flex flex-col items-center justify-center gap-4">
+        <Logo className='h-12 w-auto' />
+        <p className="text-lg">You do not have access to this page.</p>
+        <Button onClick={() => window.history.back()}>Go Back</Button>
+      </div>
     );
   }
   if (isLoading || columnsLoading) return <Spinner />;

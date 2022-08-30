@@ -46,10 +46,6 @@ const CardVotesContainer = styled.div`
   }
 `;
 
-const Loader = styled(Spinner)`
-  margin-right: 1rem;
-`;
-
 const CardVotesButton = styled.button`
   svg {
     height: 1rem;

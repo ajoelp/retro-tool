@@ -13,6 +13,7 @@ export const useBoard = (id?: string) => {
     },
     {
       enabled: id != null,
+      retry: false
     },
   );
 };
@@ -20,6 +21,9 @@ export const useBoard = (id?: string) => {
 type CreateBoardArgs = {
   title: string;
   columns: string[];
+  settings?: {
+    sortBy: 'createdAt' | 'votes'
+  }
 };
 
 export const useCreateBoard = () => {
@@ -29,6 +33,16 @@ export const useCreateBoard = () => {
   return {
     createBoard: mutateAsync,
     createBoardLoading: isLoading,
+  };
+};
+
+export const useUpdateBoard = (id?: string) => {
+  const { mutateAsync, isLoading } = useMutation((data: Partial<CreateBoardArgs>) =>
+    apiClient.patch(`/boards/${id}`, data),
+  );
+  return {
+    updateBoard: mutateAsync,
+    updateBoardLoading: isLoading,
   };
 };
 
