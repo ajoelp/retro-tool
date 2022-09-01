@@ -6,14 +6,13 @@ import { ColumnsRouter } from './columns/ColumnsRouter';
 import { CardsRouter } from './cards/CardsRouter';
 import { Server } from 'socket.io';
 import http from 'http';
-import globalErrorMiddleware, { buildError } from './middleware/globalErrorMiddleware';
+import globalErrorMiddleware from './middleware/globalErrorMiddleware';
 import { AuthRouter } from './auth/AuthRouter';
 import passport from 'passport';
 import helmet from 'helmet';
 import dependencies from './dependencies';
 import { InvitesRouter } from './invites/InvitesRouter';
 import { UsersRouter } from './users/UsersRouter';
-import expressSession from 'express-session';
 import { ActionItemRouter } from './action-items/ActionItemRouter';
 import {Analytics} from "./utils/Analytics";
 
@@ -24,17 +23,7 @@ const applyMiddleware = (app: Express) => {
   if (process.env.NODE_ENV !== 'test') {
     app.use(cors());
   }
-
-  app.use(
-    expressSession({
-      secret: process.env.TOKEN_SECRET,
-      resave: false,
-      saveUninitialized: true,
-      cookie: { secure: true },
-    }),
-  );
   app.use(passport.initialize());
-  app.use(passport.session());
   app.use(express.json());
   app.use(helmet());
   Analytics.init(app);
