@@ -24,4 +24,4 @@ jobs:
         with:
           tags: |
             ghcr.io/ajoelp/retro-tool:latest
-            ghcr.io/ajoelp/retro-tool:${{ github.head_ref }}.${{ github.sha }}
+            ghcr.io/ajoelp/retro-tool:${{ github.sha }}
