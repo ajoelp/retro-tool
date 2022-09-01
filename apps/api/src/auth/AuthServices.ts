@@ -3,21 +3,7 @@ import { ApiRequest } from '../types/ApiRequest';
 import { NextFunction, Response } from 'express';
 import { AuthenticationError } from '../errors/AuthenticationError';
 
-export const isAllowedToRegister = (organizations: string[] = []) => {
-  const allowedOrgs = (process.env.ALLOWED_ORGS || '').split(',').filter((org) => org !== '');
-
-  if (allowedOrgs.length <= 0) return true;
-  return !!organizations.find((organization) => {
-    return allowedOrgs.find((allowedOrg) => allowedOrg === organization);
-  });
-};
-
 export const githubStrategyCallback = async (_accessToken, _refreshToken, profile, done) => {
-  if (!isAllowedToRegister(profile.organizations)) {
-    done(new Error('Invalid organization'), null);
-    return;
-  }
-
   try {
     const user = await prisma.user.upsert({
       where: { email: profile.email },

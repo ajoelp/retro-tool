@@ -15,6 +15,7 @@ import { InvitesRouter } from './invites/InvitesRouter';
 import { UsersRouter } from './users/UsersRouter';
 import expressSession from 'express-session';
 import { ActionItemRouter } from './action-items/ActionItemRouter';
+import {Analytics} from "./utils/Analytics";
 
 const expressApp = express();
 
@@ -36,6 +37,7 @@ const applyMiddleware = (app: Express) => {
   app.use(passport.session());
   app.use(express.json());
   app.use(helmet());
+  Analytics.init(app);
 };
 
 applyMiddleware(expressApp);
@@ -50,6 +52,7 @@ expressApp.use(InvitesRouter);
 expressApp.use(UsersRouter);
 expressApp.use(ActionItemRouter);
 
+Analytics.sentryErrors(expressApp)
 expressApp.use(globalErrorMiddleware);
 
 const app = http.createServer(expressApp);

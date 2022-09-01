@@ -11,13 +11,11 @@ RUN apk update && apk add --no-cache \
   curl \
   bash \
   && rm -rf /var/cache/apk/*
-RUN curl -sfL https://install.goreleaser.com/github.com/tj/node-prune.sh | bash -s -- -b /usr/local/bin
 COPY package.json .
 COPY yarn.lock .
 COPY prisma/ ./
 RUN yarn install
 COPY --from=build /usr/src/app/dist ./src
-RUN /usr/local/bin/node-prune
 
 FROM node:16-alpine
 ENV NODE_ENV production
