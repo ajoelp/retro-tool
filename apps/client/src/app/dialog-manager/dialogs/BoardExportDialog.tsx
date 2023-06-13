@@ -35,7 +35,7 @@ export default function BoardExportDialog(props: BoardExportDialogProps) {
   };
 
   return (
-    <BaseDialog footer={footer} closeDialog={props.closeDialog}>
+    <BaseDialog footer={footer} closeDialog={props.closeDialog} size='md'>
       <h3
         className="text-lg leading-6 font-medium text-gray-900"
         id="modal-title"
@@ -44,9 +44,8 @@ export default function BoardExportDialog(props: BoardExportDialogProps) {
       </h3>
       <div className="mt-2">
         <textarea
-          className="resize border p-1 bg-transparent whitespace-pre rounded"
-          defaultValue={result}
-          readOnly={true}
+          className="resize-none border bg-transparent whitespace-pre rounded h-96 w-full"
+          value={result}
         ></textarea>
       </div>
     </BaseDialog>
