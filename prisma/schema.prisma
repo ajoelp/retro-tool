@@ -61,7 +61,7 @@ model Card {
   columnId  String
   order     Int
   parentId  String?
-  parent    Card?    @relation(fields: [parentId], references: [id])
+  parent    Card?    @relation("CardToCard", fields: [parentId], references: [id])
   children  Card[]   @relation("CardToCard")
   votes     Int      @default(0)
 }
