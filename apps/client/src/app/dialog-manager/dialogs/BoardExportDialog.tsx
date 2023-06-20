@@ -35,7 +35,7 @@ export default function BoardExportDialog(props: BoardExportDialogProps) {
   };
 
   return (
-    <BaseDialog footer={footer} closeDialog={props.closeDialog} size='md'>
+    <BaseDialog footer={footer} closeDialog={props.closeDialog}>
       <h3
         className="text-lg leading-6 font-medium text-gray-900"
         id="modal-title"
