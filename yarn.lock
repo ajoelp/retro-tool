@@ -2748,15 +2748,10 @@
   resolved "https://registry.yarnpkg.com/@prisma/engines/-/engines-3.15.1-1.461d6a05159055555eb7dfb337c9fb271cbd4d7e.tgz#f691893df506b93e3cb1ccc15ec6e5ac64e8e570"
   integrity sha512-NHlojO1DFTsSi3FtEleL9QWXeSF/UjhCW0fgpi7bumnNZ4wj/eQ+BJJ5n2pgoOliTOGv9nX2qXvmHap7rJMNmg==
 
-"@prisma/engines@3.15.1-1.461d6a05159055555eb7dfb337c9fb271cbd4d7e":
+"@prisma/fetch-engine@3.15.1-1.461d6a05159055555eb7dfb337c9fb271cbd4d7e":
   version "3.15.1-1.461d6a05159055555eb7dfb337c9fb271cbd4d7e"
-  resolved "https://registry.yarnpkg.com/@prisma/engines/-/engines-3.15.1-1.461d6a05159055555eb7dfb337c9fb271cbd4d7e.tgz#f691893df506b93e3cb1ccc15ec6e5ac64e8e570"
-  integrity sha512-NHlojO1DFTsSi3FtEleL9QWXeSF/UjhCW0fgpi7bumnNZ4wj/eQ+BJJ5n2pgoOliTOGv9nX2qXvmHap7rJMNmg==
-
-"@prisma/fetch-engine@2.31.0-32.2452cc6313d52b8b9a96999ac0e974d0aedf88db":
-  version "2.31.0-32.2452cc6313d52b8b9a96999ac0e974d0aedf88db"
-  resolved "https://registry.yarnpkg.com/@prisma/fetch-engine/-/fetch-engine-2.31.0-32.2452cc6313d52b8b9a96999ac0e974d0aedf88db.tgz#d5f5b18d273cb933eab134c46ca3bd65a006482c"
-  integrity sha512-MVlloe2gnnG8YpB9utDos0qnnHw05ud24OOu6jtXFcYIBJR4rd+7pmRTY5TgD76RnbWH4rNzD5NL1xAiXMTZKA==
+  resolved "https://registry.yarnpkg.com/@prisma/fetch-engine/-/fetch-engine-3.15.1-1.461d6a05159055555eb7dfb337c9fb271cbd4d7e.tgz#7cd322ae805ba357f409c1747ac8a0a8076b4004"
+  integrity sha512-/Xi9sTBjTm3RexDO8lm/XSO67OUqHRemf74cwOcyLCwLGydrkmZF2IT1whppHG7+xqwrQn7cNzWSf/+7FB3fcA==
   dependencies:
     "@prisma/debug" "3.14.0"
     "@prisma/get-platform" "3.15.1-1.461d6a05159055555eb7dfb337c9fb271cbd4d7e"

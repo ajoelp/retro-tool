@@ -52,7 +52,8 @@ describe('CardMiddlware', () => {
       const response = {} as Response;
       const nextFunction = jest.fn();
 
-      expect(() =>
+      expect.assertions(1);
+      await expect(() =>
         canEditCard(request, response, nextFunction),
       ).rejects.toEqual(expect.any(Error));
     });
@@ -64,8 +65,9 @@ describe('CardMiddlware', () => {
 
       const response = {} as Response;
       const nextFunction = jest.fn();
-
-      expect(() =>
+      
+      expect.assertions(1);
+      await expect(() =>
         canEditCard(request, response, nextFunction),
       ).rejects.toEqual(expect.any(Error));
     });
@@ -78,7 +80,8 @@ describe('CardMiddlware', () => {
       const response = {} as Response;
       const nextFunction = jest.fn();
 
-      expect(() =>
+      expect.assertions(1);
+      await expect(() =>
         canEditCard(request, response, nextFunction),
       ).rejects.toEqual(expect.any(Error));
     });
@@ -91,23 +94,17 @@ describe('CardMiddlware', () => {
           avatar: '',
         },
       });
-      const cardWithWrongOwner = await prisma.card.create({
-        data: {
-          content: '',
-          columnId: column.id,
-          ownerId: differentOwner.id,
-          order: 2,
-        },
-      });
+
       const request = {
-        params: { cardId: cardWithWrongOwner.id },
-        user,
+        params: { cardId: card.id },
+        user: differentOwner,
       } as unknown as ApiRequest;
 
       const response = {} as Response;
       const nextFunction = jest.fn();
 
-      expect(() =>
+      expect.assertions(1);
+      await expect(() =>
         canEditCard(request, response, nextFunction),
       ).rejects.toEqual(expect.any(Error));
     });
